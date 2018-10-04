@@ -4,29 +4,31 @@ import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import pt.unl.fct.ciai.companies.Company;
 
 @Entity
-public class Contact   {
+public class Contact {
 
 	@Id
-	//@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GenericGenerator(name="contact_id_increment", strategy="increment")
+	@GeneratedValue(generator="contact_id_increment")
 	private Long id;
 	private String name;
-
-	public Contact id(Long id) {
-		this.id = id;
-		this.name = null;
-		return this;
-	}
+	@ManyToOne
+	@JoinColumn(name = "company_id")
+	@JsonBackReference
+	private Company company;
 
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Contact name(String name) {
@@ -42,6 +44,19 @@ public class Contact   {
 		this.name = name;
 	}
 
+	public Contact company(Company company) {
+		this.company = company;
+		return this;
+	}
+	
+	public Company getCompany() {
+		return this.company;
+	}
+	
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+	
 
 	@Override
 	public boolean equals(Object o) {
@@ -53,12 +68,13 @@ public class Contact   {
 		}
 		Contact contact = (Contact) o;
 		return Objects.equals(this.id, contact.id) &&
-				Objects.equals(this.name, contact.name);
+				Objects.equals(this.name, contact.name)
+				&& Objects.equals(this.company, contact.company);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name);
+		return Objects.hash(id, name, company);
 	}
 
 	@Override
@@ -68,6 +84,7 @@ public class Contact   {
 
 		sb.append("    id: ").append(toIndentedString(id)).append("\n");
 		sb.append("    name: ").append(toIndentedString(name)).append("\n");
+		sb.append("    company: ").append(toIndentedString(company)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

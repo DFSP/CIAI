@@ -4,11 +4,16 @@ import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import pt.unl.fct.ciai.contacts.Contact;
 
@@ -16,22 +21,15 @@ import pt.unl.fct.ciai.contacts.Contact;
 public class Company {
 
 	@Id
-	//@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GenericGenerator(name="company_id_increment", strategy="increment")
+	@GeneratedValue(generator="company_id_increment")
 	private Long id;
 	private String name;
 	private String address;
 	private String email;
-	@ElementCollection
+	@JsonManagedReference
+	@OneToMany(cascade = CascadeType.ALL, mappedBy="company", fetch=FetchType.EAGER)
 	private List<Contact> contacts;
-
-	public Company id(Long id) {
-		this.id = id;
-		this.name = null;
-		this.address = null;
-		this.email = null;
-		this.contacts = null;
-		return this;
-	}
 
 	public Long getId() {
 		return id;
