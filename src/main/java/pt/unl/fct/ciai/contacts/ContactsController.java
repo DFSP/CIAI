@@ -1,6 +1,5 @@
 package pt.unl.fct.ciai.contacts;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +16,11 @@ import pt.unl.fct.ciai.exceptions.NotFoundException;
 @RequestMapping(value = "/contacts")
 public class ContactsController { //implements ContactsApi {
 
-	@Autowired
-	private ContactsRepository contacts;
+	private final ContactsRepository contacts;
+
+	public ContactsController(ContactsRepository contacts) {
+		this.contacts = contacts;
+	}
 
 	@GetMapping
 	public Iterable<Contact> getContacts(@RequestParam(value = "search", required = false) String search) {
@@ -27,19 +29,19 @@ public class ContactsController { //implements ContactsApi {
 
 	@GetMapping(value = "/{id}")
 	public Contact getContact(@PathVariable("id") Long id) {
-		return contacts.findById(id).orElseThrow(NotFoundException::new);
+		return contacts.findById(id).orElseThrow(() -> new NotFoundException(String.format("Contact with id %d does not exist", id)));
 	}
-	
+
 	@PutMapping(value = "/{id}")
 	public void updateContact(@PathVariable("id") Long id, @RequestBody Contact contact) {
-		if (!id.equals(contact.getId())) {
-			throw new BadRequestException();
-		} else {
-			contacts.findById(id).orElseThrow(NotFoundException::new);
+		if (id.equals(contact.getId())) {
+			contacts.findById(id).orElseThrow(() -> new NotFoundException(String.format("Contact with id %d does not exist", id)));
 			contacts.save(contact);
+		} else {
+			throw new BadRequestException(String.format("Path id %d does not match contact id %d", id, contact.getId()));
 		}
 	}
-	
+
 	@DeleteMapping(value = "/{id}")
 	public void deleteContact(@PathVariable("id") Long id) {
 		contacts.deleteById(id);

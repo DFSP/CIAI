@@ -1,9 +1,5 @@
 package pt.unl.fct.ciai.companies;
 
-
-import java.util.Collections;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +18,12 @@ import pt.unl.fct.ciai.exceptions.NotFoundException;
 @RequestMapping("/companies")
 public class CompaniesController { //implements CompaniesApi {
 
-	@Autowired
-	private CompaniesRepository companies;
+	private final CompaniesRepository companies;
 
+	public CompaniesController(CompaniesRepository companies) {
+		this.companies = companies;
+	}
+	
 	@GetMapping
 	public Iterable<Company> getCompanies(@RequestParam(value = "search", required = false) String search) {
 		return search == null ? companies.findAll() : companies.searchCompanies(search);
@@ -64,7 +63,7 @@ public class CompaniesController { //implements CompaniesApi {
 		if (search == null) {
 			contacts = company.getContacts();
 		} else {
-			contacts = companies.searchContacts(company, search);
+			contacts = companies.searchContacts(search);
 		}
 		return contacts;
 	}
