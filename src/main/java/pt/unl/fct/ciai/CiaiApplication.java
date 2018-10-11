@@ -30,7 +30,6 @@ public class CiaiApplication implements CommandLineRunner {
 		ciai.addContact(ciaiContact);
 		companies.save(ciai);
 		
-		
 		Company fct = new Company().name("fct").email("fct@fct.unl.pt").address("fct");
 		Contact fctContact = new Contact().name("contactfct").company(fct);
 		fct.addContact(fctContact);
