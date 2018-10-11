@@ -6,14 +6,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.GenericGenerator;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import pt.unl.fct.ciai.contacts.Contact;
 
@@ -21,14 +16,12 @@ import pt.unl.fct.ciai.contacts.Contact;
 public class Company {
 
 	@Id
-	@GenericGenerator(name="company_id_increment", strategy="increment")
-	@GeneratedValue(generator="company_id_increment")
+	@GeneratedValue
 	private Long id;
 	private String name;
 	private String address;
 	private String email;
-	@JsonManagedReference
-	@OneToMany(cascade = CascadeType.ALL, mappedBy="company", fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private List<Contact> contacts;
 
 	public Long getId() {

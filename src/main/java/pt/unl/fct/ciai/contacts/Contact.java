@@ -5,12 +5,9 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import pt.unl.fct.ciai.companies.Company;
 
@@ -18,13 +15,11 @@ import pt.unl.fct.ciai.companies.Company;
 public class Contact {
 
 	@Id
-	@GenericGenerator(name="contact_id_increment", strategy="increment")
-	@GeneratedValue(generator="contact_id_increment")
+	@GeneratedValue
 	private Long id;
 	private String name;
+	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "company_id")
-	@JsonBackReference
 	private Company company;
 
 	public Long getId() {

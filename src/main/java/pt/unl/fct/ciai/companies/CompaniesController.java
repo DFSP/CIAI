@@ -17,7 +17,7 @@ import pt.unl.fct.ciai.exceptions.NotFoundException;
 @RestController
 @RequestMapping("/companies")
 public class CompaniesController { //implements CompaniesApi {
-
+	
 	private final CompaniesRepository companies;
 
 	public CompaniesController(CompaniesRepository companies) {
@@ -36,43 +36,40 @@ public class CompaniesController { //implements CompaniesApi {
 
 	@GetMapping(value = "/{id}")
 	public Company getCompany(@PathVariable("id") Long id) {
-		return companies.findById(id).orElseThrow(NotFoundException::new);
+		return findCompanyOrThrowException(id);
 	}
 
 	@PutMapping(value = "/{id}")
 	public void updateCompany(@PathVariable("id") Long id, @RequestBody Company company) {
 		if (id.equals(company.getId())) {
-			companies.findById(id).orElseThrow(NotFoundException::new);
+			findCompanyOrThrowException(id);
 			companies.save(company);
 		}
 		else {
-			throw new BadRequestException();
+			throw new BadRequestException(String.format("Path id %d does not match company id %d", id, company.getId()));
 		}
 	}
 
 	@DeleteMapping(value = "/{id}")
 	public void deleteCompany(@PathVariable("id") Long id) {
-		companies.findById(id).orElseThrow(NotFoundException::new);
+		findCompanyOrThrowException(id);
 		companies.deleteById(id);
 	}
 
 	@GetMapping(value = "/{id}/contacts")
 	public Iterable<Contact> getCompanyContacts(@PathVariable("id") Long id, @RequestParam(value = "search", required = false) String search) {
-		Iterable<Contact> contacts;
-		Company company = companies.findById(id).orElseThrow(NotFoundException::new);
-		if (search == null) {
-			contacts = company.getContacts();
-		} else {
-			contacts = companies.searchContacts(search);
-		}
-		return contacts;
+		return search == null ? findCompanyOrThrowException(id).getContacts() : companies.searchContacts(search);
 	}
 
 	@PostMapping(value = "/{id}/contacts")
 	public void addCompanyContact(@PathVariable("id") Long id, @RequestBody Contact contact) {
-		Company c = companies.findById(id).orElseThrow(NotFoundException::new);
-		c.addContact(contact);
-		companies.save(c);
+		Company company = findCompanyOrThrowException(id);
+		company.addContact(contact);
+		companies.save(company);
+	}
+	
+	private Company findCompanyOrThrowException(Long id) {
+		return companies.findById(id).orElseThrow(() -> new NotFoundException(String.format("Company with id %d not found", id)));
 	}
 
 }

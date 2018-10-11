@@ -29,13 +29,13 @@ public class ContactsController { //implements ContactsApi {
 
 	@GetMapping(value = "/{id}")
 	public Contact getContact(@PathVariable("id") Long id) {
-		return contacts.findById(id).orElseThrow(() -> new NotFoundException(String.format("Contact with id %d does not exist", id)));
+		return findContactOrThrowException(id);
 	}
 
 	@PutMapping(value = "/{id}")
 	public void updateContact(@PathVariable("id") Long id, @RequestBody Contact contact) {
 		if (id.equals(contact.getId())) {
-			contacts.findById(id).orElseThrow(() -> new NotFoundException(String.format("Contact with id %d does not exist", id)));
+			findContactOrThrowException(id);
 			contacts.save(contact);
 		} else {
 			throw new BadRequestException(String.format("Path id %d does not match contact id %d", id, contact.getId()));
@@ -44,7 +44,12 @@ public class ContactsController { //implements ContactsApi {
 
 	@DeleteMapping(value = "/{id}")
 	public void deleteContact(@PathVariable("id") Long id) {
+		findContactOrThrowException(id);
 		contacts.deleteById(id);
+	}
+	
+	private Contact findContactOrThrowException(Long id) {
+		return contacts.findById(id).orElseThrow(() -> new NotFoundException(String.format("Contact with id %d does not exist", id)));
 	}
 
 }
