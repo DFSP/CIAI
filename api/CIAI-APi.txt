@@ -1,0 +1,35 @@
+CIAI Proj1 - API Documentation (Tentative)
+
+
+GET /users - Lists all users in the system.
+POST /users - Creates a new user in the system. The request body must include all necessary attributes.
+PUT /users/{id} - Updates the user with {id} having values in the payload.
+DELETE /users/{id} - Deletes user with {id}.
+
+GET /partners - Lists all partner companies in the system.
+POST /partners - Creates a new partner company in the system. The request body must include all necessary attributes.
+PUT /partners/{id} - Updates partner company with {id} having values in the payload.
+DELETE /partners/{id} - Deletes partner company with {id}.
+
+GET /partners/{id}/employees - Lists all employees of partner company with {id}.
+POST /partners/{id}/employees - Creates a new employee in partner company with {id}. The request body must include all necessary attributes.
+PUT /partners/{pid}/employees/{eid} - Updates employee with {eid} of partner company with {pid}, having values in the payload.
+DELETE /partners/{pid}/employees/{eid} - Deletes employee with {eid} from partner company with {pid}.
+
+GET /proposals - Lists all proposals in the system.
+POST /proposals - Creates a new proposal in the system. The request body must include all necessary attributes.
+PUT /proposals/{id} - Updates the proposal with {id} having values in the payload.
+DELETE /proposals/{id} - Deletes proposal with {id}.
+
+GET /proposals/{evid}/reviews - Lists all reviews of proposal with {evid} in the system.
+POST /proposals/{evid}/reviews - Creates a new review in proposal with {evid}. The request body must include all necessary attributes.
+PUT /proposals/{evid}/reviews/{rid} - Updates the review with {rid} in proposal with {evid}, having values in the payload.
+DELETE /proposals/{evid}/reviews/{rid} - Deletes review with {rid} in proposal with {evid}.
+
+POST /proposals/{evid}/reviewer- Associates a new reviewer to proposal with {evid}. The request body must include all necessary attributes.
+DELETE /proposals/{evid}/reviewer/{rid} - Deletes reviewer with {rid} in proposal with {evid}.
+
+GET /proposals/{evid}/comments - Lists all comments of proposal with {evid} in the system.
+POST /proposals/{evid}/comments - Creates a new comment in proposal with {evid}. The request body must include all necessary attributes.
+PUT /proposals/{evid}/comments/{cid} - Updates the comment with {cid} in proposal with {evid}, having values in the payload.
+DELETE /proposals/{evid}/comments/{cid} - Deletes comment with {cid} in proposal with {evid}.

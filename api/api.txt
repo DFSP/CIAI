@@ -1,0 +1,82 @@
+Entidades:
+- User (Admin, Reviewer?, Approver, Standard)
+- Company
+- Employee
+- Event?
+- Event Proposal
+- Event Review
+- Event Comment
+- Event Comment Reply?
+
+
+- User
+GET /users - Obter todos os utilizadores do sistema
+GET /users?search=<criteria> - Obter todos os utilizadores que satisfazem o critério
+GET /users/{id} - Obter o utilizador com id {id}
+POST /users - Adicionar um utilizador ao sistema. O corpo do Post contém todos os atributos obrigatórios
+PUT /users{id} - Atualizar o utilizador com id {id} com os atributos que vão no corpo do PUT
+DELETE /users{id} - Remover o utilizador com id {id} do sistema
+
+- Partner Company
+GET /partners - Obter todas as empresas parceiras
+GET /partners?search=<criteria> - Obter todas as empresas parceiras que satisfazem o critério
+GET /partners/{id} - Obter a empresa parceira com id {id}
+POST /partners - Adicionar uma empresa parceira. O corpo do POST contém todos os atributos necessários
+PUT /partners/{id} - Atualizar a empresa parceira com id {id} com os atributos que vão no corpo do PUT
+DELETE /partners/{id} - Remover a empresa parceira com id {id}
+
+- Employee
+GET /employees - Obter todos os empregados
+GET /employees?search=<criteria> - Obter todos os empregados que satisfazem o critério
+GET /employees/{id} - Obter o empregado com id {id}
+PUT /employees/{id} - Atualizar o empregado com id {id} com os atributos que vão no corpo do PUT
+DELETE /employees/{id} - Remover o empregado com id {id}
+
+- Company Employee
+GET /partners/{id}/employees - Obter todos os empregados da empresa com id {id}
+GET /partners/{id}/employees?search=<criteria> - Obter todos os empregados da empresa com id {id} que satisfazem o critério
+POST /partners/{id}/employees - Adicionar um empregado à empresa com id {id}. Os dados do empregado vão no método do POST
+
+- Event Proposal
+GET /proposals - Obter todas as propostas de eventos
+GET /proposals/{id} - Obter a proposta de evento com id {id}
+GET /proposals?search=<criteria> - Obter as propostas de eventos que satisfazem o critério
+POST /proposals - Adicionar uma proposta de evento. Todos os dados necessarios vão no corpo do POST
+PUT /proposals/{id} - Atualizar a proposta de evento com id {id}. Os dados a atualizar vão no corpo do PUT
+DELETE /proposals/{id} - Remover a proposta com id {id}
+
+- Review
+GET /reviews - Obter todos os reviews de propostas
+GET /reviews?search=<criteria> - Obter todos os reviews que satisfazem o critério
+GET /reviews/{id} - Obter o review com id {id}
+PUT /reviews/{id} - Atualizar o review com id {id} com os atributos que vão no corpo do PUT
+DELETE /reviews/{id} - Remover o review com id {id}
+
+- Event Proposal Review
+GET /proposals/{id}/reviews - Obter todos os reviews da proposta com id {id}
+GET /proposals/{id}/reviews?search=<criteria> - Obter todos os reviews da proposta com id {id} que satisfazem o critério
+POST /proposals/{id}/reviews - Adicionar uma review à proposta com id {id}. Os dados necessários à review vão no corpo do método
+
+- Comment
+GET /comments - Obter todos os comentários de propostas
+GET /comments/{id} - Obter o comentário com id {id}
+GET /comments?search=<criteria> - Obter os comentários que satisfazem o critério 
+PUT /comments/{id} - Atualizar o comentário que tem id {id}
+DELETE /comments/{id} - Apagar o comentário com id {id}
+
+- Event Proposal Comment
+GET /proposals/{id}/comments - Obter todos os comentários da proposta com id {id}
+GET /proposals/{id}/comments?search=<criteria> - Obter os comentários da proposta com id {id} que satisfazem o critéro
+POST /proposals/{id}/comments - Adicionar um comentário à proposta com id {id}. Todos os dados obrigatórios vão no corpo do POST
+
+- Reply
+GET /replies - Obter todas as respostas a comentários de propostas
+GET /replies/{id} - Obter a resposta com id {id}
+GET /replies?search=<criteria> - Obter todas as respostas que satisfazem o critério
+PUT /replies/{id} - Atualizar a resposta com id {id}
+DELETE /replies/{id} - Apagar a resposta com id {id}
+
+- Event Proposal Comment Reply
+GET /comments/{id}/replies - Obter todas as respostas ao comentário com id {id}
+GET /comments/{id}/replies?search=<criteria> - Obter as respostas ao comentário com id {id} que satisfazem o critério 
+POST /comments/{id}/replies - Adicionar uma resposta ao comentário com id {id}

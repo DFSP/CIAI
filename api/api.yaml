@@ -1,0 +1,224 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: ECMA's Events
+  description: API da aplicação gerida pela companhia de marketing ECMA para a gestão da organização de eventos com a colaboração das suas companhias parceiras.
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: Users
+    description: Todas as operações sobre utilizadores no sistema
+  - name: Partner Company
+    description: Operações sobre as companhias parceiras
+  - name: Employee
+    description: Operações sobre os trabalhadores das companhias parceiras
+  - name: Event Proposal
+    description: Todas as operações sobre as propostas de eventos
+  - name: Event Proposal Review
+    description: Operações sobre as revisões de propostas de eventos
+  - name: Event Proposal Comment
+    description: Operações sobre comentários a propostas de eventos
+  - name: Event Proposal Comment Reply
+    description: Operações sobre respostas a comentários de propostas de eventos
+paths:
+  /users:
+    get:
+      tags: 
+        - Users
+      description: Obter todos os utilizadores do sistema
+      operationId: getUsers
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar os utilizadores que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre os utilizadores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: 
+        - Users
+      description: Adicionar um utilizador ao sistema
+      operationId: addUser
+      requestBody:
+        description: Todos os necessários dados do utilizador
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Utilizador adicionado com sucesso
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}:
+    get:
+      tags: 
+        - Users
+      description: Obter o utilizador identificado pelo {id}
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação do utilizador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Users
+      description: Atualizar o utilizador identificado pelo {id}
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user
+          in: query
+          description: Objeto utilizador que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Utilizador atualizado
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: 
+        - Users
+      description: Remover do sistema o utilizador identificado pelo {id}
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Utilizador removido
+        '404':
+          description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    User:
+      ## TODO mais campos
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: user1
+    Partner Company:
+      ## TODO mais campos
+      required:
+        - name
+        - address
+        - email
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: ECMA
+        address:
+          type: string
+          example: Long Street
+        email:
+          type: string
+          example: info@ecma.com
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+    Employee:
+      ## TODO mais campos
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: John
+    Event Proposal:
+      ## TODO
+    Event Proposal Review:
+      ## TODO
+    Event Proposal Comment:
+      ## TODO
+    Event Proposal Comment Reply:
+      ## TODO
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
