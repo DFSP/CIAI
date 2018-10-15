@@ -171,7 +171,7 @@ paths:
           description: Filtrar as empresas que satisfazem o critério
           required: false
           schema:
-            type: array
+            type: array ## TODO array?
             items:
               type: string
       responses:
@@ -686,12 +686,82 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/proposals/{id}/comments':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter todos os comentários da proposta de evento identificada pelo {id}'
+      operationId: getEventProposalComments
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: criteria
+          in: query
+          description: Filtrar os comentários que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com os comentários da proposta de evento em questão
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalComment'
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Event Proposal
+      description: 'Adicionar um comentário à proposta de evento identificada pelo {id}'
+      operationId: addEventProposalComment
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Todos os necessários dados do comentário
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposalComment'
+      responses:
+        '200':
+          description: Comentário adicionado com sucesso
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /reviews:
     get:
       tags:
         - Event Proposal Review
       description: Obter todas as reviews do sistema
-      operationId: getEventProposalsReviews
+      operationId: getReviews
       parameters:
         - name: criteria
           in: query
@@ -721,7 +791,7 @@ paths:
       tags:
         - Event Proposal Review
       description: 'Obter review identificada pelo {id}'
-      operationId: getEventProposalReview
+      operationId: getReview
       parameters:
         - name: id
           in: path
@@ -749,11 +819,11 @@ paths:
       tags:
         - Event Proposal Review
       description: 'Atualizar review identificada pelo {id}'
-      operationId: updateEventProposalReview
+      operationId: updateReview
       parameters:
         - name: id
           in: path
-          description: Identificador da review a remover
+          description: Identificador da review a atualizar
           required: true
           schema:
             type: integer
@@ -781,7 +851,7 @@ paths:
       tags:
         - Event Proposal Review
       description: 'Remover do sistema a review identificada pelo {id}'
-      operationId: deleteEventProposalReview
+      operationId: deleteReview
       parameters:
         - name: id
           in: path
@@ -801,9 +871,125 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /comments:
+    get:
+      tags:
+        - Event Proposal Comment
+      description: Obter todos os comentários a propostas de eventos
+      operationId: getComments
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar os comentários que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre os comentários de propostas de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalComment'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/comments/{id}':
+    get:
+      tags:
+        - Event Proposal Comment
+      description: 'Obter o comentário identificado pelo {id}'
+      operationId: getComment
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do comentário a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação do comentário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalComment'
+        '404':
+          description: Comentário não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Event Proposal Comment
+      description: 'Atualizar o comentário identificado pelo {id}'
+      operationId: updateComment
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do comentário a atualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: comment
+          in: query
+          description: Objeto comentário que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/EventProposalComment'
+      responses:
+        '200':
+          description: Comentário atualizado
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Comentário não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal Comment
+      description: 'Remover do sistema o comentário identificado pelo {id}'
+      operationId: deleteComment
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do comentário a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Comentário removido
+        '404':
+          description: Comentário não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     User:
+    ## TODO CAMPOS
       required:
         - name
       properties:
@@ -814,6 +1000,7 @@ components:
           type: string
           example: user1
     PartnerCompany:
+    ## TODO CAMPOS
       required:
         - name
         - address
@@ -838,6 +1025,7 @@ components:
             $ref: '#/components/schemas/Employee'
           readOnly: true
     Employee:
+    ## TODO CAMPOS
       required:
         - name
       properties:
@@ -849,9 +1037,13 @@ components:
           type: string
           example: John
     EventProposal: null
+    ## TODO CAMPOS
     EventProposalReview: null
-    EvenProposalComment: null
+    ## TODO CAMPOS
+    EventProposalComment: null
+    ## TODO CAMPOS
     EventProposalCommentReply: null
+    ## TODO CAMPOS
     Error:
       required:
         - code
