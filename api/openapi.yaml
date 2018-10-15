@@ -171,7 +171,7 @@ paths:
           description: Filtrar as empresas que satisfazem o critério
           required: false
           schema:
-            type: array ##TODO array?
+            type: array
             items:
               type: string
       responses:
@@ -200,7 +200,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPartnerCompany'
+              $ref: '#/components/schemas/PartnerCompany'
       responses:
         '200':
           description: Empresa adicionada com sucesso
@@ -353,7 +353,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewEmployee'
+              $ref: '#/components/schemas/Employee'
       responses:
         '200':
           description: Empregado adicionado com sucesso
@@ -804,7 +804,6 @@ paths:
 components:
   schemas:
     User:
-    ## TODO mais campos
       required:
         - name
       properties:
@@ -814,13 +813,16 @@ components:
         name:
           type: string
           example: user1
-    NewPartnerCompany:
-    ## TODO mais campos
+    PartnerCompany:
       required:
         - name
         - address
         - email
       properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
         name:
           type: string
           example: ECMA
@@ -830,43 +832,26 @@ components:
         email:
           type: string
           example: info@ecma.com
-    PartnerCompany:
-      allOf:
-        - $ref: '#/components/schemas/NewPartnerCompany'
-      required:
-        - id
-      properties:
-        id:
-          type: integer
-          format: int64
         employees:
           type: array
           items:
             $ref: '#/components/schemas/Employee'
-    NewEmployee:
+          readOnly: true
+    Employee:
       required:
         - name
-      properties:
-        name:
-          type: string
-          example: John
-    Employee:
-      allOf:
-        - $ref: '#/components/schemas/NewEmployee'
-      required:
-        - id
       properties:
         id:
           type: integer
           format: int64
-    EventProposal:  
-      ## TODO
-    EventProposalReview:  
-      ## TODO
-    EvenProposalComment:  
-      ## TODO
-    EventProposalCommentReply:  
-      ## TODO
+          readOnly: true
+        name:
+          type: string
+          example: John
+    EventProposal: null
+    EventProposalReview: null
+    EvenProposalComment: null
+    EventProposalCommentReply: null
     Error:
       required:
         - code
