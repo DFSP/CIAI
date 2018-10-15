@@ -11,7 +11,7 @@ tags:
   - name: Partner Company
     description: Operações sobre as companhias parceiras
   - name: Employee
-    description: Operações sobre os trabalhadores das companhias parceiras
+    description: Operações sobre os empregados das companhias parceiras
   - name: Event Proposal
     description: Todas as operações sobre as propostas de eventos
   - name: Event Proposal Review
@@ -157,7 +157,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                
   /partners:
     get:
       tags:
@@ -181,7 +180,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Partner%20Company'
+                  $ref: '#/components/schemas/PartnerCompany'
         default:
           description: Erro não esperado
           content:
@@ -199,7 +198,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Partner%20Company'
+              $ref: '#/components/schemas/NewPartnerCompany'
       responses:
         '200':
           description: Empresa adicionada com sucesso
@@ -229,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Partner%20Company''
+                $ref: '#/components/schemas/PartnerCompany'
         '404':
           description: Empresa não encontrada
         default:
@@ -241,29 +240,29 @@ paths:
     put:
       tags:
         - Partner Company
-      description: Atualizar o utilizador identificado pelo {id}
-      operationId: updateUser
+      description: Atualizar a empresa identificada pelo {id}
+      operationId: updatePartnerCompany
       parameters:
         - name: id
           in: path
-          description: Identificador do utilizador a remover
+          description: Identificador da empresa a remover
           required: true
           schema:
             type: integer
             format: int64
         - name: user
           in: query
-          description: Objeto utilizador que é atualizado
+          description: Objeto da empresa que é atualizada
           required: true
           schema:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/PartnerCompany'
       responses:
         '200':
-          description: Utilizador atualizado
+          description: Empresa atualizada
         '400':
           description: Id especificado inválido
         '404':
-          description: Utilizador não encontrado
+          description: Empresa não encontrada
         default:
           description: Erro não esperado
           content:
@@ -294,6 +293,192 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /partners/{id}/employees:
+    get:
+      tags: 
+        - Partner Company
+      description: Obter todos os empregados da empresa parceira identificada pelo {id}
+      operationId: getCompanyEmployees
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa parceira
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: criteria
+          in: query
+          description: Filtrar os empregados que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com as informações dos empregados da empresa em questão
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '404':
+          description: Empresa não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: 
+        - Partner Company
+      description: Adicionar um empregado à companhia parceira identificada pelo {id}
+      operationId: addEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa parceira
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Todos os necessários dados do empregado
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEmployee'
+      responses:
+        '200':
+          description: Empregado adicionado com sucesso
+        '404':
+          description: Empresa não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      
+  /employee:
+    get:
+      tags: 
+        - Employee
+      description: Obter todos os empregados de empresas parceiras
+      operationId: getEmployees
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar os empregados que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre os empregados de empresas parceiras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /employee/{id}:
+    get:
+      tags: 
+        - Employee
+      description: Obter o empregado identificado pelo {id}
+      operationId: getEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do empregado a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação do empregado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Empregado não encontrado no sistema
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Employee
+      description: Atualizar o empregado identificado pelo {id}
+      operationId: updateEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do empregado a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user
+          in: query
+          description: Objeto do empregado que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: Informações do empregado atualizadas
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Empregado não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: 
+        - Employee
+      description: Remover do sistema o empregado identificado pelo {id}
+      operationId: deleteEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do empregado a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Empregado removido
+        '404':
+          description: Empregado não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
 components:
   schemas:
     User:
@@ -307,18 +492,13 @@ components:
         name:
           type: string
           example: user1
-    New Partner Company:
-      
-    Partner Company:
+    NewPartnerCompany:
       ## TODO mais campos
       required:
         - name
         - address
         - email
       properties:
-        id:
-          type: integer
-          format: int64
         name:
           type: string
           example: ECMA
@@ -328,28 +508,42 @@ components:
         email:
           type: string
           example: info@ecma.com
+    PartnerCompany:
+      allOf:
+        - $ref: '#/components/schemas/NewPartnerCompany'
+      required:
+        - id
+      properties:
+        id: 
+          type: integer
+          format: int64
         employees:
           type: array
           items:
             $ref: '#/components/schemas/Employee'
-    Employee:
-      ## TODO mais campos
+    NewEmployee:
       required:
         - name
+      properties:
+        name:
+          type: string
+          example: John
+    Employee:
+      allOf:
+        - $ref: '#/components/schemas/NewEmployee'
+      required:
+        - id
       properties:
         id:
           type: integer
           format: int64
-        name:
-          type: string
-          example: John
-    Event Proposal:
+    EventProposal:
       ## TODO
-    Event Proposal Review:
+    EventProposalReview:
       ## TODO
-    Event Proposal Comment:
+    EvenProposalComment:
       ## TODO
-    Event Proposal Comment Reply:
+    EventProposalCommentReply:
       ## TODO
     Error:
       required:
