@@ -1,10 +1,12 @@
-openapi: "3.0.0"
+openapi: 3.0.0
 info:
   version: 1.0.0
   title: ECMA's Events
-  description: API da aplicação gerida pela companhia de marketing ECMA para a gestão da organização de eventos com a colaboração das suas companhias parceiras.
+  description: >-
+    API da aplicação gerida pela companhia de marketing ECMA para a gestão da
+    organização de eventos com a colaboração das suas companhias parceiras.
 servers:
-  - url: http://localhost:8080/
+  - url: 'http://localhost:8080/'
 tags:
   - name: Users
     description: Todas as operações sobre utilizadores no sistema
@@ -23,7 +25,7 @@ tags:
 paths:
   /users:
     get:
-      tags: 
+      tags:
         - Users
       description: Obter todos os utilizadores do sistema
       operationId: getUsers
@@ -52,7 +54,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags: 
+      tags:
         - Users
       description: Adicionar um utilizador ao sistema
       operationId: addUser
@@ -72,11 +74,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /users/{id}:
+  '/users/{id}':
     get:
-      tags: 
+      tags:
         - Users
-      description: Obter o utilizador identificado pelo {id}
+      description: 'Obter o utilizador identificado pelo {id}'
       operationId: getUser
       parameters:
         - name: id
@@ -104,7 +106,7 @@ paths:
     put:
       tags:
         - Users
-      description: Atualizar o utilizador identificado pelo {id}
+      description: 'Atualizar o utilizador identificado pelo {id}'
       operationId: updateUser
       parameters:
         - name: id
@@ -134,9 +136,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags: 
+      tags:
         - Users
-      description: Remover do sistema o utilizador identificado pelo {id}
+      description: 'Remover do sistema o utilizador identificado pelo {id}'
       operationId: deleteUser
       parameters:
         - name: id
@@ -169,7 +171,7 @@ paths:
           description: Filtrar as empresas que satisfazem o critério
           required: false
           schema:
-            type: array ##TODO array?
+            type: array
             items:
               type: string
       responses:
@@ -188,7 +190,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags: 
+      tags:
         - Partner Company
       description: Adicionar uma companhia parceira ao sistema
       operationId: addPartnerCompany
@@ -208,11 +210,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /partners/{id}:
+  '/partners/{id}':
     get:
-      tags: 
+      tags:
         - Partner Company
-      description: Obter a empresa identificada pelo {id}
+      description: 'Obter a empresa identificada pelo {id}'
       operationId: getPartnerCompany
       parameters:
         - name: id
@@ -240,7 +242,7 @@ paths:
     put:
       tags:
         - Partner Company
-      description: Atualizar a empresa identificada pelo {id}
+      description: 'Atualizar a empresa identificada pelo {id}'
       operationId: updatePartnerCompany
       parameters:
         - name: id
@@ -270,9 +272,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags: 
+      tags:
         - Partner Company
-      description: Remover do sistema a empresa identificada pelo {id}
+      description: 'Remover do sistema a empresa identificada pelo {id}'
       operationId: deletePartnerCompany
       parameters:
         - name: id
@@ -293,11 +295,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /partners/{id}/employees:
+  '/partners/{id}/employees':
     get:
-      tags: 
+      tags:
         - Partner Company
-      description: Obter todos os empregados da empresa parceira identificada pelo {id}
+      description: 'Obter todos os empregados da empresa parceira identificada pelo {id}'
       operationId: getCompanyEmployees
       parameters:
         - name: id
@@ -333,9 +335,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags: 
+      tags:
         - Partner Company
-      description: Adicionar um empregado à companhia parceira identificada pelo {id}
+      description: 'Adicionar um empregado à companhia parceira identificada pelo {id}'
       operationId: addEmployee
       parameters:
         - name: id
@@ -363,10 +365,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      
   /employee:
     get:
-      tags: 
+      tags:
         - Employee
       description: Obter todos os empregados de empresas parceiras
       operationId: getEmployees
@@ -394,11 +395,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /employee/{id}:
+  '/employee/{id}':
     get:
-      tags: 
+      tags:
         - Employee
-      description: Obter o empregado identificado pelo {id}
+      description: 'Obter o empregado identificado pelo {id}'
       operationId: getEmployee
       parameters:
         - name: id
@@ -426,7 +427,7 @@ paths:
     put:
       tags:
         - Employee
-      description: Atualizar o empregado identificado pelo {id}
+      description: 'Atualizar o empregado identificado pelo {id}'
       operationId: updateEmployee
       parameters:
         - name: id
@@ -456,9 +457,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags: 
+      tags:
         - Employee
-      description: Remover do sistema o empregado identificado pelo {id}
+      description: 'Remover do sistema o empregado identificado pelo {id}'
       operationId: deleteEmployee
       parameters:
         - name: id
@@ -479,10 +480,330 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Employee'
+  /proposals:
+    get:
+      tags:
+        - Event Proposal
+      description: Obter todas as propostas de eventos do sistema
+      operationId: getEventProposals
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar as propostas de eventos que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre as propostas de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposal'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Event Proposal
+      description: Adicionar uma proposta de evento ao sistema
+      operationId: addEventProposal
+      requestBody:
+        description: Todos os necessários dados da proposta de evento
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposal'
+      responses:
+        '200':
+          description: Proposta de evento adicionada com sucesso
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{id}':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter a proposta de evento identificado pelo {id}'
+      operationId: getEventProposal
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação da proposta de evento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposal'
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Event Proposal
+      description: 'Atualizar a proposta de evento identificada pelo {id}'
+      operationId: updateEventProposal
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: proposal
+          in: query
+          description: Objeto proposta de evento que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/EventProposal'
+      responses:
+        '200':
+          description: Proposta de evento atualizada
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal
+      description: 'Remover do sistema a proposta de evento identificada pelo {id}'
+      operationId: deleteEventProposal
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Proposta de evento removida
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{id}/reviews':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter todas as reviews da proposta de evento identificada pelo {id}'
+      operationId: getEventProposalReviews
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: criteria
+          in: query
+          description: Filtrar as reviews que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com as reviews da proposta de evento em questão
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalReview'
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Event Proposal
+      description: 'Adicionar uma review à proposta de evento identificada pelo {id}'
+      operationId: addEventProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Todos os necessários dados da review
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposalReview'
+      responses:
+        '200':
+          description: Review adicionada com sucesso
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /reviews:
+    get:
+      tags:
+        - Event Proposal Review
+      description: Obter todas as reviews do sistema
+      operationId: getEventProposalsReviews
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar as reviews que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre as reviews de propostas de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalReview'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/reviews/{id}':
+    get:
+      tags:
+        - Event Proposal Review
+      description: 'Obter review identificada pelo {id}'
+      operationId: getEventProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da review a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação da review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalReview'
+        '404':
+          description: Review não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Event Proposal Review
+      description: 'Atualizar review identificada pelo {id}'
+      operationId: updateEventProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da review a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: proposal
+          in: query
+          description: Objeto review que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/EventProposalReview'
+      responses:
+        '200':
+          description: Review atualizada
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Review não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal Review
+      description: 'Remover do sistema a review identificada pelo {id}'
+      operationId: deleteEventProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da review a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Review removida
+        '404':
+          description: Review não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     User:
-      ## TODO mais campos
       required:
         - name
       properties:
@@ -493,7 +814,6 @@ components:
           type: string
           example: user1
     NewPartnerCompany:
-      ## TODO mais campos
       required:
         - name
         - address
@@ -514,7 +834,7 @@ components:
       required:
         - id
       properties:
-        id: 
+        id:
           type: integer
           format: int64
         employees:
@@ -537,14 +857,10 @@ components:
         id:
           type: integer
           format: int64
-    EventProposal:
-      ## TODO
-    EventProposalReview:
-      ## TODO
-    EvenProposalComment:
-      ## TODO
-    EventProposalCommentReply:
-      ## TODO
+    EventProposal: null
+    EventProposalReview: null
+    EvenProposalComment: null
+    EventProposalCommentReply: null
     Error:
       required:
         - code
