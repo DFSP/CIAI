@@ -171,7 +171,7 @@ paths:
           description: Filtrar as empresas que satisfazem o critério
           required: false
           schema:
-            type: array
+            type: array ##TODO array?
             items:
               type: string
       responses:
@@ -804,6 +804,7 @@ paths:
 components:
   schemas:
     User:
+    ## TODO mais campos
       required:
         - name
       properties:
@@ -814,6 +815,7 @@ components:
           type: string
           example: user1
     NewPartnerCompany:
+    ## TODO mais campos
       required:
         - name
         - address
@@ -857,10 +859,14 @@ components:
         id:
           type: integer
           format: int64
-    EventProposal: null
-    EventProposalReview: null
-    EvenProposalComment: null
-    EventProposalCommentReply: null
+    EventProposal:  
+      ## TODO
+    EventProposalReview:  
+      ## TODO
+    EvenProposalComment:  
+      ## TODO
+    EventProposalCommentReply:  
+      ## TODO
     Error:
       required:
         - code
