@@ -986,6 +986,191 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/comments/{id}/replies':
+    get:
+      tags:
+        - Event Proposal Comment
+      description: 'Obter todos as respostas ao comentário de propostas de eventos identificado pelo {id}'
+      operationId: getCommentReplies
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do comentário à proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: criteria
+          in: query
+          description: Filtrar as respostas que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com as respostas ao comentário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalCommentReply'
+        '404':
+          description: Comentário a proposta de evento não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Event Proposal Comment
+      description: 'Adicionar uma resposta ao comentário identificado pelo {id}'
+      operationId: addCommentReply
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do comentário
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Todos os necessários dados da resposta ao comentário
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventProposalCommentReply'
+      responses:
+        '200':
+          description: Resposta a comentário adicionada com sucesso
+        '404':
+          description: Comentário não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /replies:
+    get:
+      tags:
+        - Event Proposal Comment Reply
+      description: Obter todas as respostas a comentários de propostas de eventos
+      operationId: getReplies
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar as respostas que satisfazem o critério
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre as respostas a comentários de propostas de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventProposalCommentReply'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/replies/{id}':
+    get:
+      tags:
+        - Event Proposal Comment Reply
+      description: 'Obter a resposta identificada pelo {id}'
+      operationId: getReply
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da resposta a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação da resposta ao comentário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalCommentReply'
+        '404':
+          description: Resposta não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Event Proposal Comment Reply
+      description: 'Atualizar a resposta identificada pelo {id}'
+      operationId: updateReply
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da resposta a atualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: reply
+          in: query
+          description: Objeto resposta que é atualizada
+          required: true
+          schema:
+            $ref: '#/components/schemas/EventProposalCommentReply'
+      responses:
+        '200':
+          description: Resposta atualizada
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Resposta não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal Comment Reply
+      description: 'Remover do sistema a resposta identificada pelo {id}'
+      operationId: deleteReply
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da resposta a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Resposta removida
+        '404':
+          description: Resposta não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     User:
@@ -996,6 +1181,7 @@ components:
         id:
           type: integer
           format: int64
+          readOnly: true
         name:
           type: string
           example: user1
@@ -1036,14 +1222,34 @@ components:
         name:
           type: string
           example: John
-    EventProposal: null
+    EventProposal:
     ## TODO CAMPOS
-    EventProposalReview: null
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+    EventProposalReview:
     ## TODO CAMPOS
-    EventProposalComment: null
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+    EventProposalComment:
     ## TODO CAMPOS
-    EventProposalCommentReply: null
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+    EventProposalCommentReply:
     ## TODO CAMPOS
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
     Error:
       required:
         - code
