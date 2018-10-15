@@ -157,6 +157,143 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+                
+  /partners:
+    get:
+      tags:
+        - Partner Company
+      description: Obter todas as empresas parceiras
+      operationId: getPartnerCompanies
+      parameters:
+        - name: criteria
+          in: query
+          description: Filtrar as empresas que satisfazem o critério
+          required: false
+          schema:
+            type: array ##TODO array?
+            items:
+              type: string
+      responses:
+        '200':
+          description: Lista com a informação sobre as empresas parceiras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partner%20Company'
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: 
+        - Partner Company
+      description: Adicionar uma companhia parceira ao sistema
+      operationId: addPartnerCompany
+      requestBody:
+        description: Todos os necessários dados da empresa
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Partner%20Company'
+      responses:
+        '200':
+          description: Empresa adicionada com sucesso
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /partners/{id}:
+    get:
+      tags: 
+        - Partner Company
+      description: Obter a empresa identificada pelo {id}
+      operationId: getPartnerCompany
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação da empresa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner%20Company''
+        '404':
+          description: Empresa não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Partner Company
+      description: Atualizar o utilizador identificado pelo {id}
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user
+          in: query
+          description: Objeto utilizador que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Utilizador atualizado
+        '400':
+          description: Id especificado inválido
+        '404':
+          description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: 
+        - Partner Company
+      description: Remover do sistema a empresa identificada pelo {id}
+      operationId: deletePartnerCompany
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Empresa removida
+        '404':
+          description: Empresa não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     User:
@@ -170,6 +307,8 @@ components:
         name:
           type: string
           example: user1
+    New Partner Company:
+      
     Partner Company:
       ## TODO mais campos
       required:
