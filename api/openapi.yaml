@@ -1179,36 +1179,37 @@ components:
   schemas:
     User:
       required:
-        - name
-        - job
-        - email
-        - role
+        - firstname
+        - lastname
+        - username
+        - emailaddress
+        - passwordhash
       properties:
         id:
           type: integer
           format: int64
           readOnly: true
-        name:
+        firstname:
+          type: string
+          example: john
+        lastname:
+          type: string
+          example: smith
+        username:
           type: string
           example: user1
-        job:
-          type: string
-          example: CEO
-        email:
+        emailaddress:
           type: string
           example: user1@ecma.com
-        role:
+        passwordhash:
           type: string
-          description: User role
-          enum:
-          - Admin
-          - Approver
-          - Standard
+          example: $2y$12$95z6mYtPI371qXLCTWzP0elvLNv7Znh8dlwoseWncIm2zQb4u94xS
     PartnerCompany:
       required:
         - name
-        - address
-        - email
+        - city
+        - zipcode
+        - streetaddress
       properties:
         id:
           type: integer
@@ -1217,12 +1218,22 @@ components:
         name:
           type: string
           example: ECMA
-        address:
+        city:
           type: string
-          example: Long Street
-        email:
+          example: Lisbon
+        streetaddress:
+          type: string
+          example: 'Long Street'
+        phone:
+          type: integer
+          format: int64
+          example: 212121212 
+        emailaddress:
           type: string
           example: info@ecma.com
+        fax:
+          type: string
+          example: 211212121
         employees:
           type: array
           items:
@@ -1230,19 +1241,63 @@ components:
           readOnly: true
     Employee:
       required:
-        - name
+        - userid
+        - companyid
+        - city
+        - zipcode
+        - streetaddress
+        - cellphone
+        - homephone
+        - gender
+        - salary
+        - birthday
+        - role
       properties:
         id:
           type: integer
           format: int64
           readOnly: true
-        name:
+        userid:
+          type: integer
+          format: int64
+        companyid:
+          type: integer
+          format: int64
+        city:
           type: string
-          example: John
+          example: Lisbon
+        zipcode:
+          type: string
+          example: '1000-260'
+        streetaddress:
+          type: string
+          example: 'Short Street'
+        cellphone:
+          type: integer
+          format: int64
+          example: 919191919
+        homephone:
+          type: integer
+          format: int64
+          example: 211111111
+        gender:
+          type: string
+          enum:
+          - M
+          - F
+        salary:
+          type: integer
+          format: int64
+          example: 5000
+          minimum: 0
+        birthday:
+          type: string
+          example: '2018-01-01'
+          format: date
+        role:
+          type: string
+          example: 'CEO'
     EventProposal:
-      required:
-        - title
-        - description
       properties:
         id:
           type: integer
@@ -1251,68 +1306,145 @@ components:
         isApproved:
           type: boolean
           default: false
-        title:
+        date:
           type: string
-        description:
-          type: string
-        goals:
-          type: string
-        material:
-          type: string
-        budget:
-          type: number
-          format: float
-        workPlan:
-          type: string
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+          format: date
           readOnly: true
-    EventProposalReview:
-      required:
-        - proposalId
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        proposalId:
-          type: integer
-          format: int64
         reviewers:
           type: array
           items:
             $ref: '#/components/schemas/User'
           readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventProposalDocument'
+          readOnly: true
+        staff:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          readOnly: true
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+          readOnly: true
+    EventProposalDocument:
+      required:
+        - title
+        - description
+        - goals
+        - material
+        - budget
+        - workplan
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        title:
+          type: string
+          example: 'Document nr1'
+        description:
+          type: string
+          example: 'Document for a new perfume promotion event'
+        goals:
+          type: string
+          example: 'Boost sales by getting costumers to buy the product'
+        material:
+          type: string
+          example: 'Perfume samples'
+        budget:
+          type: number
+          format: float
+          example: 5000
+        workplan:
+          type: string
+          example: 'Go to a place and promote the new perfume by letting interested people try it'
+    EventProposalReview:
+      required:
+        - proposalid
+        - reviewerid
+        - title
+        - text
+        - classification
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        proposalid:
+          type: integer
+          format: int64
+        reviewerid:
+          type: integer
+          format: int64
+        title:
+          type: string
+          example: 'Worst proposition ever'
+        text:
+          type: string
+          example: 'After analysing this proposition I came to the conclusion that this is not a very well-thought-out proposition because it lacks this and that'
+        summary:
+          type: string
+          example: 'A very bad proposition'
+        classification:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10
+          example: 0
+        date:
+          type: string
+          format: date
+          example: '2018-10-10'
     EventProposalComment:
       required:
-        - proposalId
+        - proposalid
+        - commenterid
+        - title
         - text
       properties:
         id:
           type: integer
           format: int64
           readOnly: true
-        proposalId:
+        proposalid:
           type: integer
           format: int64
+        commenterid:
+          type: integer
+          format: int64
+        title:
+          type: string
+          example: 'Workplan question'
         text:
           type: string
+          example: 'Hello, can someone involved give a bit more detail about the workplan?'
+        date:
+          type: string
+          format: date
+          example: '2018-10-15'
     EventProposalCommentReply:
       required:
-        - commentId
+        - commentid
         - text
       properties:
         id:
           type: integer
           format: int64
           readOnly: true
-        commentId:
+        commentid:
           type: integer
           format: int64
         text:
           type: string
+          example: 'Hi user1494, yes, this is our detailed workplan ...'
+        date:
+          type: string
+          format: date
+          example: '2018-10-11'
     Error:
       required:
         - code
