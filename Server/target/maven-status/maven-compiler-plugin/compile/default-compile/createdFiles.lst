@@ -1,0 +1,9 @@
+pt\unl\fct\ciai\contacts\ContactsRepository.class
+pt\unl\fct\ciai\exceptions\NotFoundException.class
+pt\unl\fct\ciai\companies\Company.class
+pt\unl\fct\ciai\contacts\ContactsController.class
+pt\unl\fct\ciai\exceptions\BadRequestException.class
+pt\unl\fct\ciai\companies\CompaniesController.class
+pt\unl\fct\ciai\companies\CompaniesRepository.class
+pt\unl\fct\ciai\CiaiApplication.class
+pt\unl\fct\ciai\contacts\Contact.class
