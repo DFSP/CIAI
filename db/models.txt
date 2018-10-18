@@ -1,0 +1,74 @@
+User:
+id pk
+firstName
+lastName
+userName
+emailAddress
+passwordHash
+
+Employee:
+id pk
+userId fk
+companyId fk
+city
+zipCode
+streetAddress
+cellPhone
+homePhone
+gender
+salary
+birthday
+role
+
+PartnerCompany:
+id pk
+name
+city
+zipCode
+streetAddress
+phone
+emailAddress
+fax
+list of employees
+
+EventProposal:
+id pk
+isApproved
+date
+list of documents
+list of reviewers
+list of users
+list of employees
+
+EventProposalDocument:
+id pk
+title
+description
+goals
+material
+budget
+workPlan
+
+EventProposalReview:
+id pk
+proposalId fk
+reviewerId fk
+title
+text
+summary
+classification
+date
+
+EventProposalComment:
+id pk
+proposalId fk
+commenterId fk
+title
+text
+date
+
+EventProposalCommentReply:
+id pk
+commentId fk
+text
+date
