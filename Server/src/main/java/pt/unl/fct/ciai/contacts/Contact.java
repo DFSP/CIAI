@@ -21,6 +21,8 @@ public class Contact {
 	@JsonIgnore
 	@ManyToOne
 	private Company company;
+    @JsonIgnore
+    private String password;
 
 	public Long getId() {
 		return id;
@@ -50,6 +52,19 @@ public class Contact {
 	
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+	
+	public Contact password(String password) {
+		this.password = password;
+		return this;
+	}
+	
+	public String getPassword() {
+		return this.password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 

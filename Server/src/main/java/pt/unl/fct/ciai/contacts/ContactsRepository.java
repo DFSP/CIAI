@@ -6,6 +6,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ContactsRepository extends CrudRepository<Contact, Long> {
 
+    Contact findByName(String name);
+	
 	@Query("SELECT c "
 			+ "FROM Contact c "
 			+ "WHERE c.id LIKE CONCAT('%',:search,'%') "
