@@ -1,10 +1,10 @@
-package pt.unl.fct.ciai.contacts;
+package pt.unl.fct.ciai.contact;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface ContactsRepository extends CrudRepository<Contact, Long> {
+public interface ContactRepository extends CrudRepository<Contact, Long> {
 
     Contact findByName(String name);
 	

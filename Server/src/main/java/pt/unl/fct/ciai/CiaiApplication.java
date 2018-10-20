@@ -6,18 +6,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import pt.unl.fct.ciai.companies.CompaniesRepository;
-import pt.unl.fct.ciai.companies.Company;
-import pt.unl.fct.ciai.contacts.Contact;
-import pt.unl.fct.ciai.contacts.ContactsRepository;
+import pt.unl.fct.ciai.company.CompanyRepository;
+import pt.unl.fct.ciai.company.Company;
+import pt.unl.fct.ciai.contact.Contact;
+import pt.unl.fct.ciai.contact.ContactRepository;
 
 @SpringBootApplication
 public class CiaiApplication implements CommandLineRunner {
 
 	@Autowired
-	private CompaniesRepository companies;
+	private CompanyRepository companies;
 	@Autowired
-	private ContactsRepository contacts;
+	private ContactRepository contacts;
     @Autowired
     private PasswordEncoder encoder;
     
@@ -27,14 +27,14 @@ public class CiaiApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		Company ciai = new Company().name("ciai").email("ciai@fct.unl.pt").address("fct");
-		Contact ciaiContact = new Contact().name("contact").password(encoder.encode("password1")).company(ciai);
-		ciai.addContact(ciaiContact);
-		companies.save(ciai);
-		contacts.save(ciaiContact);
-		
-		Company fct = new Company().name("fct").email("fct@fct.unl.pt").address("fct");
-		Contact fctContact = new Contact().name("contactfct").password(encoder.encode("password2")).company(fct);
+		Company ecma = new Company().name("ecma").email("ecma@ecma.pt").address("lisboa");
+		Contact ecmaContact = new Contact().name("ecmaContact").password(encoder.encode("password1")).company(ecma);
+		ecma.addContact(ecmaContact);
+		companies.save(ecma);
+		contacts.save(ecmaContact);
+
+		Company fct = new Company().name("fct").email("fct@fct.unl.pt").address("almada");
+		Contact fctContact = new Contact().name("fctContact").password(encoder.encode("password2")).company(fct);
 		fct.addContact(fctContact);
 		companies.save(fct);
 		contacts.save(fctContact);

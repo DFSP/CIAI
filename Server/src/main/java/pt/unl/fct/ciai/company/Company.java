@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.companies;
+package pt.unl.fct.ciai.company;
 
 import java.util.Objects;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import pt.unl.fct.ciai.contacts.Contact;
+import pt.unl.fct.ciai.contact.Contact;
 
 @Entity
 public class Company {

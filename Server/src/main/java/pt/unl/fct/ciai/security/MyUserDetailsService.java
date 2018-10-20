@@ -11,15 +11,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import pt.unl.fct.ciai.contacts.Contact;
-import pt.unl.fct.ciai.contacts.ContactsRepository;
+import pt.unl.fct.ciai.contact.Contact;
+import pt.unl.fct.ciai.contact.ContactRepository;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
-	private final ContactsRepository contacts;
+	private final ContactRepository contacts;
 
-    public MyUserDetailsService(ContactsRepository contacts) {
+    public MyUserDetailsService(ContactRepository contacts) {
         this.contacts = contacts;
     }
 

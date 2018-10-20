@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.companies;
+package pt.unl.fct.ciai.company;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import pt.unl.fct.ciai.contacts.Contact;
+import pt.unl.fct.ciai.contact.Contact;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
 
 @RestController
 @RequestMapping("/companies")
-public class CompaniesController { //implements CompaniesApi {
+public class CompanyController { //implements CompaniesApi {
 	
-	private final CompaniesRepository companies;
+	private final CompanyRepository companies;
 
-	public CompaniesController(CompaniesRepository companies) {
+	public CompanyController(CompanyRepository companies) {
 		this.companies = companies;
 	}
 	
@@ -64,6 +64,7 @@ public class CompaniesController { //implements CompaniesApi {
 	@PostMapping(value = "/{id}/contacts")
 	public void addCompanyContact(@PathVariable("id") Long id, @RequestBody Contact contact) {
 		Company company = findCompanyOrThrowException(id);
+		contact.setCompany(company);
 		company.addContact(contact);
 		companies.save(company);
 	}

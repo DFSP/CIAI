@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.contacts;
+package pt.unl.fct.ciai.contact;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +14,11 @@ import pt.unl.fct.ciai.exceptions.NotFoundException;
 
 @RestController
 @RequestMapping(value = "/contacts")
-public class ContactsController { //implements ContactsApi {
+public class ContactController { //implements ContactsApi {
 
-	private final ContactsRepository contacts;
+	private final ContactRepository contacts;
 
-	public ContactsController(ContactsRepository contacts) {
+	public ContactController(ContactRepository contacts) {
 		this.contacts = contacts;
 	}
 

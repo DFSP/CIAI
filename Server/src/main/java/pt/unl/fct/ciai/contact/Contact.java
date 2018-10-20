@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.contacts;
+package pt.unl.fct.ciai.contact;
 
 import java.util.Objects;
 
@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import pt.unl.fct.ciai.companies.Company;
+import pt.unl.fct.ciai.company.Company;
 
 @Entity
 public class Contact {
@@ -94,7 +94,7 @@ public class Contact {
 
 		sb.append("    id: ").append(toIndentedString(id)).append("\n");
 		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("    company: ").append(toIndentedString(company)).append("\n");
+		sb.append("    companyId: ").append(toIndentedString(company.getId())).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
