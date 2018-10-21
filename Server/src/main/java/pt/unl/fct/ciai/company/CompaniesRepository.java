@@ -5,8 +5,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import pt.unl.fct.ciai.contact.Contact;
+import pt.unl.fct.ciai.employee.Employee;
 
-public interface CompanyRepository extends CrudRepository<Company, Long> {
+public interface CompaniesRepository extends CrudRepository<Company, Long> {
 	
 	@Query("SELECT c "
 			+ "FROM Company c "
@@ -16,10 +17,10 @@ public interface CompanyRepository extends CrudRepository<Company, Long> {
 			+ "OR c.email LIKE CONCAT('%',:search,'%')")
 	Iterable<Company> searchCompanies(@Param(value = "search") String search);
 	
-	@Query("SELECT c2 "
-			+ "FROM Company c1 JOIN c1.contacts c2 "
-			+ "WHERE c2.id LIKE CONCAT('%',:search,'%') "
-			+ "OR c2.name LIKE CONCAT('%',:search,'%')")
-	Iterable<Contact> searchContacts(@Param(value = "search") String search);
+	@Query("SELECT e "
+			+ "FROM Company c JOIN c.employees e "
+			+ "WHERE e.id LIKE CONCAT('%',:search,'%') "
+			+ "OR e.name LIKE CONCAT('%',:search,'%')")
+	Iterable<Employee> searchEmployees(@Param(value = "search") String search);
 
 }

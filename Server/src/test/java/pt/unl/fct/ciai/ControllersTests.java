@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.unl.fct.ciai.company.Company;
-import pt.unl.fct.ciai.company.CompanyRepository;
+import pt.unl.fct.ciai.company.CompaniesRepository;
 import pt.unl.fct.ciai.contact.Contact;
 
 import org.junit.Assert;
@@ -34,7 +34,7 @@ public class ControllersTests {
 	@Autowired
 	private WebApplicationContext wac;
 	@Autowired
-	private CompanyRepository companies;
+	private CompaniesRepository companies;
 	private MockMvc mockMvc;
 	private ObjectMapper mapper;
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import pt.unl.fct.ciai.contact.Contact;
+import pt.unl.fct.ciai.employee.Employee;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
 
@@ -18,9 +18,9 @@ import pt.unl.fct.ciai.exceptions.NotFoundException;
 @RequestMapping("/companies")
 public class CompanyController { //implements CompaniesApi {
 	
-	private final CompanyRepository companies;
+	private final CompaniesRepository companies;
 
-	public CompanyController(CompanyRepository companies) {
+	public CompanyController(CompaniesRepository companies) {
 		this.companies = companies;
 	}
 	
@@ -56,16 +56,16 @@ public class CompanyController { //implements CompaniesApi {
 		companies.deleteById(id);
 	}
 
-	@GetMapping(value = "/{id}/contacts")
-	public Iterable<Contact> getCompanyContacts(@PathVariable("id") Long id, @RequestParam(value = "search", required = false) String search) {
-		return search == null ? findCompanyOrThrowException(id).getContacts() : companies.searchContacts(search);
+	@GetMapping(value = "/{id}/employees")
+	public Iterable<Employee> getCompanyEmployees(@PathVariable("id") Long id, @RequestParam(value = "search", required = false) String search) {
+		return search == null ? findCompanyOrThrowException(id).getEmployees() : companies.searchEmployees(search);
 	}
 
-	@PostMapping(value = "/{id}/contacts")
-	public void addCompanyContact(@PathVariable("id") Long id, @RequestBody Contact contact) {
+	@PostMapping(value = "/{id}/employees")
+	public void addCompanyEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
 		Company company = findCompanyOrThrowException(id);
-		contact.setCompany(company);
-		company.addContact(contact);
+		employee.setCompany(company);
+		company.addEmployee(employee);
 		companies.save(company);
 	}
 	

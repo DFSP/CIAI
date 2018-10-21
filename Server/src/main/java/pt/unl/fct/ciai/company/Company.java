@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import pt.unl.fct.ciai.contact.Contact;
+import pt.unl.fct.ciai.employee.Employee;
 
 @Entity
 public class Company {
@@ -19,10 +20,15 @@ public class Company {
 	@GeneratedValue
 	private Long id;
 	private String name;
+	private String city;
+	private String zipCode;
 	private String address;
+	private String phone; //+351 919229292
 	private String email;
+	private String fax;
+
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
-	private List<Contact> contacts;
+	private List<Employee> employees;
 
 	public Long getId() {
 		return id;
@@ -71,25 +77,25 @@ public class Company {
 		this.email = email;
 	}
 
-	public Company contacts(List<Contact> contacts) {
-		this.contacts = contacts;
+	public Company employees(List<Employee> employees) {
+		this.employees = employees;
 		return this;
 	}
 
-	public Company addContact(Contact contact) {
-		if (this.contacts == null) {
-			this.contacts = new ArrayList<Contact>();
+	public Company addEmployee(Employee employee) {
+		if (this.employees == null) {
+			this.employees = new ArrayList<Employee>();
 		}
-		this.contacts.add(contact);
+		this.employees.add(employee);
 		return this;
 	}
 
-	public List<Contact> getContacts() {
-		return contacts;
+	public List<Employee> getEmployees() {
+		return employees;
 	}
 
-	public void setContacts(List<Contact> contacts) {
-		this.contacts = contacts;
+	public void setEmployees(List<Employee> employees) {
+		this.employees = employees;
 	}
 
 
@@ -106,12 +112,12 @@ public class Company {
 				Objects.equals(this.name, company.name) &&
 				Objects.equals(this.address, company.address) &&
 				Objects.equals(this.email, company.email) &&
-				Objects.equals(this.contacts, company.contacts);
+				Objects.equals(this.employees, company.employees);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, address, email, contacts);
+		return Objects.hash(id, name, address, email, employees);
 	}
 
 	@Override
@@ -123,7 +129,7 @@ public class Company {
 		sb.append("    name: ").append(toIndentedString(name)).append("\n");
 		sb.append("    address: ").append(toIndentedString(address)).append("\n");
 		sb.append("    email: ").append(toIndentedString(email)).append("\n");
-		sb.append("    contacts: ").append(toIndentedString(contacts)).append("\n");
+		sb.append("    contacts: ").append(toIndentedString(employees)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

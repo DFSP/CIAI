@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import pt.unl.fct.ciai.company.CompanyRepository;
+import pt.unl.fct.ciai.company.CompaniesRepository;
 import pt.unl.fct.ciai.company.Company;
 import pt.unl.fct.ciai.contact.Contact;
 import pt.unl.fct.ciai.contact.ContactRepository;
@@ -15,7 +15,7 @@ import pt.unl.fct.ciai.contact.ContactRepository;
 public class CiaiApplication implements CommandLineRunner {
 
 	@Autowired
-	private CompanyRepository companies;
+	private CompaniesRepository companies;
 	@Autowired
 	private ContactRepository contacts;
     @Autowired
