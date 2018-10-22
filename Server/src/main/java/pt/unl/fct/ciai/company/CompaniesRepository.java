@@ -8,13 +8,20 @@ import pt.unl.fct.ciai.contact.Contact;
 import pt.unl.fct.ciai.employee.Employee;
 
 public interface CompaniesRepository extends CrudRepository<Company, Long> {
-	
+
+	// ?employees list?
 	@Query("SELECT c "
 			+ "FROM Company c "
 			+ "WHERE c.id LIKE CONCAT('%',:search,'%') "
 			+ "OR c.name LIKE CONCAT('%',:search,'%') "
 			+ "OR c.address LIKE CONCAT('%',:search,'%') "
-			+ "OR c.email LIKE CONCAT('%',:search,'%')")
+			+ "OR c.email LIKE CONCAT('%',:search,'%')"
+			+ "OR c.city LIKE CONCAT('%',:search,'%')"
+			+ "OR c.zipCode LIKE CONCAT('%',:search,'%')"
+			+ "OR c.phone LIKE CONCAT('%',:search,'%')"
+			+ "OR c.fax LIKE CONCAT('%',:search,'%')"
+	)
+
 	Iterable<Company> searchCompanies(@Param(value = "search") String search);
 	
 	@Query("SELECT e "

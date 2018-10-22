@@ -10,8 +10,9 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     @Query("SELECT u "
             + "FROM User u "
             + "WHERE u.id LIKE CONCAT('%',:search,'%') "
-            + "OR u.name LIKE CONCAT('%',:search,'%') "
-            + "OR u.address LIKE CONCAT('%',:search,'%') "
+            + "OR u.first_name LIKE CONCAT('%',:search,'%') "
+            + "OR u.last_name LIKE CONCAT('%',:search,'%') "
+            + "OR u.username LIKE CONCAT('%',:search,'%')"
             + "OR u.email LIKE CONCAT('%',:search,'%')")
     Iterable<User> searchUsers(@Param(value = "search") String search);
 }

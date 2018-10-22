@@ -98,6 +98,37 @@ public class Company {
 		this.employees = employees;
 	}
 
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getZipCode() {
+		return zipCode;
+	}
+
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -144,5 +175,7 @@ public class Company {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
+
 }
 

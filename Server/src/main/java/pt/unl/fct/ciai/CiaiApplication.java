@@ -27,16 +27,17 @@ public class CiaiApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		Company ecma = new Company().name("ecma").email("ecma@ecma.pt").address("lisboa");
-		Contact ecmaContact = new Contact().name("ecmaContact").password(encoder.encode("password1")).company(ecma);
-		ecma.addContact(ecmaContact);
-		companies.save(ecma);
-		contacts.save(ecmaContact);
+		//Company ecma = new Company().name("ecma").email("ecma@ecma.pt").address("lisboa");
+		//Contact ecmaContact = new Contact().name("ecmaContact").password(encoder.encode("password1")).company(ecma);
+		//ecma.addContact(ecmaContact);
+		//companies.save(ecma);
+		//contacts.save(ecmaContact);
 
-		Company fct = new Company().name("fct").email("fct@fct.unl.pt").address("almada");
+		/*Company fct = new Company().name("fct").email("fct@fct.unl.pt").address("almada");
 		Contact fctContact = new Contact().name("fctContact").password(encoder.encode("password2")).company(fct);
 		fct.addContact(fctContact);
 		companies.save(fct);
 		contacts.save(fctContact);
+		*/
 	}
 }
