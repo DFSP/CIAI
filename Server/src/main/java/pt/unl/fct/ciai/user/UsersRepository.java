@@ -7,6 +7,8 @@ import pt.unl.fct.ciai.company.Company;
 
 public interface UsersRepository extends CrudRepository<User, Long> {
 
+    User findByUsername(String username);
+
     @Query("SELECT u "
             + "FROM User u "
             + "WHERE u.id LIKE CONCAT('%',:search,'%') "

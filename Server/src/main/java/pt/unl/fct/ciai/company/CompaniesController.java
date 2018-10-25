@@ -16,11 +16,12 @@ import pt.unl.fct.ciai.exceptions.NotFoundException;
 
 @RestController
 @RequestMapping("/companies")
-public class CompanyController { //implements CompaniesApi {
+public class CompaniesController { //implements CompaniesApi {
 	
 	private final CompaniesRepository companies;
 
-	public CompanyController(CompaniesRepository companies) {
+
+	public CompaniesController(CompaniesRepository companies) {
 		this.companies = companies;
 	}
 	
@@ -61,8 +62,8 @@ public class CompanyController { //implements CompaniesApi {
 		return search == null ? findCompanyOrThrowException(id).getEmployees() : companies.searchEmployees(search);
 	}
 
-	@PostMapping(value = "/{id}/employees")
-	public void addCompanyEmployee(@PathVariable("id") Long id, @RequestBody Employee employee) {
+	@PostMapping(value = "/{id}/contacts")
+	public void addCompanyContact(@PathVariable("id") Long id, @RequestBody Employee employee) {
 		Company company = findCompanyOrThrowException(id);
 		employee.setCompany(company);
 		company.addEmployee(employee);

@@ -1,85 +1,40 @@
 package pt.unl.fct.ciai.company;
 
+import pt.unl.fct.ciai.employee.Employee;
+
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import pt.unl.fct.ciai.contact.Contact;
-import pt.unl.fct.ciai.employee.Employee;
+import javax.persistence.*;
 
 @Entity
 public class Company {
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 	private String name;
 	private String city;
 	private String zipCode;
 	private String address;
-	private String phone; //+351 919229292
+	private String phone;
 	private String email;
 	private String fax;
 
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private List<Employee> employees;
 
-	public Long getId() {
-		return id;
-	}
+	public Company(){}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Company name(String name) {
+	public Company(String name, String city, String zipCode, String address, String phone, String email, String fax) {
 		this.name = name;
-		return this;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Company address(String address) {
+		this.city = city;
+		this.zipCode = zipCode;
 		this.address = address;
-		return this;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public Company email(String email) {
+		this.phone = phone;
 		this.email = email;
-		return this;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public Company employees(List<Employee> employees) {
-		this.employees = employees;
-		return this;
+		this.fax = fax;
 	}
 
 	public Company addEmployee(Employee employee) {
@@ -90,12 +45,20 @@ public class Company {
 		return this;
 	}
 
-	public List<Employee> getEmployees() {
-		return employees;
+	public long getId() {
+		return id;
 	}
 
-	public void setEmployees(List<Employee> employees) {
-		this.employees = employees;
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getCity() {
@@ -114,6 +77,14 @@ public class Company {
 		this.zipCode = zipCode;
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public String getPhone() {
 		return phone;
 	}
@@ -122,12 +93,28 @@ public class Company {
 		this.phone = phone;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public String getFax() {
 		return fax;
 	}
 
 	public void setFax(String fax) {
 		this.fax = fax;
+	}
+
+	public List<Employee> getEmployees() {
+		return employees;
+	}
+
+	public void setEmployees(List<Employee> employees) {
+		this.employees = employees;
 	}
 
 	@Override
@@ -143,12 +130,15 @@ public class Company {
 				Objects.equals(this.name, company.name) &&
 				Objects.equals(this.address, company.address) &&
 				Objects.equals(this.email, company.email) &&
+				Objects.equals(this.fax, company.fax) &&
+				Objects.equals(this.zipCode, company.zipCode) &&
+				Objects.equals(this.phone, company.phone) &&
 				Objects.equals(this.employees, company.employees);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, address, email, employees);
+		return Objects.hash(id, name, address, phone, zipCode, fax, email, employees);
 	}
 
 	@Override
@@ -160,7 +150,7 @@ public class Company {
 		sb.append("    name: ").append(toIndentedString(name)).append("\n");
 		sb.append("    address: ").append(toIndentedString(address)).append("\n");
 		sb.append("    email: ").append(toIndentedString(email)).append("\n");
-		sb.append("    contacts: ").append(toIndentedString(employees)).append("\n");
+		sb.append("    employees: ").append(toIndentedString(employees)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

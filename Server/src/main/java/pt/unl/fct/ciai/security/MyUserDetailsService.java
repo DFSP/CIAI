@@ -10,17 +10,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.ciai.user.UsersRepository;
 
-import pt.unl.fct.ciai.contact.Contact;
-import pt.unl.fct.ciai.contact.ContactRepository;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
-	private final ContactRepository contacts;
+	private final UsersRepository users;
 
-    public MyUserDetailsService(ContactRepository contacts) {
-        this.contacts = contacts;
+    public MyUserDetailsService(UsersRepository users) {
+        this.users  = users;
     }
 
     @Override
@@ -32,11 +31,11 @@ public class MyUserDetailsService implements UserDetailsService {
         }
         else {
             // Now for the database user searching
-            Contact contact = contacts.findByName(username);
-            if (contact == null) {
+            pt.unl.fct.ciai.user.User user = users.findByUsername(username);
+            if (user == null) {
             	throw new UsernameNotFoundException(username);
             }
-            return new User(username, contact.getPassword(), Collections.emptyList());
+            return new User(username, user.getPassword(), Collections.emptyList());
         }
     }
 
