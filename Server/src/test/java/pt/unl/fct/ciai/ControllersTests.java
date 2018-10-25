@@ -1,8 +1,39 @@
 package pt.unl.fct.ciai;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import pt.unl.fct.ciai.company.CompaniesRepository;
+import pt.unl.fct.ciai.company.Company;
+import pt.unl.fct.ciai.employee.Employee;
+import pt.unl.fct.ciai.user.User;
 
-/*@RunWith(SpringRunner.class)
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class ControllersTests {
 
@@ -20,9 +51,15 @@ public class ControllersTests {
 
 		// Data Fixture
 		companies.deleteAll();
-		Company ecma = new Company().name("ecma").email("ecma@ecma.pt").address("lisboa");
-		companies.save(ecma);
-		Company fct = new Company().name("fct").email("fct@fct.unl.pt").address("almada");
+		Company ist = new Company();
+		ist.setName("ist");
+		ist.setEmail("ist@ist.pt");
+		ist.setAddress("lisboa");
+		companies.save(ist);
+		Company fct = new Company();
+        fct.setName("fct");
+        fct.setEmail("fct@fct.pt");
+        fct.setAddress("almada");
 		companies.save(fct);
 	}
 
@@ -40,58 +77,69 @@ public class ControllersTests {
 	public void testGetCompanies() throws Exception {
 		List<Company> companies = this.getCompanies();
 		List<String> companyNames = companies.stream().map(Company::getName).collect(Collectors.toList());
-		Assert.assertTrue(companyNames.contains("ecma"));
+		Assert.assertTrue(companyNames.contains("ist"));
 		Assert.assertTrue(companyNames.contains("fct"));
 	}
 
 	@Test
-	public void testAddContact() throws Exception {
+	public void testAddEmployee() throws Exception {
 		List<Company> companies = this.getCompanies();
 		long firstId = companies.get(0).getId();
-		// Add contact
-		Contact contact = new Contact().name("NewContact");
-		String json = mapper.writeValueAsString(contact);
-		this.mockMvc.perform(post("/companies/" + firstId + "/contacts")
+		// Add contact to a company {id}
+        User user = new User();
+        user.setUsername("NewEmployee");
+		Employee employee = new Employee();
+		employee.setUserId(user.getId());
+		String json = mapper.writeValueAsString(employee);
+		this.mockMvc.perform(post("/companies/" + firstId + "/employees")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(json))
 		.andExpect(status().isOk());
-		// Get contacts
-		this.mockMvc.perform(get("/companies/" + firstId + "/contacts"))
+		// Get employees from a company {id}
+		this.mockMvc.perform(get("/companies/" + firstId + "/employees"))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 		.andExpect(jsonPath("$", hasSize(1)))
-		.andExpect(jsonPath("$[0].name", is("NewContact")));
+		.andExpect(jsonPath("$[0].username").value("NewEmployee"));
+		//.andExpect(jsonPath("$[0].username".is("NewUser"));
 	}
 
 	@Test
-	public void testAddRemoveContacts() throws Exception {
+	public void testAddRemoveEmployees() throws Exception {
 		List<Company> companies = getCompanies();
 		long firstCompanyId = companies.get(0).getId();
-		// Add contact
-		Contact contact = new Contact().name("NewContact");
-		String json = mapper.writeValueAsString(contact);
-		this.mockMvc.perform(post("/companies/" + firstCompanyId + "/contacts")
+		// Add employee
+        User user = new User();
+        user.setUsername("NewEmployee");
+        Employee employee = new Employee();
+        employee.setUserId(user.getId());
+
+		String json = mapper.writeValueAsString(employee);
+		this.mockMvc.perform(post("/companies/" + firstCompanyId + "/employees")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(json))
 		.andExpect(status().isOk())
 		.andReturn();
-		// Get contacts and expect not empty list
-		final MvcResult result = this.mockMvc.perform(get("/companies/" + firstCompanyId + "/contacts"))
+		// Get employees from a company and expect not empty list
+		final MvcResult result = this.mockMvc.perform(get("/companies/" + firstCompanyId + "/employees"))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(jsonPath("$", hasSize(greaterThan(0))))
 				.andReturn();
 		String list = result.getResponse().getContentAsString();
-		List<Contact> contacts = mapper.readValue(list,new TypeReference<List<Contact>>(){});
-		// Delete contact
-		long firstContactId = contacts.get(0).getId();
-		this.mockMvc.perform(delete("/contacts/" + firstContactId))
+		List<Employee> employees = mapper.readValue(list,new TypeReference<List<Employee>>(){});
+		// Delete employee
+		long firstEmployeeId = employees.get(0).getId();
+
+		// TODO: delete of employees not on Employee, but in Company
+		this.mockMvc.perform(delete("/employees/" + firstEmployeeId))
 		.andExpect(status().isOk());
-		// Get contacts and expect empty list
-		this.mockMvc.perform(get("/companies/" + firstCompanyId + "/contacts/"))
+
+		// Get employees and expect empty list
+		this.mockMvc.perform(get("/companies/" + firstCompanyId + "/employees/"))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 		.andExpect(jsonPath("$", hasSize(0)));
 	}
-}*/
+}
 
