@@ -131,7 +131,8 @@ public class ControllersTests {
 		// Delete employee
 		long firstEmployeeId = employees.get(0).getId();
 
-		// TODO: delete of employees not on Employee, but in Company
+		// TODO: delete of employees not on Employee,
+        // but in Company -> this.mockMvc.perform(delete("/company/" + firstCompanyId + "/employees/" + firstEmployeeId))
 		this.mockMvc.perform(delete("/employees/" + firstEmployeeId))
 		.andExpect(status().isOk());
 
