@@ -12,6 +12,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Employee employee;
+
     private String first_name;
     private String last_name;
     private String username;
@@ -19,9 +22,6 @@ public class User {
     private String role;
     @JsonIgnore
     private String password;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Employee employee;
 
     public User(){}
 

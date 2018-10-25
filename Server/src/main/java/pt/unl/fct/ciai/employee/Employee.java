@@ -12,6 +12,17 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @JsonIgnore
+    @ManyToOne
+    private Company company;
+
+    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name="userId", insertable = false, updatable = false)
+    private User user;
+    // ID from user to link Employee to the correspondent UserTable
+    private long userId;
+
     private String city;
     private String address;
     private String zipCode;
@@ -20,18 +31,7 @@ public class Employee {
     private String gender;
     private double salary;
     private String birthday;
-    // ID from user to link Employee to the correspondent UserTable
-    private long userId;
 
-    @JsonIgnore
-    @ManyToOne
-    private Company company;
-
-
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name="userId", insertable = false, updatable = false)
-    private User user;
 
     public Employee(){}
 
