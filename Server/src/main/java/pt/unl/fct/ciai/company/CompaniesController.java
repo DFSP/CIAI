@@ -20,7 +20,6 @@ public class CompaniesController { //implements CompaniesApi {
 	
 	private final CompaniesRepository companies;
 
-
 	public CompaniesController(CompaniesRepository companies) {
 		this.companies = companies;
 	}

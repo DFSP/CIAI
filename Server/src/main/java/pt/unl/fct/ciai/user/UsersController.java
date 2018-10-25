@@ -1,7 +1,8 @@
 package pt.unl.fct.ciai.user;
 
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.exceptions.*;
+import pt.unl.fct.ciai.exceptions.BadRequestException;
+import pt.unl.fct.ciai.exceptions.NotFoundException;
 
 import java.util.Optional;
 
@@ -59,5 +60,4 @@ public class UsersController {
         } else
             throw new NotFoundException("User with id "+id+" does not exist.");
     }
-
 }

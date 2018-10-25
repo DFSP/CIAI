@@ -21,7 +21,6 @@ public class Company {
 	private String phone;
 	private String email;
 	private String fax;
-
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private List<Employee> employees;
 
@@ -165,7 +164,5 @@ public class Company {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
-
-
 }
 

@@ -6,12 +6,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
 
-    // ? lists documents reviews users employees ?
-    @Query("SELECT proposal "
-            + "FROM Proposal proposal "
-            + "WHERE proposal.id LIKE CONCAT('%',:search,'%') "
-            + "OR proposal.isApproved LIKE CONCAT('%',:search,'%') "
-            + "OR proposal.date LIKE CONCAT('%',:search,'%') "
-            )
+    @Query("SELECT p "
+            + "FROM Proposal p "
+            + "WHERE p.id LIKE CONCAT('%',:search,'%') "
+            + "OR p.isApproved LIKE CONCAT('%',:search,'%') "
+            + "OR p.date LIKE CONCAT('%',:search,'%') "
+    )
     Iterable<Proposal> searchProposals(@Param(value = "search") String search);
 }

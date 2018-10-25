@@ -1,40 +1,37 @@
 package pt.unl.fct.ciai.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import pt.unl.fct.ciai.employee.Employee;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class User {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     private String first_name;
     private String last_name;
     private String username;
     private String email;
+    private String role;
     @JsonIgnore
     private String password;
 
-    public User() {
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Employee employee;
 
-    public String getPassword() {
-        return password;
-    }
+    public User(){}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public User(String first_name, String last_name, String username, String email) {
+    public User(String first_name, String last_name, String username, String email, String role, String password) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.username = username;
         this.email = email;
+        this.role = role;
+        this.password = password;
     }
 
     public long getId() {
@@ -76,4 +73,29 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
 }

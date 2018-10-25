@@ -5,7 +5,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import pt.unl.fct.ciai.company.CompaniesRepository;
 import pt.unl.fct.ciai.company.Company;
 import pt.unl.fct.ciai.employee.Employee;
@@ -34,7 +33,6 @@ public class CiaiApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-
 		Company ist = new Company();
 		ist.setName("ist");
 		ist.setEmail("ist@ist.pt");
@@ -83,6 +81,5 @@ public class CiaiApplication implements CommandLineRunner {
 		System.out.println("employeeID > "+e1.get().getId()+" associated with user > "+e1.get().getUser().getUsername());
 		Optional<Employee> e2 = employees.findById(6l);
 		System.out.println("employeeID > "+e2.get().getId()+" associated with user > "+e2.get().getUser().getUsername());*/
-
 	}
 }

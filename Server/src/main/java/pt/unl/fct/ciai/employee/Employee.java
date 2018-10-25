@@ -2,77 +2,53 @@ package pt.unl.fct.ciai.employee;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import pt.unl.fct.ciai.company.Company;
+import pt.unl.fct.ciai.user.User;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import java.util.Date;
+import javax.persistence.*;
 
 @Entity
 public class Employee {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    private long userId;
-    private long companyId;
     private String city;
-    private String zipCode;
     private String address;
-    private String homePhone;
+    private String zipCode;
     private String cellPhone;
-
+    private String homePhone;
     private String gender;
-    private float salary;
-    private Date birthday;
-    private String role;
+    private double salary;
+    private String birthday;
+    // ID from user to link Employee to the correspondent UserTable
+    private long userId;
 
     @JsonIgnore
-    private String password;
-
     @ManyToOne
     private Company company;
 
-    public Employee() {
-    }
 
-    public Company getCompany() {
-        return company;
-    }
+    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name="userId", insertable = false, updatable = false)
+    private User user;
+
+    public Employee(){}
 
 
 
-    public Employee(long userId, long companyId, String city, String zipCode, String address,
-                    String homePhone, String cellPhone, String gender, float salary, Date birthday, String role) {
-        this.userId = userId;
-        this.companyId = companyId;
+    public Employee(String city, String address, String zipCode, String cellPhone,
+                    String homePhone, String gender, double salary, String birthday,
+                    long userId) {
         this.city = city;
-        this.zipCode = zipCode;
         this.address = address;
-        this.homePhone = homePhone;
+        this.zipCode = zipCode;
         this.cellPhone = cellPhone;
+        this.homePhone = homePhone;
         this.gender = gender;
         this.salary = salary;
         this.birthday = birthday;
-        this.role = role;
-
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public Employee(Company company) {
-        this.company = company;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        this.userId = userId;
     }
 
     public long getId() {
@@ -83,36 +59,12 @@ public class Employee {
         this.id = id;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    public long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(long companyId) {
-        this.companyId = companyId;
-    }
-
     public String getCity() {
         return city;
     }
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
     }
 
     public String getAddress() {
@@ -123,12 +75,12 @@ public class Employee {
         this.address = address;
     }
 
-    public String getHomePhone() {
-        return homePhone;
+    public String getZipCode() {
+        return zipCode;
     }
 
-    public void setHomePhone(String homePhone) {
-        this.homePhone = homePhone;
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
     }
 
     public String getCellPhone() {
@@ -139,6 +91,14 @@ public class Employee {
         this.cellPhone = cellPhone;
     }
 
+    public String getHomePhone() {
+        return homePhone;
+    }
+
+    public void setHomePhone(String homePhone) {
+        this.homePhone = homePhone;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -147,27 +107,39 @@ public class Employee {
         this.gender = gender;
     }
 
-    public float getSalary() {
+    public double getSalary() {
         return salary;
     }
 
-    public void setSalary(float salary) {
+    public void setSalary(double salary) {
         this.salary = salary;
     }
 
-    public Date getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
-    public String getRole() {
-        return role;
+    public Company getCompany() {
+        return company;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public User getUser(){
+        return user;
     }
 }

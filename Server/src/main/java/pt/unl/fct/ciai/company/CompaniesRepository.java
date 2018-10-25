@@ -4,12 +4,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-
 import pt.unl.fct.ciai.employee.Employee;
 
 public interface CompaniesRepository extends CrudRepository<Company, Long> {
 	
-
 	@Query("SELECT c "
 			+ "FROM Company c "
 			+ "WHERE c.id LIKE CONCAT('%',:search,'%') "
@@ -31,7 +29,6 @@ public interface CompaniesRepository extends CrudRepository<Company, Long> {
 			+ "OR e.salary LIKE CONCAT('%',:search,'%')"
 			+ "OR e.birthday LIKE CONCAT('%',:search,'%')"
 	)
-
 	Iterable<Employee> searchEmployees(@Param(value = "search") String search);
 
 }
