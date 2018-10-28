@@ -46,47 +46,57 @@ public class CiaiApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
+		
+		// Create ecma user
+		User ecmaUser = new User();
+		ecmaUser.setUsername("ecmaUser");
+		ecmaUser.setFirst_name("ecma");
+		ecmaUser.setLast_name("User");
+		ecmaUser.setPassword(encoder.encode("password1"));
+		users.save(ecmaUser);
+		
+		// Create ist company
 		Company ist = new Company();
 		ist.setName("ist");
 		ist.setEmail("ist@ist.pt");
 		ist.setAddress("lisboa");
 		companies.save(ist);
-
+		
 		// Create user
-		User istUser = new User();
-		istUser.setUsername("istUser");
-		istUser.setFirst_name("ist");
-		istUser.setLast_name("User");
-		istUser.setPassword(encoder.encode("password1"));
-		users.save(istUser);
+//		User istUser = new User();
+//		istUser.setUsername("istUser");
+//		istUser.setFirst_name("ist");
+//		istUser.setLast_name("User");
+//		istUser.setPassword(encoder.encode("password1"));
+//		users.save(istUser);
 
-		// Create employee and link to correspondent user
+		// Create employee
 		Employee istEmployee = new Employee();
 		istEmployee.setCompany(ist);
-		//istEmployee.setUserId(istUser.getId());
-		istEmployee.setUserId(users.findByUsername("istUser").getId());
+		istEmployee.setUsername("istUser");
+		istEmployee.setPassword("password2");
 		ist.addEmployee(istEmployee);
 		employees.save(istEmployee);
 
-
+		// Create fct company
 		Company fct = new Company();
 		fct.setName("fct");
 		fct.setEmail("fct@fct.pt");
 		fct.setAddress("almada");
 		companies.save(fct);
-
-		// Create user
-		User fctUser = new User();
-		fctUser.setUsername("fctUser");
-		fctUser.setFirst_name("fct");
-		fctUser.setLast_name("User");
-		fctUser.setPassword(encoder.encode("password2"));
-		users.save(fctUser);
+		
+//		User fctUser = new User();
+//		fctUser.setUsername("fctUser");
+//		fctUser.setFirst_name("fct");
+//		fctUser.setLast_name("User");
+//		fctUser.setPassword(encoder.encode("password2"));
+//		users.save(fctUser);
 
 		Employee fctEmployee = new Employee();
 		fctEmployee.setCompany(fct);
 		//fctEmployee.setUserId(fctUser.getId());
-		fctEmployee.setUserId(users.findByUsername("fctUser").getId());
+		istEmployee.setUsername("fctUser");
+		istEmployee.setPassword("password3");
 		fct.addEmployee(fctEmployee);
 		employees.save(fctEmployee);
 
@@ -96,6 +106,7 @@ public class CiaiApplication implements CommandLineRunner {
 		review1.setTitle("Review1");
 		review1.setSummary("Very good review");
 		//reviews.save(review1);
+
 
 		Proposal proposal1 = new Proposal();
 		review1.setProposal(proposal1);

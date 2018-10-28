@@ -1371,6 +1371,7 @@ components:
         - userName
         - emailAddress
         - passwordHash
+        - isAdmin
       properties:
         id:
           type: integer
@@ -1390,7 +1391,9 @@ components:
           example: user1@ecma.com
         passwordHash:
           type: string
-          example: '$2y$12$95z6mYtPI371qXLCTWzP0elvLNv7Znh8dlwoseWncIm2zQb4u94xS'
+          example: $2y$12$95z6mYtPI371qXLCTWzP0elvLNv7Znh8dlwoseWncIm2zQb4u94xS
+        isAdmin:
+          type: boolean
     PartnerCompany:
       required:
         - name
@@ -1410,14 +1413,14 @@ components:
           example: Lisbon
         zipCode:
           type: string
-          example: '1000-261'
+          example: 1000-261
         streetAddress:
           type: string
-          example: 'Long Street'
+          example: Long Street
         phone:
           type: integer
           format: int64
-          example: 212121212 
+          example: 212121212
         emailAddress:
           type: string
           example: info@ecma.com
@@ -1458,10 +1461,10 @@ components:
           example: Lisbon
         zipCode:
           type: string
-          example: '1000-260'
+          example: 1000-260
         streetAddress:
           type: string
-          example: 'Short Street'
+          example: Short Street
         cellPhone:
           type: integer
           format: int64
@@ -1473,8 +1476,8 @@ components:
         gender:
           type: string
           enum:
-          - M
-          - F
+            - M
+            - F
         salary:
           type: integer
           format: int64
@@ -1486,10 +1489,19 @@ components:
           format: date
         role:
           type: string
-          example: 'CEO'
+          example: CEO
     EventProposal:
+      required:
+        - documents
+        - staff
+        - members
+        - approverId
       properties:
         id:
+          type: integer
+          format: int64
+          readOnly: true
+        approverId:
           type: integer
           format: int64
           readOnly: true
@@ -1504,21 +1516,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EventProposalDocument'
-          readOnly: true
-        reviewers:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-          readOnly: true
         staff:
           type: array
           items:
             $ref: '#/components/schemas/User'
-          readOnly: true
         members:
           type: array
           items:
             $ref: '#/components/schemas/Employee'
+        reviewers:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
           readOnly: true
     EventProposalDocument:
       required:
@@ -1540,23 +1549,25 @@ components:
           readOnly: true
         title:
           type: string
-          example: 'Document nr1'
+          example: Document nr1
         description:
           type: string
-          example: 'Document for a new perfume promotion event'
+          example: Document for a new perfume promotion event
         goals:
           type: string
-          example: 'Boost sales by getting costumers to buy the product'
+          example: Boost sales by getting costumers to buy the product
         material:
           type: string
-          example: 'Perfume samples'
+          example: Perfume samples
         budget:
           type: number
           format: float
           example: 5000
         workPlan:
           type: string
-          example: 'Go to a place and promote the new perfume by allowing interested people to try it'
+          example: >-
+            Go to a place and promote the new perfume by allowing interested
+            people to try it
     EventProposalReview:
       required:
         - proposalId
@@ -1579,13 +1590,16 @@ components:
           readOnly: true
         title:
           type: string
-          example: 'Worst proposition ever'
+          example: Worst proposition ever
         text:
           type: string
-          example: 'After analysing this proposition I came to the conclusion that this is not a very well-thought-out proposition because it lacks this and that'
+          example: >-
+            After analysing this proposition I came to the conclusion that this
+            is not a very well-thought-out proposition because it lacks this and
+            that
         summary:
           type: string
-          example: 'A very bad proposition'
+          example: A very bad proposition
         classification:
           type: integer
           format: int32
@@ -1617,10 +1631,12 @@ components:
           readOnly: true
         title:
           type: string
-          example: 'Workplan question'
+          example: Workplan question
         text:
           type: string
-          example: 'Hello, can someone involved give a bit more detail about the workplan?'
+          example: >-
+            Hello, can someone involved give a bit more detail about the
+            workplan?
         date:
           type: string
           format: date
