@@ -6,6 +6,7 @@ import pt.unl.fct.ciai.employee.Employee;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id

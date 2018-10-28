@@ -1,6 +1,5 @@
-package pt.unl.fct.ciai.review;
+package pt.unl.fct.ciai.comment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import pt.unl.fct.ciai.proposal.Proposal;
@@ -8,8 +7,8 @@ import pt.unl.fct.ciai.proposal.Proposal;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "reviews")
-public class Review {
+@Table(name = "comments")
+public class Comment {
 
     @Id
     @GeneratedValue
@@ -20,22 +19,19 @@ public class Review {
     private Proposal proposal;
 
     //private long proposalId;
-    //private long reviewerId;
+    //private long commentatorId;
 
     private String title;
     private String text;
-    private String summary;
-    private double classification;
     private String date;
 
-    public Review(){ }
+    public Comment(){}
 
-    public Review(String title, String text, String summary, double classification, String date) {
+    public Comment(String title, String text, String date) {
         this.title = title;
         this.text = text;
-        this.summary = summary;
-        this.classification = classification;
         this.date = date;
+
     }
 
     public long getId() {
@@ -62,22 +58,6 @@ public class Review {
         this.text = text;
     }
 
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public double getClassification() {
-        return classification;
-    }
-
-    public void setClassification(double classification) {
-        this.classification = classification;
-    }
-
     public String getDate() {
         return date;
     }
@@ -93,4 +73,6 @@ public class Review {
     public void setProposal(Proposal proposal) {
         this.proposal = proposal;
     }
+
+
 }

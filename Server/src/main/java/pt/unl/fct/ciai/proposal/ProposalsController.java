@@ -1,8 +1,12 @@
 package pt.unl.fct.ciai.proposal;
 
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.ciai.comment.Comment;
+import pt.unl.fct.ciai.comment.CommentsRepository;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.review.Review;
+import pt.unl.fct.ciai.review.ReviewsRepository;
 
 import java.util.Optional;
 
@@ -11,10 +15,14 @@ import java.util.Optional;
 public class ProposalsController {
 
     private ProposalsRepository proposals;
+    private ReviewsRepository reviews;
+    private CommentsRepository comments;
 
-    public ProposalsController(ProposalsRepository proposals) {
+    public ProposalsController(ProposalsRepository proposals, ReviewsRepository reviews,
+                               CommentsRepository comments) {
         this.proposals = proposals;
-
+        this.reviews = reviews;
+        this.comments = comments;
     }
 
     @GetMapping("")
@@ -61,4 +69,31 @@ public class ProposalsController {
         } else
             throw new NotFoundException("Proposal with id "+id+" does not exist.");
     }
+
+    @GetMapping("{id}/reviews")
+    Iterable<Review> getAllReviewsOfProposal(@RequestParam(required = false) String search){
+        if(search == null)
+            return reviews.findAll();
+        else
+            return reviews.searchReviews(search);
+    }
+
+    @PostMapping("{id}/reviews")
+    void addReview(@RequestBody Review review){
+        reviews.save(review);
+    }
+
+    @GetMapping("{id}/comments")
+    Iterable<Comment> getAllCommentsOfProposal(@RequestParam(required = false) String search){
+        if(search == null)
+            return comments.findAll();
+        else
+            return comments.searchComments(search);
+    }
+
+    @PostMapping("{id}/comments")
+    void addComment(@RequestBody Comment comment){
+        comments.save(comment);
+    }
+
 }

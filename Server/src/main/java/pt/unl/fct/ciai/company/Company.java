@@ -2,13 +2,12 @@ package pt.unl.fct.ciai.company;
 
 import pt.unl.fct.ciai.employee.Employee;
 
-import java.util.Objects;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.persistence.*;
 
 @Entity
+@Table(name = "companies")
 public class Company {
 
 	@Id
@@ -21,8 +20,9 @@ public class Company {
 	private String phone;
 	private String email;
 	private String fax;
+
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
-	private List<Employee> employees;
+	private Set<Employee> employees;
 
 	public Company(){}
 
@@ -38,7 +38,7 @@ public class Company {
 
 	public Company addEmployee(Employee employee) {
 		if (this.employees == null) {
-			this.employees = new ArrayList<Employee>();
+			this.employees = new HashSet<Employee>();
 		}
 		this.employees.add(employee);
 		return this;
@@ -108,11 +108,11 @@ public class Company {
 		this.fax = fax;
 	}
 
-	public List<Employee> getEmployees() {
+	public Set<Employee> getEmployees() {
 		return employees;
 	}
 
-	public void setEmployees(List<Employee> employees) {
+	public void setEmployees(Set<Employee> employees) {
 		this.employees = employees;
 	}
 

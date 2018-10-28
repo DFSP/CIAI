@@ -1,12 +1,14 @@
 package pt.unl.fct.ciai.employee;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
 import pt.unl.fct.ciai.company.Company;
 import pt.unl.fct.ciai.user.User;
 
 import javax.persistence.*;
 
 @Entity
+@Table(name = "employees")
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,14 +16,15 @@ public class Employee {
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "company_id")
     private Company company;
 
     @JsonIgnore
     @OneToOne
-    @JoinColumn(name="userId", insertable = false, updatable = false)
+    @JoinColumn(name="user_id", insertable = false, updatable = false)
     private User user;
     // ID from user to link Employee to the correspondent UserTable
-    private long userId;
+    private long user_id;
 
     private String city;
     private String address;
@@ -39,7 +42,7 @@ public class Employee {
 
     public Employee(String city, String address, String zipCode, String cellPhone,
                     String homePhone, String gender, double salary, String birthday,
-                    long userId) {
+                    long user_id) {
         this.city = city;
         this.address = address;
         this.zipCode = zipCode;
@@ -48,7 +51,7 @@ public class Employee {
         this.gender = gender;
         this.salary = salary;
         this.birthday = birthday;
-        this.userId = userId;
+        this.user_id = user_id;
     }
 
     public long getId() {
@@ -132,11 +135,15 @@ public class Employee {
     }
 
     public long getUserId() {
-        return userId;
+        return user_id;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUserId(long user_id) {
+        this.user_id = user_id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public User getUser(){
