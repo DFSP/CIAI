@@ -12,18 +12,8 @@ tags:
     description: Todas as operações sobre utilizadores no sistema
   - name: Partner Company
     description: Operações sobre as companhias parceiras
-  - name: Employee
-    description: Operações sobre os empregados das companhias parceiras
   - name: Event Proposal
     description: Todas as operações sobre as propostas de eventos
-  - name: Event Proposal Document
-    description: Operações sobre os documentos de propostas de eventos
-  - name: Event Proposal Review
-    description: Operações sobre as revisões de propostas de eventos
-  - name: Event Proposal Comment
-    description: Operações sobre comentários a propostas de eventos
-  - name: Event Proposal Comment Reply
-    description: Operações sobre respostas a comentários de propostas de eventos
 paths:
   /users:
     get:
@@ -155,6 +145,96 @@ paths:
           description: Utilizador removido
         '404':
           description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/users/{id}/approverInProposals':
+    get:
+      tags:
+        - Users
+      description: 'Obter a lista de propostas que o utilizador {id} pode aprovar.'
+      operationId: getUserApproverInProposals
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ids das propostas que o utilizador pode aprovar
+        '404':
+          description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/users/{id}/approverInProposals/{pid}':
+    post:
+      tags:
+        - Users
+      description: 'Adicionar a proposta {pid} a lista de aprovação do utilizador {id}'
+      operationId: addUserApproverInProposals
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: pid
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Id da proposta adicionado à lista de aprovação do utilizador
+        '400':
+          description: Id especificado do utilizador ou proposta inválidos
+        '404':
+          description: Utilizador ou proposta não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Users
+      description: 'Remover a proposta {pid} da lista de aprovação do utilizador {id}'
+      operationId: deleteUserApproverInProposals
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: pid
+          in: path
+          description: Identificador da proposta a remover da lista de aprovação do utilizador
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Proposta removida da lista de aporvação do utilizador
+        '404':
+          description: Utilizador ou porposta não encontrados
         default:
           description: Erro não esperado
           content:
@@ -297,6 +377,112 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/partners/{id}/employee/{eid}':
+    get:
+      tags:
+        - Partner Company
+      description: 'Obter o empregado identificado pelo {eid} na empresa {id}'
+      operationId: getPartnerCompanyEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: eid
+          in: path
+          description: Identificador do empregado a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação do empregado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Empregado ou empresa não encontrados no sistema
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Partner Company
+      description: 'Atualizar o empregado identificado pelo {eid} na empresa {id}'
+      operationId: updatePartnerCompanyEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: eid
+          in: path
+          description: Identificador do empregado a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user
+          in: query
+          description: Objeto do empregado que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: Informações do empregado atualizadas
+        '400':
+          description: Id especificado da empresa ou empregado inválidos
+        '404':
+          description: Empregado ou empresa não encontrados no sistema
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Partner Company
+      description: 'Remover do sistema o empregado identificado pelo {eid} na empresa {id}'
+      operationId: deletePartnerCompanyEmployee
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da empresa
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: eid
+          in: path
+          description: Identificador do empregado a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Empregado removido
+        '404':
+          description: Empresa ou empregado não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
   '/partners/{id}/employees':
     get:
       tags:
@@ -367,121 +553,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /employee:
-    get:
-      tags:
-        - Employee
-      description: Obter todos os empregados de empresas parceiras
-      operationId: getEmployees
-      parameters:
-        - name: criteria
-          in: query
-          description: Filtrar os empregados que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Lista com a informação sobre os empregados de empresas parceiras
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Employee'
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/employee/{id}':
-    get:
-      tags:
-        - Employee
-      description: 'Obter o empregado identificado pelo {id}'
-      operationId: getEmployee
-      parameters:
-        - name: id
-          in: path
-          description: Identificador do empregado a obter
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Informação do empregado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Employee'
-        '404':
-          description: Empregado não encontrado no sistema
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      tags:
-        - Employee
-      description: 'Atualizar o empregado identificado pelo {id}'
-      operationId: updateEmployee
-      parameters:
-        - name: id
-          in: path
-          description: Identificador do empregado a remover
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: user
-          in: query
-          description: Objeto do empregado que é atualizado
-          required: true
-          schema:
-            $ref: '#/components/schemas/Employee'
-      responses:
-        '200':
-          description: Informações do empregado atualizadas
-        '400':
-          description: Id especificado inválido
-        '404':
-          description: Empregado não encontrado
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      tags:
-        - Employee
-      description: 'Remover do sistema o empregado identificado pelo {id}'
-      operationId: deleteEmployee
-      parameters:
-        - name: id
-          in: path
-          description: Identificador do empregado a remover
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Empregado removido
-        '404':
-          description: Empregado não encontrado
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Employee'
   /proposals:
     get:
       tags:
@@ -688,6 +759,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/proposals/{id}/documents/{did}':
+    put:
+      tags:
+        - Event Proposal
+      description: 'Atualizar o documento identificada pelo {did} na proposta {id}'
+      operationId: updateProposalDocument
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: did
+          in: path
+          description: Identificador do documento a atualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: document
+          in: query
+          description: Objeto document que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/EventProposalDocument'
+      responses:
+        '200':
+          description: Documento atualizado
+        '400':
+          description: Id especificado da proposta ou documento inválidos
+        '404':
+          description: Proposta ou documento não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal
+      description: 'Remover do sistema o documento identificado pelo {did} da proposta {id}'
+      operationId: deletProposalDocument
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: did
+          in: path
+          description: Identificador do documento a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Documento removido
+        '404':
+          description: Proposta ou documento não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   '/proposals/{id}/reviews':
     get:
       tags:
@@ -752,6 +894,112 @@ paths:
           description: Revisão adicionada com sucesso
         '404':
           description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{id}/reviews/{rid}':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter a revisão identificada pelo {rid} da proposta {id}'
+      operationId: getProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: rid
+          in: path
+          description: Identificador da revisão a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação da revisão
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventProposalReview'
+        '404':
+          description: Proposta ou revisão não encontradas
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Event Proposal
+      description: 'Atualizar a revisão identificada pelo {rid} na empresa {id}'
+      operationId: updateProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: rid
+          in: path
+          description: Identificador da revisão a atualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: review
+          in: query
+          description: Objeto review que é atualizado
+          required: true
+          schema:
+            $ref: '#/components/schemas/EventProposalReview'
+      responses:
+        '200':
+          description: Revisão atualizada
+        '400':
+          description: Id especificado da proposta ou revisão inválidos
+        '404':
+          description: Proposta ou revisão não encontradas
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal
+      description: 'Remover do sistema a revisão identificada pelo {rid} da proposta {id}'
+      operationId: deleteProposalReview
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: rid
+          in: path
+          description: Identificador da revisão a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Revisão removida
+        '404':
+          description: Porposta ou revisão não encontradas
         default:
           description: Erro não esperado
           content:
@@ -828,274 +1076,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /documents:
+  '/proposals/{id}/comments/{cid}':
     get:
       tags:
-        - Event Proposal Document
-      description: Obter todos os documentos do sistema
-      operationId: getDocuments
-      parameters:
-        - name: criteria
-          in: query
-          description: Filtrar os documentos que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Lista com a informação sobre os documentos de propostas de eventos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EventProposalDocument'
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/documents/{id}':
-    get:
-      tags:
-        - Event Proposal Document
-      description: 'Obter o documento identificado pelo {id}'
-      operationId: getDocument
+        - Event Proposal
+      description: 'Obter o comentário identificado pelo {cid} na proposta {id}'
+      operationId: getProposalComment
       parameters:
         - name: id
           in: path
-          description: Identificador do documento a obter
+          description: Identificador da proposta
           required: true
           schema:
             type: integer
             format: int64
-      responses:
-        '200':
-          description: Informação do documento
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EventProposalDocument'
-        '404':
-          description: Review não encontrada
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      tags:
-        - Event Proposal Document
-      description: 'Atualizar o documento identificada pelo {id}'
-      operationId: updateDocument
-      parameters:
-        - name: id
-          in: path
-          description: Identificador do documento a atualizar
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: document
-          in: query
-          description: Objeto document que é atualizado
-          required: true
-          schema:
-            $ref: '#/components/schemas/EventProposalDocument'
-      responses:
-        '200':
-          description: Documento atualizado
-        '400':
-          description: Id especificado inválido
-        '404':
-          description: Documento não encontrado
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      tags:
-        - Event Proposal Document
-      description: 'Remover do sistema o documento identificado pelo {id}'
-      operationId: deleteDocument
-      parameters:
-        - name: id
-          in: path
-          description: Identificador do documento a remover
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Documento removido
-        '404':
-          description: Documento não encontrado
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /reviews:
-    get:
-      tags:
-        - Event Proposal Review
-      description: Obter todas as revisões do sistema
-      operationId: getReviews
-      parameters:
-        - name: criteria
-          in: query
-          description: Filtrar as revisões que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Lista com a informação sobre as revisões de propostas de eventos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EventProposalReview'
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/reviews/{id}':
-    get:
-      tags:
-        - Event Proposal Review
-      description: 'Obter a revisão identificada pelo {id}'
-      operationId: getReview
-      parameters:
-        - name: id
-          in: path
-          description: Identificador da revisão a obter
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Informação da revisão
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EventProposalReview'
-        '404':
-          description: Revisão não encontrada
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      tags:
-        - Event Proposal Review
-      description: 'Atualizar a revisão identificada pelo {id}'
-      operationId: updateReview
-      parameters:
-        - name: id
-          in: path
-          description: Identificador da revisão a atualizar
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: review
-          in: query
-          description: Objeto review que é atualizado
-          required: true
-          schema:
-            $ref: '#/components/schemas/EventProposalReview'
-      responses:
-        '200':
-          description: Revisão atualizada
-        '400':
-          description: Id especificado inválido
-        '404':
-          description: Revisão não encontrada
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      tags:
-        - Event Proposal Review
-      description: 'Remover do sistema a revisão identificada pelo {id}'
-      operationId: deleteReview
-      parameters:
-        - name: id
-          in: path
-          description: Identificador da revisão a remover
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Revisão removida
-        '404':
-          description: Revisão não encontrada
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /comments:
-    get:
-      tags:
-        - Event Proposal Comment
-      description: Obter todos os comentários a propostas de eventos
-      operationId: getComments
-      parameters:
-        - name: criteria
-          in: query
-          description: Filtrar os comentários que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Lista com a informação sobre os comentários de propostas de eventos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EventProposalComment'
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/comments/{id}':
-    get:
-      tags:
-        - Event Proposal Comment
-      description: 'Obter o comentário identificado pelo {id}'
-      operationId: getComment
-      parameters:
-        - name: id
+        - name: cid
           in: path
           description: Identificador do comentário a obter
           required: true
@@ -1110,7 +1105,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EventProposalComment'
         '404':
-          description: Comentário não encontrado
+          description: Proposta ou comentário não encontrados
         default:
           description: Erro não esperado
           content:
@@ -1119,11 +1114,18 @@ paths:
                 $ref: '#/components/schemas/Error'
     put:
       tags:
-        - Event Proposal Comment
-      description: 'Atualizar o comentário identificado pelo {id}'
-      operationId: updateComment
+        - Event Proposal
+      description: 'Atualizar o comentário identificado pelo {cid} na proposta {id}'
+      operationId: updateProposalComment
       parameters:
         - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: cid
           in: path
           description: Identificador do comentário a atualizar
           required: true
@@ -1140,9 +1142,9 @@ paths:
         '200':
           description: Comentário atualizado
         '400':
-          description: Id especificado inválido
+          description: Id especificado da proposta ou comentário inválido
         '404':
-          description: Comentário não encontrado
+          description: Proposta ou comentário não encontrados
         default:
           description: Erro não esperado
           content:
@@ -1151,11 +1153,18 @@ paths:
                 $ref: '#/components/schemas/Error'
     delete:
       tags:
-        - Event Proposal Comment
-      description: 'Remover do sistema o comentário identificado pelo {id}'
-      operationId: deleteComment
+        - Event Proposal
+      description: 'Remover do sistema o comentário identificado pelo {cid} na proposta {id}'
+      operationId: deleteProposalComment
       parameters:
         - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: cid
           in: path
           description: Identificador do comentário a remover
           required: true
@@ -1166,172 +1175,70 @@ paths:
         '204':
           description: Comentário removido
         '404':
-          description: Comentário não encontrado
+          description: Proposta ou comentário não encontrados
         default:
           description: Erro não esperado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/comments/{id}/replies':
+  '/proposals/{id}/usersForBiding':
     get:
       tags:
-        - Event Proposal Comment
-      description: >-
-        Obter todos as respostas ao comentário de propostas de eventos
-        identificado pelo {id}
-      operationId: getCommentReplies
+        - Event Proposal
+      description: 'Obter os Ids dos utilizadores interessados em fazer review à proposta {id}.'
+      operationId: getProposalUsersForBiding
       parameters:
         - name: id
           in: path
-          description: Identificador do comentário à proposta de evento
+          description: Identificador da proposta
           required: true
           schema:
             type: integer
             format: int64
-        - name: criteria
-          in: query
-          description: Filtrar as respostas que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
       responses:
         '200':
-          description: Lista com as respostas ao comentário
+          description: Ids dos utilizadores
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EventProposalCommentReply'
+                $ref: '#/components/schemas/EventProposalComment'
         '404':
-          description: Comentário a proposta de evento não encontrado
+          description: Proposta não encontrada
         default:
           description: Erro não esperado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/proposals/{id}/usersForBiding/{uid}':
     post:
       tags:
-        - Event Proposal Comment
-      description: 'Adicionar uma resposta ao comentário identificado pelo {id}'
-      operationId: addCommentReply
+        - Event Proposal
+      description: 'Adiciona o id de utilizador {uid} à lista de utilizadores interessados em fazer review à proposta {id}'
+      operationId: addProposalUserForBiding
       parameters:
         - name: id
           in: path
-          description: Identificador do comentário
+          description: Identificador da proposta
           required: true
           schema:
             type: integer
             format: int64
-      requestBody:
-        description: Todos os necessários dados da resposta ao comentário
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EventProposalCommentReply'
-      responses:
-        '200':
-          description: Resposta a comentário adicionada com sucesso
-        '404':
-          description: Comentário não encontrado
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /replies:
-    get:
-      tags:
-        - Event Proposal Comment Reply
-      description: Obter todas as respostas a comentários de propostas de eventos
-      operationId: getReplies
-      parameters:
-        - name: criteria
-          in: query
-          description: Filtrar as respostas que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: >-
-            Lista com a informação sobre as respostas a comentários de propostas
-            de eventos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EventProposalCommentReply'
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/replies/{id}':
-    get:
-      tags:
-        - Event Proposal Comment Reply
-      description: 'Obter a resposta identificada pelo {id}'
-      operationId: getReply
-      parameters:
-        - name: id
+        - name: uid
           in: path
-          description: Identificador da resposta a obter
+          description: Identificador da utilizador
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Informação da resposta ao comentário
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EventProposalCommentReply'
-        '404':
-          description: Resposta não encontrada
-        default:
-          description: Erro não esperado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      tags:
-        - Event Proposal Comment Reply
-      description: 'Atualizar a resposta identificada pelo {id}'
-      operationId: updateReply
-      parameters:
-        - name: id
-          in: path
-          description: Identificador da resposta a atualizar
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: reply
-          in: query
-          description: Objeto resposta que é atualizada
-          required: true
-          schema:
-            $ref: '#/components/schemas/EventProposalCommentReply'
-      responses:
-        '200':
-          description: Resposta atualizada
+          description: Id do utilizador adicionado
         '400':
-          description: Id especificado inválido
+          description: Id especificado da proposta ou utiizador inválido
         '404':
-          description: Resposta não encontrada
+          description: Proposta ou utilizador não encontrados
         default:
           description: Erro não esperado
           content:
@@ -1340,22 +1247,29 @@ paths:
                 $ref: '#/components/schemas/Error'
     delete:
       tags:
-        - Event Proposal Comment Reply
-      description: 'Remover do sistema a resposta identificada pelo {id}'
-      operationId: deleteReply
+        - Event Proposal
+      description: 'Remover o id do utilizador {uid} da lista de utilizadores interessados em fazer review à proposta {id}'
+      operationId: deleteProposalUserForBiding
       parameters:
         - name: id
           in: path
-          description: Identificador da resposta a remover
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: uid
+          in: path
+          description: Identificador a remover da lista
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '204':
-          description: Resposta removida
+          description: Id do utilizador removido
         '404':
-          description: Resposta não encontrada
+          description: Proposta ou utilizador não encontrados
         default:
           description: Erro não esperado
           content:
@@ -1390,7 +1304,11 @@ components:
           example: user1@ecma.com
         passwordHash:
           type: string
-          example: '$2y$12$95z6mYtPI371qXLCTWzP0elvLNv7Znh8dlwoseWncIm2zQb4u94xS'
+          example: $2y$12$95z6mYtPI371qXLCTWzP0elvLNv7Znh8dlwoseWncIm2zQb4u94xS
+        approverInProposals:
+          type: array
+          items:
+            type: number
     PartnerCompany:
       required:
         - name
@@ -1410,14 +1328,14 @@ components:
           example: Lisbon
         zipCode:
           type: string
-          example: '1000-261'
+          example: 1000-261
         streetAddress:
           type: string
-          example: 'Long Street'
+          example: Long Street
         phone:
           type: integer
           format: int64
-          example: 212121212 
+          example: 212121212
         emailAddress:
           type: string
           example: info@ecma.com
@@ -1441,7 +1359,7 @@ components:
         - gender
         - salary
         - birthday
-        - role
+        - job
       properties:
         id:
           type: integer
@@ -1458,10 +1376,10 @@ components:
           example: Lisbon
         zipCode:
           type: string
-          example: '1000-260'
+          example: 1000-260
         streetAddress:
           type: string
-          example: 'Short Street'
+          example: Short Street
         cellPhone:
           type: integer
           format: int64
@@ -1473,8 +1391,8 @@ components:
         gender:
           type: string
           enum:
-          - M
-          - F
+            - M
+            - F
         salary:
           type: integer
           format: int64
@@ -1484,9 +1402,12 @@ components:
           type: string
           example: '2018-01-01'
           format: date
-        role:
+        job:
           type: string
-          example: 'CEO'
+          example: CEO
+        isAdmin:
+          type: boolean
+          default: false
     EventProposal:
       properties:
         id:
@@ -1520,6 +1441,10 @@ components:
           items:
             $ref: '#/components/schemas/Employee'
           readOnly: true
+        usersForBiding:
+          type: array
+          items:
+            type: number
     EventProposalDocument:
       required:
         - proposalId
@@ -1540,23 +1465,25 @@ components:
           readOnly: true
         title:
           type: string
-          example: 'Document nr1'
+          example: Document nr1
         description:
           type: string
-          example: 'Document for a new perfume promotion event'
+          example: Document for a new perfume promotion event
         goals:
           type: string
-          example: 'Boost sales by getting costumers to buy the product'
+          example: Boost sales by getting costumers to buy the product
         material:
           type: string
-          example: 'Perfume samples'
+          example: Perfume samples
         budget:
           type: number
           format: float
           example: 5000
         workPlan:
           type: string
-          example: 'Go to a place and promote the new perfume by allowing interested people to try it'
+          example: >-
+            Go to a place and promote the new perfume by allowing interested
+            people to try it
     EventProposalReview:
       required:
         - proposalId
@@ -1579,13 +1506,16 @@ components:
           readOnly: true
         title:
           type: string
-          example: 'Worst proposition ever'
+          example: Worst proposition ever
         text:
           type: string
-          example: 'After analysing this proposition I came to the conclusion that this is not a very well-thought-out proposition because it lacks this and that'
+          example: >-
+            After analysing this proposition I came to the conclusion that this
+            is not a very well-thought-out proposition because it lacks this and
+            that
         summary:
           type: string
-          example: 'A very bad proposition'
+          example: A very bad proposition
         classification:
           type: integer
           format: int32
@@ -1617,33 +1547,16 @@ components:
           readOnly: true
         title:
           type: string
-          example: 'Workplan question'
+          example: Workplan question
         text:
           type: string
-          example: 'Hello, can someone involved give a bit more detail about the workplan?'
+          example: >-
+            Hello, can someone involved give a bit more detail about the
+            workplan?
         date:
           type: string
           format: date
           example: '2018-10-15'
-    EventProposalCommentReply:
-      required:
-        - commentId
-        - text
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        commentId:
-          type: integer
-          format: int64
-        text:
-          type: string
-          example: 'Hi user1494, yes, this is our detailed workplan ...'
-        date:
-          type: string
-          format: date
-          example: '2018-10-11'
     Error:
       required:
         - code
