@@ -15,8 +15,9 @@ public class Review {
     @GeneratedValue
     private long id;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "proposal_id")
+    @JoinColumn(name = "proposals_id")
     private Proposal proposal;
 
     //private long proposalId;

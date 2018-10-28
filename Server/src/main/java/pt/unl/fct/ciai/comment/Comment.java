@@ -1,5 +1,6 @@
 package pt.unl.fct.ciai.comment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import pt.unl.fct.ciai.proposal.Proposal;
@@ -14,8 +15,9 @@ public class Comment {
     @GeneratedValue
     private long id;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "proposal_id")
+    @JoinColumn(name = "proposals_id")
     private Proposal proposal;
 
     //private long proposalId;

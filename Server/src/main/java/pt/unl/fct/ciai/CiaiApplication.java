@@ -95,9 +95,10 @@ public class CiaiApplication implements CommandLineRunner {
 		review1.setClassification(5);
 		review1.setTitle("Review1");
 		review1.setSummary("Very good review");
-		reviews.save(review1);
+		//reviews.save(review1);
 
 		Proposal proposal1 = new Proposal();
+		review1.setProposal(proposal1);
 		proposal1.addReview(review1);
 		proposal1.setDate("12-12-2012");
 		proposals.save(proposal1);
