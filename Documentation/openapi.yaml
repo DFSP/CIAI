@@ -176,15 +176,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-<<<<<<< HEAD
-    post:
-      tags:
-        - Users
-      description: 'Adicionar uma proposta à lista de aprovação do utilizador.'
-      operationId: addUserApproverInProposals
-      parameters:
-        - name: id
-=======
   '/users/{uid}/approverInProposals/{pid}':
     post:
       tags:
@@ -193,22 +184,12 @@ paths:
       operationId: addUserApproverInProposals
       parameters:
         - name: uid
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
           in: path
           description: Identificador do utilizador
           required: true
           schema:
             type: integer
             format: int64
-<<<<<<< HEAD
-      requestBody:
-        description: Todos os necessários dados da proposal
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Proposal'
-=======
         - name: pid
           in: path
           description: Identificador da proposta
@@ -216,7 +197,6 @@ paths:
           schema:
             type: integer
             format: int64
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
       responses:
         '200':
           description: Id da proposta adicionado à lista de aprovação do utilizador
@@ -230,10 +210,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-<<<<<<< HEAD
-  '/users/{uid}/approverInProposals/{pid}':
-=======
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
     delete:
       tags:
         - Users
@@ -249,13 +225,7 @@ paths:
             format: int64
         - name: pid
           in: path
-<<<<<<< HEAD
-          description: >-
-            Identificador da proposta a remover da lista de aprovação do
-            utilizador
-=======
           description: Identificador da proposta a remover da lista de aprovação do utilizador
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
           required: true
           schema:
             type: integer
@@ -1216,13 +1186,7 @@ paths:
     get:
       tags:
         - Event Proposal
-<<<<<<< HEAD
-      description: >-
-        Obter os Ids dos utilizadores interessados em fazer review à proposta
-        {id}.
-=======
       description: 'Obter os Ids dos utilizadores interessados em fazer review à proposta {id}.'
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
       operationId: getProposalUsersForBidding
       parameters:
         - name: id
@@ -1251,13 +1215,7 @@ paths:
     post:
       tags:
         - Event Proposal
-<<<<<<< HEAD
-      description: >-
-        Adiciona o id de utilizador {uid} à lista de utilizadores interessados
-        em fazer review à proposta {pid}
-=======
       description: 'Adiciona o id de utilizador {uid} à lista de utilizadores interessados em fazer review à proposta {pid}'
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
       operationId: addProposalUserForBidding
       parameters:
         - name: pid
@@ -1290,13 +1248,7 @@ paths:
     delete:
       tags:
         - Event Proposal
-<<<<<<< HEAD
-      description: >-
-        Remover o id do utilizador {uid} da lista de utilizadores interessados
-        em fazer review à proposta {pid}
-=======
       description: 'Remover o id do utilizador {uid} da lista de utilizadores interessados em fazer review à proposta {pid}'
->>>>>>> 0e6dc9576a65f4a4405afd0406243511f0e0201b
       operationId: deleteProposalUserForBidding
       parameters:
         - name: pid
