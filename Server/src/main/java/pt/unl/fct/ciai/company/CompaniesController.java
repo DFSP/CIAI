@@ -15,7 +15,7 @@ import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
 
 @RestController
-@RequestMapping("/companies")
+@RequestMapping("/partners")
 public class CompaniesController { //implements CompaniesApi {
 	
 	private final CompaniesRepository companies;
@@ -35,13 +35,13 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@GetMapping(value = "/{id}")
-	public Company getCompany(@PathVariable("id") Long id) {
+	public Company getCompany(@PathVariable("id") long id) {
 		return findCompanyOrThrowException(id);
 	}
 
 	@PutMapping(value = "/{id}")
-	public void updateCompany(@PathVariable("id") Long id, @RequestBody Company company) {
-		if (id.equals(company.getId())) {
+	public void updateCompany(@PathVariable("id") long id, @RequestBody Company company) {
+		if (id == company.getId()) {
 			findCompanyOrThrowException(id);
 			companies.save(company);
 		}
@@ -51,25 +51,43 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@DeleteMapping(value = "/{id}")
-	public void deleteCompany(@PathVariable("id") Long id) {
+	public void deleteCompany(@PathVariable("id") long id) {
 		findCompanyOrThrowException(id);
 		companies.deleteById(id);
 	}
+	
+	//TODO
+	@GetMapping(value = "/{pid}/employees/{eid}")
+	public Employee getOneCompanyEmployee(@PathVariable("id") long pid, @PathVariable long eid) {
+		return null;
+	}
+	
+	//TODO
+	@PutMapping(value = "/{pid}/employees/{eid}")
+	public void updateOneCompanyEmployee(@PathVariable("id") long pid, @PathVariable long eid, @RequestBody Employee employee) {
+		
+	}
+	
+	//TODO
+	@DeleteMapping(value = "/{pid}/employees/{eid}")
+	public void deleteOneCompanyEmployee(@PathVariable("id") long pid, @PathVariable long eid) {
+		
+	}	
 
 	@GetMapping(value = "/{id}/employees")
-	public Iterable<Employee> getCompanyEmployees(@PathVariable("id") Long id, @RequestParam(value = "search", required = false) String search) {
+	public Iterable<Employee> getCompanyEmployees(@PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
 		return search == null ? findCompanyOrThrowException(id).getEmployees() : companies.searchEmployees(search);
 	}
 
-	@PostMapping(value = "/{id}/contacts")
-	public void addCompanyContact(@PathVariable("id") Long id, @RequestBody Employee employee) {
+	@PostMapping(value = "/{id}/employees")
+	public void addCompanyContact(@PathVariable("id") long id, @RequestBody Employee employee) {
 		Company company = findCompanyOrThrowException(id);
 		employee.setCompany(company);
 		company.addEmployee(employee);
 		companies.save(company);
 	}
 	
-	private Company findCompanyOrThrowException(Long id) {
+	private Company findCompanyOrThrowException(long id) {
 		return companies.findById(id).orElseThrow(() -> new NotFoundException(String.format("Company with id %d not found", id)));
 	}
 

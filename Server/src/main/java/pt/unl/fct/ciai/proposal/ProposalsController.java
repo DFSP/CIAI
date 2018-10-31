@@ -7,6 +7,8 @@ import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
 import pt.unl.fct.ciai.review.Review;
 import pt.unl.fct.ciai.review.ReviewsRepository;
+import pt.unl.fct.ciai.section.Section;
+import pt.unl.fct.ciai.user.User;
 
 import java.util.Optional;
 
@@ -33,7 +35,7 @@ public class ProposalsController {
             return proposals.searchProposals(search);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     Proposal getProposalById(@PathVariable long id){
         Optional<Proposal> p1 = proposals.findById(id);
         if(p1.isPresent())
@@ -48,7 +50,7 @@ public class ProposalsController {
         proposals.save(proposal);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     void updateProposal(@PathVariable long id, @RequestBody Proposal proposal){
         if(proposal.getId() == id) {
             Optional<Proposal> p1 = proposals.findById(id);
@@ -61,7 +63,7 @@ public class ProposalsController {
             throw new BadRequestException("invalid request");
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     void deleteProposal(@PathVariable long id) {
         Optional<Proposal> p1 = proposals.findById(id);
         if( p1.isPresent() ) {
@@ -69,8 +71,32 @@ public class ProposalsController {
         } else
             throw new NotFoundException("Proposal with id "+id+" does not exist.");
     }
+    
+    // TODO
+    @GetMapping("/{id}/sections")
+    Iterable<Section> getAllSectionsOfProposal(@PathVariable long id){
+        return null;
+    }
+    
+    // TODO
+    @PostMapping("/{id}/sections")
+    void addSectionOfProposal(@PathVariable long id, @RequestBody Section section){
+        
+    }
+    
+    // TODO
+    @PutMapping("/{pid}/sections/{sid}")
+    void updateSectionOfProposal(@PathVariable long pid, @PathVariable long sid, @RequestBody Section section){
+        
+    }
+    
+    // TODO
+    @DeleteMapping("/{pid}/sections/{sid}")
+    void deleteSectionOfProposal(@PathVariable long pid, @PathVariable long sid){
+        
+    }
 
-    @GetMapping("{id}/reviews")
+    @GetMapping("/{id}/reviews")
     Iterable<Review> getAllReviewsOfProposal(@RequestParam(required = false) String search){
         if(search == null)
             return reviews.findAll();
@@ -78,12 +104,30 @@ public class ProposalsController {
             return reviews.searchReviews(search);
     }
 
-    @PostMapping("{id}/reviews")
+    @PostMapping("/{id}/reviews")
     void addReview(@RequestBody Review review){
         reviews.save(review);
     }
+    
+    //TODO
+    @GetMapping("/{pid}/reviews/{rid}")
+    Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
+        return null;
+    }
+    
+    //TODO
+    @PutMapping("/{pid}/reviews/{rid}")
+    void updateOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid, @RequestBody Review review){
+        
+    }
+    
+    //TODO
+    @DeleteMapping("/{pid}/reviews/{rid}")
+    void deleteOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
+        
+    }
 
-    @GetMapping("{id}/comments")
+    @GetMapping("/{id}/comments")
     Iterable<Comment> getAllCommentsOfProposal(@RequestParam(required = false) String search){
         if(search == null)
             return comments.findAll();
@@ -91,9 +135,45 @@ public class ProposalsController {
             return comments.searchComments(search);
     }
 
-    @PostMapping("{id}/comments")
+    @PostMapping("/{id}/comments")
     void addComment(@RequestBody Comment comment){
         comments.save(comment);
     }
+    
+    // TODO
+    @GetMapping("/{pid}/comments/{cid}")
+    Comment getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
+        return null;
+    }
+    
+    // TODO
+    @PutMapping("/{pid}/comments/{cid}")
+    void updateOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
+        
+    }
+    
+    // TODO
+    @DeleteMapping("/{pid}/comments/{cid}")
+    void deleteOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
+        
+    }
+    
+    // TODO
+    @GetMapping("/{pid}/usersForBiding")
+    Iterable<User> getUsersForBidingOfProposal(@PathVariable long pid){
+        return null;
+    }
+    
+    // TODO
+    @PostMapping("/{pid}/usersForBiding/{uid}")
+    void addUserForBiding(@PathVariable long pid, @PathVariable long uid, @RequestBody User user){
+        
+    }
+    
+    // TODO
+    @DeleteMapping("/{pid}/usersForBiding/{uid}")
+    void deleteUserForBiding(@PathVariable long pid, @PathVariable long uid){
+        
+    }    
 
 }

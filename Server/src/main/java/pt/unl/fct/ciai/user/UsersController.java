@@ -3,7 +3,9 @@ package pt.unl.fct.ciai.user;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.proposal.Proposal;
 
+import java.util.LinkedList;
 import java.util.Optional;
 
 @RestController
@@ -24,7 +26,7 @@ public class UsersController {
             return users.searchUsers(search);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     User getUserById(@PathVariable long id){
         Optional<User> u1 = users.findById(id);
         if(u1.isPresent())
@@ -39,7 +41,7 @@ public class UsersController {
         users.save(user);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     void updateUser(@PathVariable long id, @RequestBody User user){
         if(user.getId() == id) {
             Optional<User> u1 = users.findById(id);
@@ -52,12 +54,30 @@ public class UsersController {
             throw new BadRequestException("invalid request");
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     void deleteUser(@PathVariable long id) {
         Optional<User> u1 = users.findById(id);
         if( u1.isPresent() ) {
             users.delete(u1.get());
         } else
             throw new NotFoundException("User with id "+id+" does not exist.");
+    }
+    
+    //TODO
+    @GetMapping("/{id}/approverInProposals")
+    Iterable<Proposal> getUserApproverInProposals(@PathVariable long id){
+        return new LinkedList<>();
+    }
+    
+    //TODO
+    @PostMapping("/{id}/approverInProposals")
+    void addUserApproverInProposal(@PathVariable long id, @RequestBody Proposal proposal){
+        
+    }
+    
+    //TODO
+    @DeleteMapping("/{uid}/approverInProposals/{pid}")
+    void deleteUserApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
+
     }
 }
