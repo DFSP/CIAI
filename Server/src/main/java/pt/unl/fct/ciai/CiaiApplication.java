@@ -119,6 +119,6 @@ public class CiaiApplication implements CommandLineRunner {
 		//users.save(ecmaUser);
 		//System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
 		//System.out.println(ecmaUser.getProposalsToApprove().contains(proposal1));
-		
+
 	}
 }
