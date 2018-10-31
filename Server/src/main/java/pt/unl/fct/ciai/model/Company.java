@@ -1,6 +1,4 @@
-package pt.unl.fct.ciai.company;
-
-import pt.unl.fct.ciai.employee.Employee;
+package pt.unl.fct.ciai.model;
 
 import java.util.*;
 

@@ -5,21 +5,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import pt.unl.fct.ciai.comment.CommentsRepository;
-import pt.unl.fct.ciai.company.CompaniesRepository;
-import pt.unl.fct.ciai.company.Company;
-import pt.unl.fct.ciai.employee.Employee;
-import pt.unl.fct.ciai.employee.EmployeesRepository;
-import pt.unl.fct.ciai.proposal.Proposal;
-import pt.unl.fct.ciai.proposal.ProposalsRepository;
-import pt.unl.fct.ciai.review.Review;
-import pt.unl.fct.ciai.review.ReviewsRepository;
-import pt.unl.fct.ciai.user.User;
-import pt.unl.fct.ciai.user.UsersRepository;
-
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import pt.unl.fct.ciai.repository.CommentsRepository;
+import pt.unl.fct.ciai.repository.CompaniesRepository;
+import pt.unl.fct.ciai.model.Company;
+import pt.unl.fct.ciai.model.Employee;
+import pt.unl.fct.ciai.repository.EmployeesRepository;
+import pt.unl.fct.ciai.model.Proposal;
+import pt.unl.fct.ciai.repository.ProposalsRepository;
+import pt.unl.fct.ciai.model.Review;
+import pt.unl.fct.ciai.repository.ReviewsRepository;
+import pt.unl.fct.ciai.model.User;
+import pt.unl.fct.ciai.repository.UsersRepository;
 
 
 @SpringBootApplication
@@ -100,6 +96,11 @@ public class CiaiApplication implements CommandLineRunner {
 		fct.addEmployee(fctEmployee);
 		employees.save(fctEmployee);
 
+		/*Optional<Employee> e1 = employees.findById(3l);
+		System.out.println("employeeID > "+e1.get().getId()+" associated with user > "+e1.get().getUser().getUsername());
+		Optional<Employee> e2 = employees.findById(6l);
+		System.out.println("employeeID > "+e2.get().getId()+" associated with user > "+e2.get().getUser().getUsername());*/
+
 		Review review1 = new Review();
 		review1.setDate("10-12-2012");
 		review1.setClassification(5);
@@ -114,9 +115,10 @@ public class CiaiApplication implements CommandLineRunner {
 		proposal1.setDate("12-12-2012");
 		proposals.save(proposal1);
 
-		/*Optional<Employee> e1 = employees.findById(3l);
-		System.out.println("employeeID > "+e1.get().getId()+" associated with user > "+e1.get().getUser().getUsername());
-		Optional<Employee> e2 = employees.findById(6l);
-		System.out.println("employeeID > "+e2.get().getId()+" associated with user > "+e2.get().getUser().getUsername());*/
+		ecmaUser.addProposalToApprove(proposal1);
+		//users.save(ecmaUser);
+		//System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
+		//System.out.println(ecmaUser.getProposalsToApprove().contains(proposal1));
+		
 	}
 }

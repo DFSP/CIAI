@@ -1,8 +1,9 @@
-package pt.unl.fct.ciai.review;
+package pt.unl.fct.ciai.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import pt.unl.fct.ciai.model.Review;
 
 public interface ReviewsRepository extends CrudRepository<Review, Long> {
 

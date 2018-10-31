@@ -1,8 +1,9 @@
-package pt.unl.fct.ciai.comment;
+package pt.unl.fct.ciai.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import pt.unl.fct.ciai.model.Comment;
 
 public interface CommentsRepository extends CrudRepository<Comment, Long> {
 

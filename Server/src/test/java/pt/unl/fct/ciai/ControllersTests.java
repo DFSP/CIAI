@@ -13,13 +13,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pt.unl.fct.ciai.company.CompaniesRepository;
-import pt.unl.fct.ciai.company.Company;
-import pt.unl.fct.ciai.employee.Employee;
-import pt.unl.fct.ciai.user.User;
+import pt.unl.fct.ciai.repository.CompaniesRepository;
+import pt.unl.fct.ciai.model.Company;
+import pt.unl.fct.ciai.model.Employee;
+import pt.unl.fct.ciai.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,7 +88,7 @@ public class ControllersTests {
         User user = new User();
         user.setUsername("NewEmployee");
 		Employee employee = new Employee();
-		employee.setUserId(user.getId());
+		//employee.setUserId(user.getId());
 		String json = mapper.writeValueAsString(employee);
 		this.mockMvc.perform(post("/companies/" + firstId + "/employees")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -112,7 +111,7 @@ public class ControllersTests {
         User user = new User();
         user.setUsername("NewEmployee");
         Employee employee = new Employee();
-        employee.setUserId(user.getId());
+        //employee.setUserId(user.getId());
 
 		String json = mapper.writeValueAsString(employee);
 		this.mockMvc.perform(post("/companies/" + firstCompanyId + "/employees")

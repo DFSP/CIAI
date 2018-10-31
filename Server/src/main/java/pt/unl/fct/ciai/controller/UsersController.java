@@ -1,9 +1,11 @@
-package pt.unl.fct.ciai.user;
+package pt.unl.fct.ciai.controller;
 
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
-import pt.unl.fct.ciai.proposal.Proposal;
+import pt.unl.fct.ciai.model.Proposal;
+import pt.unl.fct.ciai.model.User;
+import pt.unl.fct.ciai.repository.UsersRepository;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -64,9 +66,14 @@ public class UsersController {
     }
     
     //TODO
+    // Obter a lista de propostas que o User {id} pode aprovar
     @GetMapping("/{id}/approverInProposals")
-    Iterable<Proposal> getUserApproverInProposals(@PathVariable long id){
-        return new LinkedList<>();
+    Iterable<Proposal> getUserApproverProposals(@PathVariable long id){
+        Optional<User> u = users.findById(id);
+        if(u.isPresent()){
+            return u.get().getProposalsToApprove();
+        }
+        else throw new NotFoundException("User with id" +id+" not found.");
     }
     
     //TODO

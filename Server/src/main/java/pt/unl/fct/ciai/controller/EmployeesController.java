@@ -1,8 +1,10 @@
-package pt.unl.fct.ciai.employee;
+package pt.unl.fct.ciai.controller;
 
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.model.Employee;
+import pt.unl.fct.ciai.repository.EmployeesRepository;
 
 @RestController
 @RequestMapping(value = "/employees")

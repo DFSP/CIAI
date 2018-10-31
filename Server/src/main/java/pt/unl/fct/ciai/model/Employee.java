@@ -1,8 +1,6 @@
-package pt.unl.fct.ciai.employee;
+package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import pt.unl.fct.ciai.company.Company;
-import pt.unl.fct.ciai.user.User;
 
 import javax.persistence.*;
 

@@ -1,14 +1,16 @@
-package pt.unl.fct.ciai.proposal;
+package pt.unl.fct.ciai.controller;
 
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.comment.Comment;
-import pt.unl.fct.ciai.comment.CommentsRepository;
+import pt.unl.fct.ciai.model.Comment;
+import pt.unl.fct.ciai.repository.CommentsRepository;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
-import pt.unl.fct.ciai.review.Review;
-import pt.unl.fct.ciai.review.ReviewsRepository;
-import pt.unl.fct.ciai.section.Section;
-import pt.unl.fct.ciai.user.User;
+import pt.unl.fct.ciai.model.Proposal;
+import pt.unl.fct.ciai.model.Review;
+import pt.unl.fct.ciai.repository.ProposalsRepository;
+import pt.unl.fct.ciai.repository.ReviewsRepository;
+import pt.unl.fct.ciai.model.Section;
+import pt.unl.fct.ciai.model.User;
 
 import java.util.Optional;
 

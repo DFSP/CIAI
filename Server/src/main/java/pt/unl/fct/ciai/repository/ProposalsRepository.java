@@ -1,8 +1,9 @@
-package pt.unl.fct.ciai.proposal;
+package pt.unl.fct.ciai.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import pt.unl.fct.ciai.model.Proposal;
 
 public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
 

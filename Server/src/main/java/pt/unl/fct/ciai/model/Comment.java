@@ -1,9 +1,6 @@
-package pt.unl.fct.ciai.comment;
+package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import pt.unl.fct.ciai.proposal.Proposal;
 
 import javax.persistence.*;
 

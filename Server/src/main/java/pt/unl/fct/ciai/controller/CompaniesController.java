@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.company;
+package pt.unl.fct.ciai.controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import pt.unl.fct.ciai.employee.Employee;
+import pt.unl.fct.ciai.model.Company;
+import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.repository.CompaniesRepository;
 
 @RestController
 @RequestMapping("/partners")

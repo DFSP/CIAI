@@ -1,11 +1,11 @@
-package pt.unl.fct.ciai.user;
+package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
-import pt.unl.fct.ciai.employee.Employee;
-
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -28,6 +28,9 @@ public class User {
 	@JsonIgnore
 	private String password;
 
+	@OneToMany(mappedBy="approver") // cascade?
+	private Set<Proposal> proposalsToApprove;
+
 	public User(){}
 
 	public User(String first_name, String last_name, String username, String email, String role, String password) {
@@ -38,6 +41,22 @@ public class User {
 		this.role = role;
 		this.password = password;
 	}
+
+	public User addProposalToApprove(Proposal proposalToApprove) {
+		if (this.proposalsToApprove == null) {
+			this.proposalsToApprove = new HashSet<Proposal>();
+		}
+		this.proposalsToApprove.add(proposalToApprove);
+		return this;
+	}
+
+	public Set<Proposal> getProposalsToApprove(){
+		return this.proposalsToApprove;
+	}
+
+
+
+
 
 	public long getId() {
 		return id;

@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.section;
+package pt.unl.fct.ciai.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

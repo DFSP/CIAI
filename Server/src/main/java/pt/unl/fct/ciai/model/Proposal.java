@@ -1,7 +1,6 @@
-package pt.unl.fct.ciai.proposal;
+package pt.unl.fct.ciai.model;
 
-import pt.unl.fct.ciai.comment.Comment;
-import pt.unl.fct.ciai.review.Review;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -22,6 +21,10 @@ public class Proposal {
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
     private Set<Comment> comments;
 
+    @JsonIgnore
+    @ManyToOne @JoinColumn(name="approver_id")
+    private User approver;
+
     public Proposal() {
     }
 
@@ -29,6 +32,12 @@ public class Proposal {
         this.isApproved = isApproved;
         this.date = date;
     }
+
+
+
+
+
+
 
 
     public long getId() {
@@ -67,10 +76,6 @@ public class Proposal {
         return this;
     }
 
-    /*public void setReviews(Set<Review> reviews) {
-        this.reviews = reviews;
-    }*/
-
     public Set<Comment> getComments() {
         return comments;
     }
@@ -83,7 +88,11 @@ public class Proposal {
         return this;
     }
 
-    /*public void setComments(Set<Comment> comments) {
-        this.comments = comments;
-    }*/
+    public User getApprover() {
+        return approver;
+    }
+
+    public void setApprover(User approver) {
+        this.approver = approver;
+    }
 }

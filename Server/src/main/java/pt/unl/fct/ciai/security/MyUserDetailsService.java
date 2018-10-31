@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.ciai.user.UsersRepository;
+import pt.unl.fct.ciai.repository.UsersRepository;
 
 
 @Service
@@ -31,7 +31,7 @@ public class MyUserDetailsService implements UserDetailsService {
         }
         else {
             // Now for the database user searching
-            pt.unl.fct.ciai.user.User user = users.findByUsername(username);
+            pt.unl.fct.ciai.model.User user = users.findByUsername(username);
             if (user == null) {
             	throw new UsernameNotFoundException(username);
             }
