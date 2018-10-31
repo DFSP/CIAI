@@ -50,6 +50,11 @@ public class User {
 		return this;
 	}
 
+	public User removeProposalToApprove(Proposal proposalToApprove) {
+		this.proposalsToApprove.remove(proposalToApprove);
+		return this;
+	}
+
 	public Set<Proposal> getProposalsToApprove(){
 		return this.proposalsToApprove;
 	}

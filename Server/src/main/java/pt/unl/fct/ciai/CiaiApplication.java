@@ -116,9 +116,14 @@ public class CiaiApplication implements CommandLineRunner {
 		proposals.save(proposal1);
 
 		ecmaUser.addProposalToApprove(proposal1);
-		//users.save(ecmaUser);
 		//System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
-		//System.out.println(ecmaUser.getProposalsToApprove().contains(proposal1));
+		//System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
+		//System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));
+		ecmaUser.removeProposalToApprove(proposal1);
+		//System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
+		//System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
+		//System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));
+		//users.save(ecmaUser);
 
 	}
 }
