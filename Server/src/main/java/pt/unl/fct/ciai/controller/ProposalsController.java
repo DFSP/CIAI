@@ -78,12 +78,16 @@ public class ProposalsController {
             throw new NotFoundException("Proposal with id "+id+" does not exist.");
     }
 
+    //TODO
     @GetMapping("/{id}/sections")
-    Iterable<Section> getAllSectionsOfProposal(@PathVariable long id){
+    Iterable<Section> getAllSectionsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
 
         Optional<Proposal> p = proposals.findById(id);
         if(p.isPresent()){
-            return p.get().getSections();
+            if (search == null)
+                return p.get().getSections();
+            else
+                return sections.searchSections(search); // ----> ver isto
         }
         else throw new NotFoundException("Proposal with id" +id+" not found.");
     }
@@ -110,7 +114,7 @@ public class ProposalsController {
             }
             else throw new NotFoundException("Proposal "+pid+" not found.");
         }
-        else throw new BadRequestException("Invalid request: sectionID on request does not match the SectionClass id attribute");
+        else throw new BadRequestException("Invalid request: sectionID on request does not match the Section.id attribute");
     }
 
     @DeleteMapping("/{pid}/sections/{sid}")
@@ -126,67 +130,124 @@ public class ProposalsController {
         else throw new NotFoundException("Proposal "+pid+" not found.");
     }
 
-
+    //TODO
     @GetMapping("/{id}/reviews")
-    Iterable<Review> getAllReviewsOfProposal(@RequestParam(required = false) String search){
-        if(search == null)
-            return reviews.findAll();
-        else
-            return reviews.searchReviews(search);
+    Iterable<Review> getAllReviewsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
+        Optional<Proposal> p = proposals.findById(id);
+        if(p.isPresent()) {
+            if (search == null)
+                return p.get().getReviews();
+            else
+                return reviews.searchReviews(search); // ----> ver isto TODO
+        }
+        else throw new NotFoundException("Proposal "+id+" not found.");
     }
 
     @PostMapping("/{id}/reviews")
-    void addReview(@RequestBody Review review){
-        reviews.save(review);
-    }
-    
-    //TODO
-    @GetMapping("/{pid}/reviews/{rid}")
-    Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
-        return null;
-    }
-    
-    //TODO
-    @PutMapping("/{pid}/reviews/{rid}")
-    void updateOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid, @RequestBody Review review){
-        
-    }
-    
-    //TODO
-    @DeleteMapping("/{pid}/reviews/{rid}")
-    void deleteOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
-        
+    void addReview(@PathVariable long id, @RequestBody Review review){
+        Optional<Proposal> p = proposals.findById(id);
+        if(p.isPresent()){
+            if(!p.get().getReviews().contains(review))
+                reviews.save(review);
+            else throw new ConflictException("Review already associated with proposal " + id);
+        }
+        else throw new NotFoundException("Proposal "+id+" not found.");
     }
 
+    //TODO
+    @GetMapping("/{pid}/reviews/{rid}")
+    Optional<Review> getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
+        Optional<Proposal> p = proposals.findById(pid);
+        if(p.isPresent())
+            return reviews.findById(rid); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
+        else throw new NotFoundException("Proposal "+pid+" not found.");
+    }
+
+    @PutMapping("/{pid}/reviews/{rid}")
+    void updateOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid, @RequestBody Review review){
+        if(review.getId() == rid) {
+            Optional<Proposal> p = proposals.findById(pid);
+            if (p.isPresent()){
+                if(p.get().getReviews().contains(review))
+                    reviews.save(review);
+                else throw new NotFoundException("Proposal "+pid+" does not have associated Review "+rid);
+            }
+            else throw new NotFoundException("Proposal "+pid+" not found.");
+        }
+        else throw new BadRequestException("Invalid request: reviewID on request does not match the Review.id attribute");
+    }
+
+    @DeleteMapping("/{pid}/reviews/{rid}")
+    void deleteOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
+        Optional<Proposal> p = proposals.findById(pid);
+        if(p.isPresent()) {
+            Optional<Review> r = reviews.findById(rid);
+            if(r.isPresent() && p.get().getSections().contains(r)){
+                reviews.deleteById(rid);
+            }
+            else throw new NotFoundException("Proposal "+pid+" does not have Review "+rid+" associated.");
+        }
+        else throw new NotFoundException("Proposal "+pid+" not found.");
+    }
+
+    //TODO
     @GetMapping("/{id}/comments")
-    Iterable<Comment> getAllCommentsOfProposal(@RequestParam(required = false) String search){
-        if(search == null)
-            return comments.findAll();
-        else
-            return comments.searchComments(search);
+    Iterable<Comment> getAllCommentsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
+        Optional<Proposal> p = proposals.findById(id);
+        if(p.isPresent()) {
+            if (search == null)
+                return p.get().getComments();
+            else
+                return comments.searchComments(search); // ----> ver isto TODO
+        }
+        else throw new NotFoundException("Proposal "+id+" not found.");
     }
 
     @PostMapping("/{id}/comments")
-    void addComment(@RequestBody Comment comment){
-        comments.save(comment);
+    void addComment(@PathVariable long id, @RequestBody Comment comment){
+        Optional<Proposal> p = proposals.findById(id);
+        if(p.isPresent()){
+            if(!p.get().getComments().contains(comment))
+                comments.save(comment);
+            else throw new ConflictException("Comment already associated with proposal " + id);
+        }
+        else throw new NotFoundException("Proposal "+id+" not found.");
     }
     
     // TODO
     @GetMapping("/{pid}/comments/{cid}")
-    Comment getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-        return null;
+    Optional<Comment> getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
+        Optional<Proposal> p = proposals.findById(pid);
+        if(p.isPresent())
+            return comments.findById(cid); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
+        else throw new NotFoundException("Proposal "+pid+" not found.");
     }
-    
-    // TODO
+
     @PutMapping("/{pid}/comments/{cid}")
-    void updateOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-        
+    void updateOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid, @RequestBody Comment comment){
+        if(comment.getId() == cid) {
+            Optional<Proposal> p = proposals.findById(pid);
+            if (p.isPresent()){
+                if(p.get().getComments().contains(comment))
+                    comments.save(comment);
+                else throw new NotFoundException("Proposal "+pid+" does not have associated Comment "+cid);
+            }
+            else throw new NotFoundException("Proposal "+pid+" not found.");
+        }
+        else throw new BadRequestException("Invalid request: commentID on request does not match the Comment.id attribute");
     }
     
-    // TODO
     @DeleteMapping("/{pid}/comments/{cid}")
     void deleteOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-        
+        Optional<Proposal> p = proposals.findById(pid);
+        if(p.isPresent()) {
+            Optional<Comment> c = comments.findById(cid);
+            if(c.isPresent() && p.get().getComments().contains(c)){
+                comments.deleteById(cid);
+            }
+            else throw new NotFoundException("Proposal "+pid+" does not have Comment "+cid+" associated.");
+        }
+        else throw new NotFoundException("Proposal "+pid+" not found.");
     }
     
     // TODO

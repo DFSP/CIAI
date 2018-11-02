@@ -120,21 +120,22 @@ public class CiaiApplication implements CommandLineRunner {
 
 		Section section1 = new Section();
 		section1.setTitle("Section1 -> title");
-		sections.save(section1);
-		System.out.println("1- Proposal have 0 sections");
+		/*System.out.println("1- Proposal have 0 sections");
 		System.out.println();
-		System.out.println("-----------ADDING----------");
-		System.out.println();
+		System.out.println("-----------ADDING SECTION TO PROPOSAL----------");
+		System.out.println();*/
 		proposal1.addSection(section1);
-		System.out.println("2- Proposal have now "+proposal1.getSections().size()+" sections");
+		/*System.out.println("2- Proposal have now "+proposal1.getSections().size()+" sections");
 		System.out.println("3- Section1 is associated with Proposal? > "+proposal1.getSections().contains(section1));
 		System.out.println("4- Section1 exists in the system? > "+sections.existsById(section1.getId()));
 		System.out.println();
-		System.out.println("-----------REMOVING----------");
-		System.out.println();
+		System.out.println("-----------REMOVING SECTION TO PROPOSAL----------");
+		System.out.println();*/
 		proposal1.removeSection(section1);
-		System.out.println("5- Proposal have now "+proposal1.getSections().size()+" sections");
+		/*System.out.println("5- Proposal have now "+proposal1.getSections().size()+" sections");
 		System.out.println("6- Section1 is associated with Proposal? > "+proposal1.getSections().contains(section1));
-		System.out.println("7- Section1 exists in the system? > "+sections.existsById(section1.getId()));
+		System.out.println("7- Section1 exists in the system? > "+sections.existsById(section1.getId()));*/
+
+
 	}
 }
