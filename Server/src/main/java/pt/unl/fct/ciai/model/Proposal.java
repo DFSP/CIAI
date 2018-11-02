@@ -15,6 +15,9 @@ public class Proposal {
     private boolean isApproved;
     private String date;
 
+    @OneToMany(mappedBy="proposal")//, cascade = CascadeType.ALL)
+    private Set<Section> sections;
+
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
     private Set<Review> reviews;
 
@@ -64,6 +67,25 @@ public class Proposal {
         this.date = date;
     }
 
+
+
+    public Set<Section> getSections() {
+        return sections;
+    }
+
+    public Proposal addSection(Section section) {
+        if (this.sections == null) {
+            this.sections = new HashSet<Section>();
+        }
+        this.sections.add(section);
+        return this;
+    }
+
+    public Proposal removeSection(Section section) {
+        this.sections.remove(section);
+        return this;
+    }
+
     public Set<Review> getReviews() {
         return reviews;
     }
@@ -76,6 +98,11 @@ public class Proposal {
         return this;
     }
 
+    public Proposal removeReview(Review review) {
+        this.reviews.remove(review);
+        return this;
+    }
+
     public Set<Comment> getComments() {
         return comments;
     }
@@ -85,6 +112,11 @@ public class Proposal {
             this.comments = new HashSet<Comment>();
         }
         this.comments.add(comment);
+        return this;
+    }
+
+    public Proposal removeComment(Comment comment) {
+        this.comments.remove(comment);
         return this;
     }
 

@@ -1,11 +1,9 @@
 package pt.unl.fct.ciai.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-// TODO
+import javax.persistence.*;
+
 @Entity
 @Table(name = "sections")
 public class Section {
@@ -14,7 +12,12 @@ public class Section {
     private long id;
     private String title, description, goals, material, workPlan;
     private float budget;
-    
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "proposals_id")
+    private Proposal proposal;
+
     public Section() {
     }
     
@@ -34,5 +37,61 @@ public class Section {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getGoals() {
+        return goals;
+    }
+
+    public void setGoals(String goals) {
+        this.goals = goals;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
+
+    public String getWorkPlan() {
+        return workPlan;
+    }
+
+    public void setWorkPlan(String workPlan) {
+        this.workPlan = workPlan;
+    }
+
+    public float getBudget() {
+        return budget;
+    }
+
+    public void setBudget(float budget) {
+        this.budget = budget;
+    }
+
+    public Proposal getProposal() {
+        return proposal;
+    }
+
+    public void setProposal(Proposal proposal) {
+        this.proposal = proposal;
     }
 }

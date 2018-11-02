@@ -5,17 +5,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import pt.unl.fct.ciai.repository.CommentsRepository;
-import pt.unl.fct.ciai.repository.CompaniesRepository;
-import pt.unl.fct.ciai.model.Company;
-import pt.unl.fct.ciai.model.Employee;
-import pt.unl.fct.ciai.repository.EmployeesRepository;
-import pt.unl.fct.ciai.model.Proposal;
-import pt.unl.fct.ciai.repository.ProposalsRepository;
-import pt.unl.fct.ciai.model.Review;
-import pt.unl.fct.ciai.repository.ReviewsRepository;
-import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.repository.UsersRepository;
+import pt.unl.fct.ciai.model.*;
+import pt.unl.fct.ciai.repository.*;
 
 
 @SpringBootApplication
@@ -27,6 +18,8 @@ public class CiaiApplication implements CommandLineRunner {
 	private UsersRepository users;
 	@Autowired
 	private EmployeesRepository employees;
+	@Autowired
+	private SectionsRepository sections;
 	@Autowired
 	private ReviewsRepository reviews;
 	@Autowired
@@ -116,14 +109,32 @@ public class CiaiApplication implements CommandLineRunner {
 		proposals.save(proposal1);
 
 		ecmaUser.addProposalToApprove(proposal1);
-		//System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
-		//System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
-		//System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));
+		/*System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
+		System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
+		System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));*/
 		ecmaUser.removeProposalToApprove(proposal1);
-		//System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
-		//System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
-		//System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));
+		/*System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
+		System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
+		System.out.println("Proposal exists in the system? > " + proposals.existsById(proposal1.getId()));*/
 		//users.save(ecmaUser);
 
+		Section section1 = new Section();
+		section1.setTitle("Section1 -> title");
+		sections.save(section1);
+		System.out.println("1- Proposal have 0 sections");
+		System.out.println();
+		System.out.println("-----------ADDING----------");
+		System.out.println();
+		proposal1.addSection(section1);
+		System.out.println("2- Proposal have now "+proposal1.getSections().size()+" sections");
+		System.out.println("3- Section1 is associated with Proposal? > "+proposal1.getSections().contains(section1));
+		System.out.println("4- Section1 exists in the system? > "+sections.existsById(section1.getId()));
+		System.out.println();
+		System.out.println("-----------REMOVING----------");
+		System.out.println();
+		proposal1.removeSection(section1);
+		System.out.println("5- Proposal have now "+proposal1.getSections().size()+" sections");
+		System.out.println("6- Section1 is associated with Proposal? > "+proposal1.getSections().contains(section1));
+		System.out.println("7- Section1 exists in the system? > "+sections.existsById(section1.getId()));
 	}
 }

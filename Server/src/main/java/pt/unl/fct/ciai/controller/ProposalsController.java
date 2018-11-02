@@ -1,6 +1,7 @@
 package pt.unl.fct.ciai.controller;
 
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.ciai.exceptions.ConflictException;
 import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.repository.CommentsRepository;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
@@ -11,6 +12,7 @@ import pt.unl.fct.ciai.repository.ProposalsRepository;
 import pt.unl.fct.ciai.repository.ReviewsRepository;
 import pt.unl.fct.ciai.model.Section;
 import pt.unl.fct.ciai.model.User;
+import pt.unl.fct.ciai.repository.SectionsRepository;
 
 import java.util.Optional;
 
@@ -21,12 +23,14 @@ public class ProposalsController {
     private ProposalsRepository proposals;
     private ReviewsRepository reviews;
     private CommentsRepository comments;
+    private SectionsRepository sections;
 
     public ProposalsController(ProposalsRepository proposals, ReviewsRepository reviews,
-                               CommentsRepository comments) {
+                               CommentsRepository comments, SectionsRepository sections) {
         this.proposals = proposals;
         this.reviews = reviews;
         this.comments = comments;
+        this.sections = sections;
     }
 
     @GetMapping("")
@@ -73,30 +77,55 @@ public class ProposalsController {
         } else
             throw new NotFoundException("Proposal with id "+id+" does not exist.");
     }
-    
-    // TODO
+
     @GetMapping("/{id}/sections")
     Iterable<Section> getAllSectionsOfProposal(@PathVariable long id){
-        return null;
+
+        Optional<Proposal> p = proposals.findById(id);
+        if(p.isPresent()){
+            return p.get().getSections();
+        }
+        else throw new NotFoundException("Proposal with id" +id+" not found.");
     }
-    
-    // TODO
+
     @PostMapping("/{id}/sections")
     void addSectionOfProposal(@PathVariable long id, @RequestBody Section section){
-        
+        Optional<Proposal> p = proposals.findById(id);
+        if(p.isPresent()){
+            if(!p.get().getSections().contains(section))
+                sections.save(section);
+            else throw new ConflictException("Section already associated with proposal " + id);
+        }
+        else throw new NotFoundException("Proposal "+id+" not found.");
     }
-    
-    // TODO
+
     @PutMapping("/{pid}/sections/{sid}")
     void updateSectionOfProposal(@PathVariable long pid, @PathVariable long sid, @RequestBody Section section){
-        
+        if(section.getId() == sid) {
+            Optional<Proposal> p = proposals.findById(pid);
+            if (p.isPresent()){
+                if(p.get().getSections().contains(section))
+                    sections.save(section);
+                else throw new NotFoundException("Proposal "+pid+" does not have associated Section "+sid);
+            }
+            else throw new NotFoundException("Proposal "+pid+" not found.");
+        }
+        else throw new BadRequestException("Invalid request: sectionID on request does not match the SectionClass id attribute");
     }
-    
-    // TODO
+
     @DeleteMapping("/{pid}/sections/{sid}")
     void deleteSectionOfProposal(@PathVariable long pid, @PathVariable long sid){
-        
+        Optional<Proposal> p = proposals.findById(pid);
+        if(p.isPresent()) {
+            Optional<Section> s = sections.findById(sid);
+            if(s.isPresent() && p.get().getSections().contains(s)){
+                sections.deleteById(sid);
+            }
+            else throw new NotFoundException("Proposal "+pid+" does not have Section "+sid+" associated.");
+        }
+        else throw new NotFoundException("Proposal "+pid+" not found.");
     }
+
 
     @GetMapping("/{id}/reviews")
     Iterable<Review> getAllReviewsOfProposal(@RequestParam(required = false) String search){

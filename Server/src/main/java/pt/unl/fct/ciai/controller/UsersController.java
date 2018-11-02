@@ -59,7 +59,7 @@ public class UsersController {
                 throw new NotFoundException("User with id "+id+" does not exist.");
         }
         else
-            throw new BadRequestException("invalid request");
+            throw new BadRequestException("Invalid request: userID on request does not match the UserClass id attribute");
     }
 
     @DeleteMapping("/{id}")
@@ -92,14 +92,14 @@ public class UsersController {
         }
         else throw new NotFoundException("User "+id+" not found.");
     }
-    
+
     // Apaga proposta {pid} à lista de propostas que o User {uid} tem de aprovar
     @DeleteMapping("/{uid}/approverInProposals/{pid}")
     void deleteUserApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
         Optional<User> u = users.findById(uid);
         if(u.isPresent()){
             Optional<Proposal> p = toApprove.findById(pid);
-            if(u.get().getProposalsToApprove().contains(p))
+            if(p.isPresent() && u.get().getProposalsToApprove().contains(p))
                 toApprove.deleteById(pid);
             else throw new NotFoundException("User "+uid+" does not have proposal "+pid+" to approve.");
         }
