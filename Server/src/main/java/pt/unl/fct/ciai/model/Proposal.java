@@ -9,8 +9,8 @@ import java.util.Set;
 @Entity
 @Table(name = "proposals")
 public class Proposal {
-    @Id
-    @GeneratedValue
+	
+    @Id @GeneratedValue
     private long id;
     private boolean isApproved;
     private String date;
