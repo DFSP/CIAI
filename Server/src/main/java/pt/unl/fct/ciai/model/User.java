@@ -59,10 +59,6 @@ public class User {
 		return this.proposalsToApprove;
 	}
 
-
-
-
-
 	public long getId() {
 		return id;
 	}
