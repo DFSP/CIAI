@@ -122,7 +122,7 @@ public class ProposalsController {
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent()) {
             Optional<Section> s = sections.findById(sid);
-            if(s.isPresent() && p.get().getSections().contains(s)){
+            if(s.isPresent() && p.get().getSections().contains(s.get())){
                 sections.deleteById(sid);
             }
             else throw new NotFoundException("Proposal "+pid+" does not have Section "+sid+" associated.");
@@ -182,7 +182,7 @@ public class ProposalsController {
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent()) {
             Optional<Review> r = reviews.findById(rid);
-            if(r.isPresent() && p.get().getSections().contains(r)){
+            if(r.isPresent() && p.get().getReviews().contains(r.get())){
                 reviews.deleteById(rid);
             }
             else throw new NotFoundException("Proposal "+pid+" does not have Review "+rid+" associated.");
@@ -242,7 +242,7 @@ public class ProposalsController {
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent()) {
             Optional<Comment> c = comments.findById(cid);
-            if(c.isPresent() && p.get().getComments().contains(c)){
+            if(c.isPresent() && p.get().getComments().contains(c.get())){
                 comments.deleteById(cid);
             }
             else throw new NotFoundException("Proposal "+pid+" does not have Comment "+cid+" associated.");

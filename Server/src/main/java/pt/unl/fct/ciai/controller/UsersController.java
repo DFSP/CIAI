@@ -9,10 +9,7 @@ import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.ProposalsRepository;
 import pt.unl.fct.ciai.repository.UsersRepository;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -99,7 +96,7 @@ public class UsersController {
         Optional<User> u = users.findById(uid);
         if(u.isPresent()){
             Optional<Proposal> p = toApprove.findById(pid);
-            if(p.isPresent() && u.get().getProposalsToApprove().contains(p))
+            if(p.isPresent() && u.get().getProposalsToApprove().contains(p.get()))
                 toApprove.deleteById(pid);
             else throw new NotFoundException("User "+uid+" does not have proposal "+pid+" to approve.");
         }
