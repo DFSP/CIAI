@@ -215,10 +215,10 @@ public class ProposalsController {
     
     // TODO
     @GetMapping("/{pid}/comments/{cid}")
-    Optional<Comment> getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
+    Comment getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent())
-            return comments.findById(cid); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
+            return comments.findById(cid).get(); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
         else throw new NotFoundException("Proposal "+pid+" not found.");
     }
 
