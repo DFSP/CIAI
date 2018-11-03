@@ -153,13 +153,18 @@ public class ProposalsController {
         else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
-    //TODO
     @GetMapping("/{pid}/reviews/{rid}")
     Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
         Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent())
-            return reviews.findById(rid).get(); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+        Optional<Review> r = reviews.findById(rid);
+        if(p.isPresent()) {
+            if (r.isPresent()) {
+                Review review = r.get();
+                if (review.getProposal().equals(p.get()))
+                    return review;
+                else throw new BadRequestException(String.format("Review with id %d does not belong to proposal id %d.", rid, pid));
+            } else throw new NotFoundException(String.format("Review with id %d does not exist.", rid));
+        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
 
     @PutMapping("/{pid}/reviews/{rid}")
