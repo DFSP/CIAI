@@ -1,13 +1,13 @@
 package pt.unl.fct.ciai.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
 
-public interface CompaniesRepository extends CrudRepository<Company, Long> {
+public interface CompaniesRepository extends JpaRepository<Company, Long> {
 	
 	@Query("SELECT c "
 			+ "FROM Company c "

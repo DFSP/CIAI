@@ -16,11 +16,11 @@ import java.util.Optional;
 public class UsersController {
 
     private final UsersRepository users;
-    private final ProposalsRepository toApprove;
+    private final ProposalsRepository proposals;
 
-    public UsersController(UsersRepository users, ProposalsRepository toApprove) {
+    public UsersController(UsersRepository users, ProposalsRepository proposals) {
         this.users = users;
-        this.toApprove = toApprove;
+        this.proposals = proposals;
     }
 
     @GetMapping("")
@@ -37,7 +37,7 @@ public class UsersController {
         if(u1.isPresent())
             return u1.get();
         else{
-            throw new NotFoundException("User with id "+id+" does not exist.");
+            throw new NotFoundException(String.format("User with id %d does not exist.", id));
         }
     }
 
@@ -53,7 +53,7 @@ public class UsersController {
             if (u1.isPresent())
                 users.save(user);
             else
-                throw new NotFoundException("User with id "+id+" does not exist.");
+                throw new NotFoundException(String.format("User with id %d does not exist.", id));
         }
         else
             throw new BadRequestException("Invalid request: userID on request does not match the UserClass id attribute");
@@ -65,7 +65,7 @@ public class UsersController {
         if( u1.isPresent() ) {
             users.delete(u1.get());
         } else
-            throw new NotFoundException("User with id "+id+" does not exist.");
+            throw new NotFoundException(String.format("User with id %d does not exist.", id));
     }
 
     // Obter a lista de propostas que o User {id} pode aprovar
@@ -75,7 +75,7 @@ public class UsersController {
         if(u.isPresent()){
             return u.get().getProposalsToApprove();
         }
-        else throw new NotFoundException("User with id" +id+" not found.");
+        else throw new NotFoundException(String.format("User with id %d does not exist.", id));
     }
 
     // Add proposta à lista de propostas para o User {id} aprovar
@@ -84,10 +84,10 @@ public class UsersController {
         Optional<User> u = users.findById(id);
         if(u.isPresent()){
             if(!u.get().getProposalsToApprove().contains(proposal))
-                toApprove.save(proposal);
-            else throw new ConflictException("Proposal already to be approved by the user " + id);
+                u.get().addProposalToApprove(proposal); //TODO: check if this is enough... (need to save user?)
+            else throw new ConflictException(String.format("Proposal already approved by the user with id %d", id));
         }
-        else throw new NotFoundException("User "+id+" not found.");
+        else throw new NotFoundException(String.format("User with id %d does not exist.", id));
     }
 
     // Apaga proposta {pid} à lista de propostas que o User {uid} tem de aprovar
@@ -95,11 +95,11 @@ public class UsersController {
     void deleteUserApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
         Optional<User> u = users.findById(uid);
         if(u.isPresent()){
-            Optional<Proposal> p = toApprove.findById(pid);
+            Optional<Proposal> p = proposals.findById(pid);
             if(p.isPresent() && u.get().getProposalsToApprove().contains(p.get()))
-                toApprove.deleteById(pid);
-            else throw new NotFoundException("User "+uid+" does not have proposal "+pid+" to approve.");
+                u.get().removeProposalToApprove(p.get()); //TODO: check if this is enough... (need to save user?)
+            else throw new NotFoundException(String.format("User with id %d does not have proposal id %d to approve.", uid, pid));
         }
-        else throw new NotFoundException("User "+uid+" not found.");
+        else throw new NotFoundException(String.format("User with id %d does not exist.", uid));
     }
 }

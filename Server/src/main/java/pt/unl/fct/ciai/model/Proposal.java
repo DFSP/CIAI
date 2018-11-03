@@ -27,6 +27,9 @@ public class Proposal {
     @JsonIgnore
     @ManyToOne @JoinColumn(name="approver_id")
     private User approver;
+    
+    @ManyToMany(mappedBy = "bidingInterests", cascade = CascadeType.ALL)
+    private Set<User> usersForBiding;
 
     public Proposal() {
     }
@@ -35,13 +38,6 @@ public class Proposal {
         this.isApproved = isApproved;
         this.date = date;
     }
-
-
-
-
-
-
-
 
     public long getId() {
         return id;
@@ -66,8 +62,6 @@ public class Proposal {
     public void setDate(String date) {
         this.date = date;
     }
-
-
 
     public Set<Section> getSections() {
         return sections;
@@ -126,5 +120,20 @@ public class Proposal {
 
     public void setApprover(User approver) {
         this.approver = approver;
+    }
+    
+    public Set<User> getUsersForBiding() {
+    	return this.usersForBiding;
+    }
+    
+    public void addUserForBiding(User user) {
+        if (this.usersForBiding == null)
+            this.usersForBiding = new HashSet<User>();
+        this.usersForBiding.add(user);
+    }
+    
+    public void removeUserForBiding(User user) {
+    	if (this.usersForBiding != null)
+    		this.usersForBiding.remove(user);
     }
 }
