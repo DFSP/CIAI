@@ -73,7 +73,7 @@ public class CompaniesController { //implements CompaniesApi {
 	@PutMapping(value = "/{pid}/employees/{eid}")
 	public void updateOneCompanyEmployee(@PathVariable("id") long pid, @PathVariable long eid, @RequestBody Employee employee) {
 		findCompanyOrThrowException(pid); // Just to make sure the company exists. If not, throw exception.
-		Employee employeeFound = findEmployeeOrThrowException(pid);
+		Employee employeeFound = findEmployeeOrThrowException(eid);
 		if (employee.getId() == eid) {
 			if (employeeFound.getCompany().getId() == pid) {
 				employees.save(employee);
@@ -84,12 +84,10 @@ public class CompaniesController { //implements CompaniesApi {
 	@DeleteMapping(value = "/{pid}/employees/{eid}")
 	public void deleteOneCompanyEmployee(@PathVariable("id") long pid, @PathVariable long eid) {
 		findCompanyOrThrowException(pid); // Just to make sure the company exists. If not, throw exception.
-		Employee employeeFound = findEmployeeOrThrowException(pid);
-		if (employeeFound.getId() == eid) {
-			if (employeeFound.getCompany().getId() == pid) {
-				employees.deleteById(eid);
-			} else throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, pid));
-		} else throw new BadRequestException("Invalid request: Request body employee eid and path paramenter eid don't match.");
+		Employee employeeFound = findEmployeeOrThrowException(eid);
+		if (employeeFound.getCompany().getId() == pid) {
+			employees.deleteById(eid);
+		} else throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, pid));
 	}	
 	
 	@PostMapping(value = "/{id}/employees")
