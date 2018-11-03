@@ -47,7 +47,7 @@ public class ProposalsController {
         if(p1.isPresent())
             return p1.get();
         else{
-            throw new NotFoundException("Proposal with id "+id+" does not exist.");
+            throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
         }
     }
 
@@ -63,10 +63,10 @@ public class ProposalsController {
             if (p1.isPresent())
                 proposals.save(proposal);
             else
-                throw new NotFoundException("Proposal with id "+id+" does not exist.");
+                throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
         }
         else
-            throw new BadRequestException("invalid request");
+            throw new BadRequestException("Invalid request: Body request proposal id and path id don't match.");
     }
 
     @DeleteMapping("/{id}")
@@ -75,13 +75,12 @@ public class ProposalsController {
         if( p1.isPresent() ) {
             proposals.delete(p1.get());
         } else
-            throw new NotFoundException("Proposal with id "+id+" does not exist.");
+            throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
-    //TODO
+    // TODO
     @GetMapping("/{id}/sections")
     Iterable<Section> getAllSectionsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-
         Optional<Proposal> p = proposals.findById(id);
         if(p.isPresent()){
             if (search == null)
@@ -89,7 +88,7 @@ public class ProposalsController {
             else
                 return sections.searchSections(search); // ----> ver isto
         }
-        else throw new NotFoundException("Proposal with id" +id+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
     @PostMapping("/{id}/sections")
@@ -98,9 +97,9 @@ public class ProposalsController {
         if(p.isPresent()){
             if(!p.get().getSections().contains(section))
                 sections.save(section);
-            else throw new ConflictException("Section already associated with proposal " + id);
+            else throw new ConflictException(String.format("Section already associated with proposal id %d.", id));
         }
-        else throw new NotFoundException("Proposal "+id+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
     @PutMapping("/{pid}/sections/{sid}")
@@ -110,9 +109,9 @@ public class ProposalsController {
             if (p.isPresent()){
                 if(p.get().getSections().contains(section))
                     sections.save(section);
-                else throw new NotFoundException("Proposal "+pid+" does not have associated Section "+sid);
+                else throw new BadRequestException(String.format("Proposal id %d does not have Section id %id associated", pid, sid));
             }
-            else throw new NotFoundException("Proposal "+pid+" not found.");
+            else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
         }
         else throw new BadRequestException("Invalid request: sectionID on request does not match the Section.id attribute");
     }
@@ -122,15 +121,15 @@ public class ProposalsController {
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent()) {
             Optional<Section> s = sections.findById(sid);
-            if(s.isPresent() && p.get().getSections().contains(s)){
+            if(s.isPresent() && p.get().getSections().contains(s.get())){
                 sections.deleteById(sid);
             }
-            else throw new NotFoundException("Proposal "+pid+" does not have Section "+sid+" associated.");
+            else throw new BadRequestException(String.format("Proposal id %d does not have Section id %id associated", pid, sid));
         }
-        else throw new NotFoundException("Proposal "+pid+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
 
-    //TODO
+    // TODO
     @GetMapping("/{id}/reviews")
     Iterable<Review> getAllReviewsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
         Optional<Proposal> p = proposals.findById(id);
@@ -140,7 +139,7 @@ public class ProposalsController {
             else
                 return reviews.searchReviews(search); // ----> ver isto TODO
         }
-        else throw new NotFoundException("Proposal "+id+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
     @PostMapping("/{id}/reviews")
@@ -149,18 +148,18 @@ public class ProposalsController {
         if(p.isPresent()){
             if(!p.get().getReviews().contains(review))
                 reviews.save(review);
-            else throw new ConflictException("Review already associated with proposal " + id);
+            else throw new ConflictException(String.format("Review already associated with proposal id %d", id));
         }
-        else throw new NotFoundException("Proposal "+id+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
     //TODO
     @GetMapping("/{pid}/reviews/{rid}")
-    Optional<Review> getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
+    Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent())
-            return reviews.findById(rid); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
-        else throw new NotFoundException("Proposal "+pid+" not found.");
+            return reviews.findById(rid).get(); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
 
     @PutMapping("/{pid}/reviews/{rid}")
@@ -170,9 +169,9 @@ public class ProposalsController {
             if (p.isPresent()){
                 if(p.get().getReviews().contains(review))
                     reviews.save(review);
-                else throw new NotFoundException("Proposal "+pid+" does not have associated Review "+rid);
+                else throw new NotFoundException(String.format("Proposal id %d does not have Review id %id associated", pid, rid));
             }
-            else throw new NotFoundException("Proposal "+pid+" not found.");
+            else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
         }
         else throw new BadRequestException("Invalid request: reviewID on request does not match the Review.id attribute");
     }
@@ -182,12 +181,12 @@ public class ProposalsController {
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent()) {
             Optional<Review> r = reviews.findById(rid);
-            if(r.isPresent() && p.get().getSections().contains(r)){
+            if(r.isPresent() && p.get().getReviews().contains(r.get())){
                 reviews.deleteById(rid);
             }
-            else throw new NotFoundException("Proposal "+pid+" does not have Review "+rid+" associated.");
+            else throw new NotFoundException(String.format("Proposal id %d does not have Review id %id associated", pid, rid));
         }
-        else throw new NotFoundException("Proposal "+pid+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
 
     //TODO
@@ -200,7 +199,7 @@ public class ProposalsController {
             else
                 return comments.searchComments(search); // ----> ver isto TODO
         }
-        else throw new NotFoundException("Proposal "+id+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
 
     @PostMapping("/{id}/comments")
@@ -209,18 +208,23 @@ public class ProposalsController {
         if(p.isPresent()){
             if(!p.get().getComments().contains(comment))
                 comments.save(comment);
-            else throw new ConflictException("Comment already associated with proposal " + id);
+            else throw new ConflictException(String.format("Comment already associated with proposal id %d", id));
         }
-        else throw new NotFoundException("Proposal "+id+" not found.");
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
     }
     
-    // TODO
     @GetMapping("/{pid}/comments/{cid}")
-    Optional<Comment> getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
+    Comment getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
         Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent())
-            return comments.findById(cid); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
-        else throw new NotFoundException("Proposal "+pid+" not found.");
+        Optional<Comment> c = comments.findById(cid);
+        if(p.isPresent()) {
+            if (c.isPresent()) {
+            	Comment comment = c.get();
+            	if (comment.getProposal().equals(p.get()))
+            		return comment;
+            	else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
+            } else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
+        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
 
     @PutMapping("/{pid}/comments/{cid}")
@@ -228,26 +232,27 @@ public class ProposalsController {
         if(comment.getId() == cid) {
             Optional<Proposal> p = proposals.findById(pid);
             if (p.isPresent()){
-                if(p.get().getComments().contains(comment))
-                    comments.save(comment);
-                else throw new NotFoundException("Proposal "+pid+" does not have associated Comment "+cid);
-            }
-            else throw new NotFoundException("Proposal "+pid+" not found.");
-        }
-        else throw new BadRequestException("Invalid request: commentID on request does not match the Comment.id attribute");
+            	Optional<Comment> c = comments.findById(cid);
+            	if (c.isPresent()) {
+            		if (c.get().getProposal().equals(p.get()))
+            			comments.save(comment);
+            		else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
+            	} else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
+            } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+        } else throw new BadRequestException("Invalid request: commentID on request does not match the Comment.id attribute");
     }
     
     @DeleteMapping("/{pid}/comments/{cid}")
     void deleteOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent()) {
-            Optional<Comment> c = comments.findById(cid);
-            if(c.isPresent() && p.get().getComments().contains(c)){
-                comments.deleteById(cid);
-            }
-            else throw new NotFoundException("Proposal "+pid+" does not have Comment "+cid+" associated.");
-        }
-        else throw new NotFoundException("Proposal "+pid+" not found.");
+    	Optional<Proposal> p = proposals.findById(pid);
+    	if (p.isPresent()){
+    		Optional<Comment> c = comments.findById(cid);
+    		if (c.isPresent()) {
+    			if (c.get().getProposal().equals(p.get()))
+    				comments.deleteById(cid);
+    			else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
+    		} else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
+    	} else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
     
     // TODO
