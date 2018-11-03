@@ -7,8 +7,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "employees")
 public class Employee extends User {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	
+	@Id @GeneratedValue
 	private long id;
 
 	@JsonIgnore
@@ -24,13 +24,13 @@ public class Employee extends User {
 	private String gender;
 	private double salary;
 	private String birthday;
+	
+	public Employee() { }
 
-	public Employee(){}
-
-	public Employee(String first_name, String last_name, String username, String email, String role, String password,
+	public Employee(String firstName, String lastName, String username, String email, String role, String password,
 			String city, String address, String zipCode, String cellPhone,
 			String homePhone, String gender, double salary, String birthday) {
-		super(first_name, last_name, username, email, role, password);
+		super(firstName, lastName, username, email, role, password);
 		this.city = city;
 		this.address = address;
 		this.zipCode = zipCode;
