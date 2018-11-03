@@ -78,10 +78,9 @@ public class ProposalsController {
             throw new NotFoundException("Proposal with id "+id+" does not exist.");
     }
 
-    //TODO
+    // TODO
     @GetMapping("/{id}/sections")
     Iterable<Section> getAllSectionsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-
         Optional<Proposal> p = proposals.findById(id);
         if(p.isPresent()){
             if (search == null)
@@ -130,7 +129,7 @@ public class ProposalsController {
         else throw new NotFoundException("Proposal "+pid+" not found.");
     }
 
-    //TODO
+    // TODO
     @GetMapping("/{id}/reviews")
     Iterable<Review> getAllReviewsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
         Optional<Proposal> p = proposals.findById(id);
@@ -156,10 +155,10 @@ public class ProposalsController {
 
     //TODO
     @GetMapping("/{pid}/reviews/{rid}")
-    Optional<Review> getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
+    Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
         Optional<Proposal> p = proposals.findById(pid);
         if(p.isPresent())
-            return reviews.findById(rid); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
+            return reviews.findById(rid).get(); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
         else throw new NotFoundException("Proposal "+pid+" not found.");
     }
 

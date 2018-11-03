@@ -75,18 +75,18 @@ public class CompaniesController { //implements CompaniesApi {
 	public void deleteOneCompanyEmployee(@PathVariable("id") long pid, @PathVariable long eid) {
 		
 	}	
-
-	@GetMapping(value = "/{id}/employees")
-	public Iterable<Employee> getCompanyEmployees(@PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
-		return search == null ? findCompanyOrThrowException(id).getEmployees() : companies.searchEmployees(search);
-	}
-
+	
 	@PostMapping(value = "/{id}/employees")
-	public void addCompanyContact(@PathVariable("id") long id, @RequestBody Employee employee) {
+	public void addOneCompanyEmployee(@PathVariable("id") long id, @RequestBody Employee employee) {
 		Company company = findCompanyOrThrowException(id);
 		employee.setCompany(company);
 		company.addEmployee(employee);
 		companies.save(company);
+	}
+	
+	@GetMapping(value = "/{id}/employees")
+	public Iterable<Employee> getCompanyEmployees(@PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+		return search == null ? findCompanyOrThrowException(id).getEmployees() : companies.searchEmployees(search);
 	}
 	
 	private Company findCompanyOrThrowException(long id) {
