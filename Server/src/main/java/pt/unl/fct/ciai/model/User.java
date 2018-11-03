@@ -30,6 +30,9 @@ public class User {
 
 	@OneToMany(mappedBy="approver") // cascade?
 	private Set<Proposal> proposalsToApprove;
+	
+	@ManyToMany
+	private Set<Proposal> bidingInterests;
 
 	public User(){}
 

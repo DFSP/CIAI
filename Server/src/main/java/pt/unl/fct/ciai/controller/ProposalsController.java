@@ -13,6 +13,7 @@ import pt.unl.fct.ciai.repository.ReviewsRepository;
 import pt.unl.fct.ciai.model.Section;
 import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.SectionsRepository;
+import pt.unl.fct.ciai.repository.UsersRepository;
 
 import java.util.Optional;
 
@@ -24,13 +25,16 @@ public class ProposalsController {
     private ReviewsRepository reviews;
     private CommentsRepository comments;
     private SectionsRepository sections;
+    private UsersRepository users;
 
     public ProposalsController(ProposalsRepository proposals, ReviewsRepository reviews,
-                               CommentsRepository comments, SectionsRepository sections) {
+                               CommentsRepository comments, SectionsRepository sections,
+                               UsersRepository users) {
         this.proposals = proposals;
         this.reviews = reviews;
         this.comments = comments;
         this.sections = sections;
+        this.users = users;
     }
 
     @GetMapping("")
@@ -255,22 +259,31 @@ public class ProposalsController {
     	} else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
     
-    // TODO
     @GetMapping("/{pid}/usersForBiding")
     Iterable<User> getUsersForBidingOfProposal(@PathVariable long pid){
-        return null;
+        Optional<Proposal> p = proposals.findById(pid);
+        if (p.isPresent())
+        	return p.get().getUsersForBiding();
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
     
-    // TODO
-    @PostMapping("/{pid}/usersForBiding/{uid}")
-    void addUserForBiding(@PathVariable long pid, @PathVariable long uid, @RequestBody User user){
-        
+    @PostMapping("/{pid}/usersForBiding}")
+    void addUserForBiding(@PathVariable long pid, @RequestBody User user){
+    	Optional<Proposal> p = proposals.findById(pid);
+        if (p.isPresent())
+        	p.get().addUserForBiding(user);
+        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }
     
-    // TODO
     @DeleteMapping("/{pid}/usersForBiding/{uid}")
     void deleteUserForBiding(@PathVariable long pid, @PathVariable long uid){
-        
+    	Optional<Proposal> p = proposals.findById(pid);
+        if (p.isPresent()) {
+        	Optional<User> user = users.findById(uid);
+        	if (user.isPresent())
+        		p.get().removeUserForBiding(user.get());
+        	else throw new NotFoundException(String.format("User with id %d does not exist.", uid));
+        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
     }    
 
 }
