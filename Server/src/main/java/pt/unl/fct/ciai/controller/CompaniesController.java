@@ -76,6 +76,7 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@PutMapping(value = "/{id}")
+	// @CanModifyCompany
 	public ResponseEntity<?> updateCompany(@PathVariable("id") long id, @RequestBody Company newCompany) {
 		if (id != newCompany.getId()) {
 			throw new BadRequestException(String.format("Path id %d does not match company id %d", id, newCompany.getId()));
@@ -86,6 +87,7 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@DeleteMapping(value = "/{id}")
+	// @CanDeleteCompany
 	public ResponseEntity<?> deleteCompany(@PathVariable("id") long id) {
 		Company deletedCompany = findCompany(id);
 		companiesRepository.deleteById(id);
@@ -115,6 +117,7 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@PostMapping(value = "/{id}/employees")
+	// @CanAddEmployee
 	public ResponseEntity<Resource<Employee>> addEmployee(@PathVariable("id") long id, @RequestBody Employee employee) throws URISyntaxException {	
 		Company company = findCompany(id);
 		employee.setCompany(company);
@@ -128,6 +131,7 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@PutMapping(value = "/{pid}/employees/{eid}")
+	// @CanModifyEmployee
 	public ResponseEntity<?> updateEmployee(@PathVariable("id") long cid, @PathVariable long eid, @RequestBody Employee newEmployee) {
 		Company company = findCompany(cid);
 		Employee oldEmployee = findEmployee(eid);
@@ -142,6 +146,7 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@DeleteMapping(value = "/{pid}/employees/{eid}")
+	// @CanDeleteEmployee
 	public ResponseEntity<?> deleteEmployee(@PathVariable("id") long cid, @PathVariable long eid) {		
 		Company company = findCompany(cid);
 		Employee employee = findEmployee(eid);

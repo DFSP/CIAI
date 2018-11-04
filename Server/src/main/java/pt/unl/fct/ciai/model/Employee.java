@@ -25,11 +25,15 @@ public class Employee extends User {
 	private double salary;
 	private String birthday;
 	
+	@OneToOne(optional = true)
+	@JoinColumn(name = "company_id", nullable = true)
+    private Company adminOfCompany;
+	
 	public Employee() { }
 
 	public Employee(String firstName, String lastName, String username, String email, String role, String password,
 			String city, String address, String zipCode, String cellPhone,
-			String homePhone, String gender, double salary, String birthday) {
+			String homePhone, String gender, double salary, String birthday, boolean isAdmin) {
 		super(firstName, lastName, username, email, role, password);
 		this.city = city;
 		this.address = address;
