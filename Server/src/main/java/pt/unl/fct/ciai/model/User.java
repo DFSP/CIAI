@@ -34,6 +34,18 @@ public class User {
 	@JsonIgnore
 	@ManyToMany
 	private Set<Proposal> proposalBiddings;
+	
+	@ManyToMany
+	private Set<Proposal> userInProposals;
+	
+	@OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    private Set<Proposal> myOwnProposals;
+	
+	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private Set<Review> authorOfReviews;
+	
+	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private Set<Comment> authorOfComments;
 
 	public User() { }
 
@@ -118,6 +130,17 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public Set<Proposal> getUserInProposals() {
+		return this.userInProposals;
+	}
+	
+	public void addProposal(Proposal p) {
+		if (this.userInProposals == null) {
+			this.userInProposals = new HashSet<Proposal>();
+		}
+		this.userInProposals.add(p);
 	}
 
     public Set<Proposal> getBiddings() {

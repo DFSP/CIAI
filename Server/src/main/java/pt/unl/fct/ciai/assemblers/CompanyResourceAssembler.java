@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.CompaniesController;

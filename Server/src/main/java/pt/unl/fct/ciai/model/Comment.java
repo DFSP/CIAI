@@ -26,10 +26,15 @@ public class Comment {
 
     private String title;
     private String text;
+    
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date date;
+    
+    @ManyToOne
+    @JoinColumn(name = "comments_id")
+    private User author;
 
-    public Comment(){}
+    public Comment() { }
 
     public Comment(String title, String text) {
         this.title = title;
@@ -74,6 +79,14 @@ public class Comment {
 
     public void setProposal(Proposal proposal) {
         this.proposal = proposal;
+    }
+    
+    public User getAuthor() {
+    	return this.author;
+    }
+    
+    public void setAuthor(User u) {
+    	this.author = u;
     }
 
 

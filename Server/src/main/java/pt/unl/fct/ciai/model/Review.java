@@ -28,10 +28,14 @@ public class Review {
     private String text;
     private String summary;
     private double classification;
+    
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date date;
 
-    public Review(){ }
+    @ManyToOne
+    private User author;
+
+    public Review() { }
 
     public Review(String title, String text, String summary, double classification, String date) {
         this.title = title;
@@ -94,5 +98,13 @@ public class Review {
 
     public void setProposal(Proposal proposal) {
         this.proposal = proposal;
+    }
+    
+    public User getAuthor() {
+    	return this.author;
+    }
+    
+    public void setAuthor(User u) {
+    	this.author = u;
     }
 }

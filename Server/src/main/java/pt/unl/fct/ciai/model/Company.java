@@ -25,6 +25,9 @@ public class Company {
 	@JsonIgnore
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private Set<Employee> employees;
+	
+	@OneToOne(mappedBy = "adminOfCompany", cascade = CascadeType.ALL)
+	private Employee myAdmin;
 
 	public Company() { }
 
@@ -116,6 +119,14 @@ public class Company {
 
 	public void setEmployees(Set<Employee> employees) {
 		this.employees = employees;
+	}
+	
+	public Employee getAdmin() {
+		return this.myAdmin;
+	}
+	
+	public void setAdmin(Employee employee) {
+		this.myAdmin = employee;
 	}
 
 	@Override

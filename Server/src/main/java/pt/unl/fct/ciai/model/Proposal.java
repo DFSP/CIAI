@@ -40,8 +40,13 @@ public class Proposal {
     @ManyToMany(mappedBy = "proposalBiddings", cascade = CascadeType.ALL)
     private Set<User> biddings;
 
-    public Proposal() {
-    }
+    @ManyToMany(mappedBy = "userInProposals", cascade = CascadeType.ALL)
+    private Set<User> members;
+    
+    @ManyToOne @JoinColumn(name="user_id")
+    private User creator;
+
+    public Proposal() { }
 
     public Proposal(boolean isApproved) {
         this.isApproved = isApproved;
@@ -143,5 +148,13 @@ public class Proposal {
     public void removeBidding(User user) {
     	if (this.biddings != null)
     		this.biddings.remove(user);
+    }
+    
+    public void setCreator(User user) {
+    	this.creator = user;
+    }
+    
+    public User getCreator() {
+    	return this.creator;
     }
 }
