@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.assembler;
+package pt.unl.fct.ciai.assemblers;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;

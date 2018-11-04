@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.repository.CommentsRepository;
-import pt.unl.fct.ciai.assembler.CommentResourceAssembler;
+import pt.unl.fct.ciai.assemblers.CommentResourceAssembler;
 import pt.unl.fct.ciai.assemblers.ProposalResourceAssembler;
 import pt.unl.fct.ciai.assemblers.ReviewResourceAssembler;
 import pt.unl.fct.ciai.assemblers.SectionResourceAssembler;

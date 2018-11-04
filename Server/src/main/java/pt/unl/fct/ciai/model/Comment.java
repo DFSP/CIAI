@@ -85,8 +85,8 @@ public class Comment {
     	return this.author;
     }
     
-    public void setAuthor(User u) {
-    	this.author = u;
+    public void setAuthor(User user) {
+    	this.author = user;
     }
 
 

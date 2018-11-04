@@ -154,7 +154,7 @@ public class CompaniesController { //implements CompaniesApi {
 		}
 		employeesRepository.delete(employee);
 		return ResponseEntity.noContent().build();
-	}	
+	}
 
 	private Company findCompany(long id) {
 		return companiesRepository.findById(id)
