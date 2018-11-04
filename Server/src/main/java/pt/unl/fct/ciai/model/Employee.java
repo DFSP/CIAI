@@ -25,8 +25,8 @@ public class Employee extends User {
 	private double salary;
 	private String birthday;
 	
-	@OneToOne(optional = true)
-	@JoinColumn(name = "company_id", nullable = true)
+	@OneToOne
+	@JoinColumn(name = "companies_id")
     private Company adminOfCompany;
 	
 	public Employee() { }
