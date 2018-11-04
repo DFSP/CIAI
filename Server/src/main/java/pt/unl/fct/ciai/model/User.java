@@ -16,8 +16,7 @@ import java.util.Set;
 @Table(name = "users")
 public class User {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue
 	private long id;
 
 	private String firstName;
@@ -28,15 +27,18 @@ public class User {
 	@JsonIgnore
 	private String password;
 
+	@JsonIgnore
 	@OneToMany(mappedBy="approver") // cascade?
 	private Set<Proposal> proposalsToApprove;
 	
+	@JsonIgnore
 	@ManyToMany
-	private Set<Proposal> bidingInterests;
+	private Set<Proposal> proposalBiddings;
 
-	public User(){}
+	public User() { }
 
-	public User(String firstName, String lastName, String username, String email, String role, String password) {
+	public User(String firstName, String lastName, String username, 
+			String email, String role, String password) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
@@ -118,4 +120,20 @@ public class User {
 		this.password = password;
 	}
 
+    public Set<Proposal> getBiddings() {
+    	return this.proposalBiddings;
+    }
+    
+    public void addBidding(Proposal proposal) {
+        if (this.proposalBiddings == null)
+            this.proposalBiddings = new HashSet<Proposal>();
+        this.proposalBiddings.add(proposal);
+    }
+    
+    public void removeBidding(Proposal proposal) {
+    	if (this.proposalBiddings != null)
+    		this.proposalBiddings.remove(proposal);
+    }
+	
+	
 }

@@ -3,13 +3,19 @@ package pt.unl.fct.ciai.assemblers;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.hateoas.Resources;
+import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.CompaniesController;
 import pt.unl.fct.ciai.model.Company;
 
-public class CompanyResourceAssembler implements ResourceAssembler<Company, Resource<Company>> {
+@Component
+public class CompanyResourceAssembler implements ResourcesAssembler<Company, Resource<Company>> {
 
 	@Override
 	public Resource<Company> toResource(Company company) {
@@ -18,5 +24,16 @@ public class CompanyResourceAssembler implements ResourceAssembler<Company, Reso
 				linkTo(methodOn(CompaniesController.class).getCompanies()).withRel("companies"),
 				linkTo(methodOn(CompaniesController.class).getEmployees(company.getId())).withRel("employees"));
 	}
-
+	
+	@Override
+	public Resources<Resource<Company>> toResources(Iterable<? extends Company> entities) {
+		List<Resource<Company>> resources = 
+				StreamSupport.stream(entities.spliterator(), false)
+				.map(this::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(resources,
+				linkTo(methodOn(CompaniesController.class).getCompanies()).withSelfRel());
+	}
+	
+	
 }

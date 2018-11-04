@@ -2,7 +2,11 @@ package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Date;
+
 import javax.persistence.*;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "reviews")
@@ -24,7 +28,8 @@ public class Review {
     private String text;
     private String summary;
     private double classification;
-    private String date;
+    @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
+    private Date date;
 
     public Review(){ }
 
@@ -33,7 +38,6 @@ public class Review {
         this.text = text;
         this.summary = summary;
         this.classification = classification;
-        this.date = date;
     }
 
     public long getId() {
@@ -76,11 +80,11 @@ public class Review {
         this.classification = classification;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

@@ -99,7 +99,6 @@ public class CiaiApplication {
 			System.out.println("employeeID > "+e2.get().getId()+" associated with user > "+e2.get().getUser().getUsername());*/
 
 			Review review1 = new Review();
-			review1.setDate("10-12-2012");
 			review1.setClassification(5);
 			review1.setTitle("Review1");
 			review1.setSummary("Very good review");
@@ -109,7 +108,7 @@ public class CiaiApplication {
 			Proposal proposal1 = new Proposal();
 			review1.setProposal(proposal1);
 			proposal1.addReview(review1);
-			proposal1.setDate("12-12-2012");
+			//proposal1.setDate("12-12-2012");
 			proposals.save(proposal1);
 
 			ecmaUser.addProposalToApprove(proposal1);

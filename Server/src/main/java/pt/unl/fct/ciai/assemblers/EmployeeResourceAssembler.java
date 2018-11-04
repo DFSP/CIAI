@@ -21,5 +21,5 @@ public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Re
 			linkTo(methodOn(CompaniesController.class).getEmployee(cid, eid)).withSelfRel(),
 			linkTo(methodOn(CompaniesController.class).getEmployees(cid)).withRel("employees"));
 	}
-
+	
 }

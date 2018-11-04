@@ -1,9 +1,17 @@
 package pt.unl.fct.ciai.controller;
 
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.exceptions.ConflictException;
 import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.repository.CommentsRepository;
+import pt.unl.fct.ciai.assembler.CommentResourceAssembler;
+import pt.unl.fct.ciai.assemblers.ProposalResourceAssembler;
+import pt.unl.fct.ciai.assemblers.ReviewResourceAssembler;
+import pt.unl.fct.ciai.assemblers.SectionResourceAssembler;
+import pt.unl.fct.ciai.assemblers.UserResourceAssembler;
 import pt.unl.fct.ciai.exceptions.BadRequestException;
 import pt.unl.fct.ciai.exceptions.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
@@ -15,280 +23,341 @@ import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.SectionsRepository;
 import pt.unl.fct.ciai.repository.UsersRepository;
 
-import java.util.Optional;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/proposals")
-public class ProposalsController {
+@RequestMapping(value = "/proposals", produces = MediaType.APPLICATION_JSON_VALUE)
+public class ProposalsController { //Implements proposalControllerApi 
+	//TODO apenas com os metodos get, resto fica protected
 
-    private ProposalsRepository proposals;
-    private ReviewsRepository reviews;
-    private CommentsRepository comments;
-    private SectionsRepository sections;
-    private UsersRepository users;
+	private final ProposalsRepository proposalsRepository;
+	private final SectionsRepository sectionsRepository;
+	private final ReviewsRepository reviewsRepository;
+	private final CommentsRepository commentsRepository;
+	private final UsersRepository usersRepository;
 
-    public ProposalsController(ProposalsRepository proposals, ReviewsRepository reviews,
-                               CommentsRepository comments, SectionsRepository sections,
-                               UsersRepository users) {
-        this.proposals = proposals;
-        this.reviews = reviews;
-        this.comments = comments;
-        this.sections = sections;
-        this.users = users;
-    }
+	private final ProposalResourceAssembler proposalAssembler;
+	private final SectionResourceAssembler sectionAssembler;
+	private final ReviewResourceAssembler reviewAssembler;
+	private final CommentResourceAssembler commentAssembler;
+	private final UserResourceAssembler userAssembler;
 
-    @GetMapping("")
-    Iterable<Proposal> getAllProposals(@RequestParam(required = false) String search){
-        if(search == null)
-            return proposals.findAll();
-        else
-            return proposals.searchProposals(search);
-    }
+	public ProposalsController(ProposalsRepository proposalsRepository, SectionsRepository sectionsRepository,
+			ReviewsRepository reviewsRepository, CommentsRepository commentsRepository, UsersRepository usersRepository,
+			ProposalResourceAssembler proposalAssembler, SectionResourceAssembler sectionAssembler,
+			ReviewResourceAssembler reviewAssembler, CommentResourceAssembler commentAssembler,
+			UserResourceAssembler userAssembler) {
+		this.proposalsRepository = proposalsRepository;
+		this.sectionsRepository = sectionsRepository;
+		this.reviewsRepository = reviewsRepository;
+		this.commentsRepository = commentsRepository;
+		this.usersRepository = usersRepository;
+		this.proposalAssembler = proposalAssembler;
+		this.sectionAssembler = sectionAssembler;
+		this.reviewAssembler = reviewAssembler;
+		this.commentAssembler = commentAssembler;
+		this.userAssembler = userAssembler;
+	}
 
-    @GetMapping("/{id}")
-    Proposal getProposalById(@PathVariable long id){
-        Optional<Proposal> p1 = proposals.findById(id);
-        if(p1.isPresent())
-            return p1.get();
-        else{
-            throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-        }
-    }
+	@GetMapping
+	public ResponseEntity<Resources<Resource<Proposal>>> getProposals() {
+		// @RequestParam(required = false) String search) { // TODO search mesmo necessário?
+		Iterable<Proposal> proposals = proposalsRepository.findAll();
+		Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
+		return ResponseEntity.ok(resources);
+	}
 
-    @PostMapping("")
-    void addProposal(@RequestBody Proposal proposal){
-        proposals.save(proposal);
-    }
+	@PostMapping
+	public ResponseEntity<Resource<Proposal>> addProposal(@RequestBody Proposal proposal) throws URISyntaxException {
+		Proposal newProposal = proposalsRepository.save(proposal);
+		Resource<Proposal> resource = proposalAssembler.toResource(newProposal);
+		return ResponseEntity
+				.created(new URI(resource.getId().expand().getHref()))
+				.body(resource);	
+	}
 
-    @PutMapping("/{id}")
-    void updateProposal(@PathVariable long id, @RequestBody Proposal proposal){
-        if(proposal.getId() == id) {
-            Optional<Proposal> p1 = proposals.findById(id);
-            if (p1.isPresent())
-                proposals.save(proposal);
-            else
-                throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-        }
-        else
-            throw new BadRequestException("Invalid request: Body request proposal id and path id don't match.");
-    }
+	@GetMapping("/{id}")
+	public Resource<Proposal> getProposal(@PathVariable("id") long id) {
+		Proposal proposal = findProposal(id);
+		return proposalAssembler.toResource(proposal);
+	}
 
-    @DeleteMapping("/{id}")
-    void deleteProposal(@PathVariable long id) {
-        Optional<Proposal> p1 = proposals.findById(id);
-        if( p1.isPresent() ) {
-            proposals.delete(p1.get());
-        } else
-            throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal newProposal) {  	
+		if (id != newProposal.getId()) {
+			throw new BadRequestException(String.format("Body request proposal id %d and path id %d don't match.", newProposal.getId(), id));
+		}
+		Proposal oldProposal = findProposal(id);
+		proposalsRepository.save(newProposal);
+		return ResponseEntity.noContent().build();
+	}
 
-    // TODO
-    @GetMapping("/{id}/sections")
-    Iterable<Section> getAllSectionsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if (search == null)
-                return p.get().getSections();
-            else
-                return sections.searchSections(search); // ----> ver isto
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteProposal(@PathVariable("id") long id) {
+		Proposal proposal = findProposal(id);
+		proposalsRepository.delete(proposal);
+		return ResponseEntity.noContent().build();
+	}
 
-    @PostMapping("/{id}/sections")
-    void addSectionOfProposal(@PathVariable long id, @RequestBody Section section){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if(!p.get().getSections().contains(section))
-                sections.save(section);
-            else throw new ConflictException(String.format("Section already associated with proposal id %d.", id));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
+	// TODO
+	@GetMapping("/{id}/sections")
+	public Resources<Resource<Section>> getSections(@PathVariable("id") long id) {
+		// TODO search mesmo necessario? @RequestParam(required = false) String search){
+		List<Resource<Section>> sections = 
+				findProposal(id).getSections()
+				.stream()
+				.map(sectionAssembler::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(sections,
+				linkTo(methodOn(ProposalsController.class).getSections(id)).withSelfRel());	
+	}
 
-    @PutMapping("/{pid}/sections/{sid}")
-    void updateSectionOfProposal(@PathVariable long pid, @PathVariable long sid, @RequestBody Section section){
-        if(section.getId() == sid) {
-            Optional<Proposal> p = proposals.findById(pid);
-            if (p.isPresent()){
-                if(p.get().getSections().contains(section))
-                    sections.save(section);
-                else throw new BadRequestException(String.format("Proposal id %d does not have Section id %id associated", pid, sid));
-            }
-            else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-        }
-        else throw new BadRequestException("Invalid request: sectionID on request does not match the Section.id attribute");
-    }
+	@PostMapping("/{id}/sections")
+	public ResponseEntity<Resource<Section>> addSection(@PathVariable("id") long id, @RequestBody Section section) throws URISyntaxException {
+		Proposal proposal = findProposal(id);
+		//		if (proposal.getSections().contains(section)) { //TODO
+		//			throw new ConflictException(String.format("Section already associated with proposal id %d.", id));
+		//		}
+		section.setProposal(proposal);
+		proposal.addSection(section);
+		proposalsRepository.save(proposal); //TODO verificar se é necessário
+		Section newSection = sectionsRepository.save(section);
+		Resource<Section> resource = sectionAssembler.toResource(newSection);
+		return ResponseEntity
+				.created(new URI(resource.getId().expand().getHref()))
+				.body(resource);
+	}
 
-    @DeleteMapping("/{pid}/sections/{sid}")
-    void deleteSectionOfProposal(@PathVariable long pid, @PathVariable long sid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent()) {
-            Optional<Section> s = sections.findById(sid);
-            if(s.isPresent() && p.get().getSections().contains(s.get())){
-                sections.deleteById(sid);
-            }
-            else throw new BadRequestException(String.format("Proposal id %d does not have Section id %id associated", pid, sid));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
+	@GetMapping("/{pid}/sections/{sid}")
+	public Resource<Section> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
+		Proposal proposal = findProposal(pid);
+		Section section = findSection(sid);
+		if (!section.getProposal().equals(proposal)) {
+			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));
+		}
+		return sectionAssembler.toResource(section);
+	}
 
-    // TODO
-    @GetMapping("/{id}/reviews")
-    Iterable<Review> getAllReviewsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()) {
-            if (search == null)
-                return p.get().getReviews();
-            else
-                return reviews.searchReviews(search); // ----> ver isto TODO
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
+	@PutMapping("/{pid}/sections/{sid}")
+	public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section newSection) {
+		Proposal proposal = findProposal(pid);
+		Section oldSection = findSection(sid);
+		if (newSection.getId() != sid) {
+			throw new BadRequestException(String.format("Request body section id %d and path paramenter sid %d don't match.", newSection.getId(), sid));
+		}
+		if (oldSection.getProposal().getId() != proposal.getId()) {
+			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));	
+		}
+		sectionsRepository.save(newSection);
+		return ResponseEntity.noContent().build();
+	}
 
-    @PostMapping("/{id}/reviews")
-    void addReview(@PathVariable long id, @RequestBody Review review){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if(!p.get().getReviews().contains(review))
-                reviews.save(review);
-            else throw new ConflictException(String.format("Review already associated with proposal id %d", id));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
+	@DeleteMapping("/{pid}/sections/{sid}")
+	public ResponseEntity<?> deleteSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
+		Proposal proposal = findProposal(pid);
+		Section section = findSection(sid);
+		if (section.getProposal().getId() != proposal.getId()) {
+			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));
+		}
+		sectionsRepository.delete(section);
+		return ResponseEntity.noContent().build();
+	}
 
-    @GetMapping("/{pid}/reviews/{rid}")
-    Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
-        Optional<Proposal> p = proposals.findById(pid);
-        Optional<Review> r = reviews.findById(rid);
-        if(p.isPresent()) {
-            if (r.isPresent()) {
-                Review review = r.get();
-                if (review.getProposal().equals(p.get()))
-                    return review;
-                else throw new BadRequestException(String.format("Review with id %d does not belong to proposal id %d.", rid, pid));
-            } else throw new NotFoundException(String.format("Review with id %d does not exist.", rid));
-        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
+	@GetMapping("/{id}/reviews")
+	public Resources<Resource<Review>> getReviews(@PathVariable("id") long id) {
+		// TODO search mesmo necessario? @RequestParam(required = false) String search){
+		List<Resource<Review>> reviews = 
+				findProposal(id).getReviews()
+				.stream()
+				.map(reviewAssembler::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(reviews,
+				linkTo(methodOn(ProposalsController.class).getReviews(id)).withSelfRel());
+	}
 
-    @PutMapping("/{pid}/reviews/{rid}")
-    void updateOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid, @RequestBody Review review){
-        if(review.getId() == rid) {
-            Optional<Proposal> p = proposals.findById(pid);
-            if (p.isPresent()){
-                if(p.get().getReviews().contains(review))
-                    reviews.save(review);
-                else throw new NotFoundException(String.format("Proposal id %d does not have Review id %id associated", pid, rid));
-            }
-            else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-        }
-        else throw new BadRequestException("Invalid request: reviewID on request does not match the Review.id attribute");
-    }
+	@PostMapping("/{id}/reviews")
+	public ResponseEntity<?> addReview(@PathVariable("id") long id, @RequestBody Review review) throws URISyntaxException {
+		Proposal proposal = findProposal(id);
+		//				if (proposal.getSections().contains(review)) { //TODO
+		//					throw new ConflictException(String.format("Review already associated with proposal id %d.", id));
+		//				}
+		review.setProposal(proposal);
+		proposal.addReview(review);
+		proposalsRepository.save(proposal); //TODO verificar se é necessário
+		Review newReview = reviewsRepository.save(review);
+		Resource<Review> resource = reviewAssembler.toResource(newReview);
+		return ResponseEntity
+				.created(new URI(resource.getId().expand().getHref()))
+				.body(resource);
+	}
 
-    @DeleteMapping("/{pid}/reviews/{rid}")
-    void deleteOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent()) {
-            Optional<Review> r = reviews.findById(rid);
-            if(r.isPresent() && p.get().getReviews().contains(r.get())){
-                reviews.deleteById(rid);
-            }
-            else throw new NotFoundException(String.format("Proposal id %d does not have Review id %id associated", pid, rid));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
+	@GetMapping("/{pid}/reviews/{rid}")
+	public Resource<Review> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {	
+		Proposal proposal = findProposal(pid);
+		Review review = findReview(rid);
+		if (!review.getProposal().equals(proposal)) {
+			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));
+		}
+		return reviewAssembler.toResource(review);
+	}
 
-    //TODO
-    @GetMapping("/{id}/comments")
-    Iterable<Comment> getAllCommentsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()) {
-            if (search == null)
-                return p.get().getComments();
-            else
-                return comments.searchComments(search); // ----> ver isto TODO
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
+	@PutMapping("/{pid}/reviews/{rid}")
+	public ResponseEntity<?> updateReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review newReview) {
+		Proposal proposal = findProposal(pid);
+		Review oldReview = findReview(rid);
+		if (newReview.getId() != rid) {
+			throw new BadRequestException(String.format("Request body review id %d and path paramenter rid %d don't match.", newReview.getId(), rid));
+		}
+		if (oldReview.getProposal().getId() != proposal.getId()) {
+			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));	
+		}
+		reviewsRepository.save(newReview);
+		return ResponseEntity.noContent().build();
+	}
 
-    @PostMapping("/{id}/comments")
-    void addComment(@PathVariable long id, @RequestBody Comment comment){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if(!p.get().getComments().contains(comment))
-                comments.save(comment);
-            else throw new ConflictException(String.format("Comment already associated with proposal id %d", id));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-    }
-    
-    @GetMapping("/{pid}/comments/{cid}")
-    Comment getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-        Optional<Proposal> p = proposals.findById(pid);
-        Optional<Comment> c = comments.findById(cid);
-        if(p.isPresent()) {
-            if (c.isPresent()) {
-            	Comment comment = c.get();
-            	if (comment.getProposal().equals(p.get()))
-            		return comment;
-            	else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
-            } else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
-        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
+	@DeleteMapping("/{pid}/reviews/{rid}")
+	public ResponseEntity<?> deleteReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
+		Proposal proposal = findProposal(pid);
+		Review review = findReview(rid);
+		if (review.getProposal().getId() != proposal.getId()) {
+			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));
+		}
+		reviewsRepository.delete(review);
+		return ResponseEntity.noContent().build();
+	}
 
-    @PutMapping("/{pid}/comments/{cid}")
-    void updateOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid, @RequestBody Comment comment){
-        if(comment.getId() == cid) {
-            Optional<Proposal> p = proposals.findById(pid);
-            if (p.isPresent()){
-            	Optional<Comment> c = comments.findById(cid);
-            	if (c.isPresent()) {
-            		if (c.get().getProposal().equals(p.get()))
-            			comments.save(comment);
-            		else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
-            	} else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
-            } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-        } else throw new BadRequestException("Invalid request: commentID on request does not match the Comment.id attribute");
-    }
-    
-    @DeleteMapping("/{pid}/comments/{cid}")
-    void deleteOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-    	Optional<Proposal> p = proposals.findById(pid);
-    	if (p.isPresent()){
-    		Optional<Comment> c = comments.findById(cid);
-    		if (c.isPresent()) {
-    			if (c.get().getProposal().equals(p.get()))
-    				comments.deleteById(cid);
-    			else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
-    		} else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
-    	} else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
-    
-    @GetMapping("/{pid}/usersForBiding")
-    Iterable<User> getUsersForBidingOfProposal(@PathVariable long pid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if (p.isPresent())
-        	return p.get().getUsersForBiding();
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
-    
-    @PostMapping("/{pid}/usersForBiding}")
-    void addUserForBiding(@PathVariable long pid, @RequestBody User user){
-    	Optional<Proposal> p = proposals.findById(pid);
-        if (p.isPresent())
-        	p.get().addUserForBiding(user);
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }
-    
-    @DeleteMapping("/{pid}/usersForBiding/{uid}")
-    void deleteUserForBiding(@PathVariable long pid, @PathVariable long uid){
-    	Optional<Proposal> p = proposals.findById(pid);
-        if (p.isPresent()) {
-        	Optional<User> user = users.findById(uid);
-        	if (user.isPresent())
-        		p.get().removeUserForBiding(user.get());
-        	else throw new NotFoundException(String.format("User with id %d does not exist.", uid));
-        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-    }    
+	//TODO
+	@GetMapping("/{id}/comments")
+	public Resources<Resource<Comment>> getComments(@PathVariable("id") long id) {
+		// TODO search mesmo necessario? @RequestParam(required = false) String search){
+		List<Resource<Comment>> comments = 
+				findProposal(id).getComments()
+				.stream()
+				.map(commentAssembler::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(comments,
+				linkTo(methodOn(ProposalsController.class).getComments(id)).withSelfRel());
+	}
+
+	@PostMapping("/{id}/comments")
+	public ResponseEntity<Resource<Comment>> addComment(@PathVariable("id") long id, @RequestBody Comment comment) throws URISyntaxException {
+		Proposal proposal = findProposal(id);
+		//				if (proposal.getSections().contains(comment)) { //TODO
+		//					throw new ConflictException(String.format("Comment already associated with proposal id %d.", id));
+		//				}
+		comment.setProposal(proposal);
+		proposal.addComment(comment);
+		proposalsRepository.save(proposal); //TODO verificar se é necessário
+		Comment newComment = commentsRepository.save(comment);
+		Resource<Comment> resource = commentAssembler.toResource(newComment);
+		return ResponseEntity
+				.created(new URI(resource.getId().expand().getHref()))
+				.body(resource);
+	}
+
+	@GetMapping("/{pid}/comments/{cid}")
+	public Resource<Comment> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
+		Proposal proposal = findProposal(pid);
+		Comment comment = findComment(cid);
+		if (!comment.getProposal().equals(proposal)) {
+			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));
+		}
+		return commentAssembler.toResource(comment);
+	}
+
+	@PutMapping("/{pid}/comments/{cid}")
+	public ResponseEntity<?> updateComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid, @RequestBody Comment newComment) {
+		Proposal proposal = findProposal(pid);
+		Comment oldComment = findComment(cid);
+		if (newComment.getId() != cid) {
+			throw new BadRequestException(String.format("Request body comment id %d and path paramenter rid %d don't match.", newComment.getId(), cid));
+		}
+		if (oldComment.getProposal().getId() != proposal.getId()) {
+			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));	
+		}
+		commentsRepository.save(newComment);
+		return ResponseEntity.noContent().build();
+	}
+
+	@DeleteMapping("/{pid}/comments/{cid}")
+	public ResponseEntity<?> deleteComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
+		Proposal proposal = findProposal(pid);
+		Comment comment = findComment(cid);
+		if (comment.getProposal().getId() != proposal.getId()) {
+			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));
+		}
+		commentsRepository.delete(comment);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{id}/biddings")
+	public Resources<Resource<User>> getBiddingUsers(@PathVariable("id") long id) {
+		// TODO search mesmo necessario? @RequestParam(required = false) String search){
+		List<Resource<User>> users = 
+				findProposal(id).getBiddings()
+				.stream()
+				.map(userAssembler::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(users,
+				linkTo(methodOn(ProposalsController.class).getBiddingUsers(id)).withSelfRel());
+	}
+
+	@PostMapping("/{id}/biddings}")
+	public ResponseEntity<Resource<User>> addUserForBidding(@PathVariable("id") long id, @RequestBody User user) throws URISyntaxException {
+		Proposal proposal = findProposal(id);
+		//				if (proposal.getSections().contains(user)) { //TODO
+		//					throw new ConflictException(String.format("User already associated with proposal id %d.", id));
+		//				}
+		//user.addBidding(proposal); TODO
+		proposal.addBidding(user);
+		proposalsRepository.save(proposal); //TODO verificar se é necessário
+		User newUser = usersRepository.save(user);
+		Resource<User> resource = userAssembler.toResource(newUser);
+		return ResponseEntity
+				.created(new URI(resource.getId().expand().getHref()))
+				.body(resource);
+	}
+
+	@DeleteMapping("/{pid}/biddings/{uid}")
+	public ResponseEntity<?> deleteUserForBidding(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+		Proposal proposal = findProposal(pid);
+		User user = findUser(uid);
+		//		if (user.getBidding(pid).getId() != proposal.getId()) { //TODO
+		//			throw new BadRequestException(String.format("User id %d did not bid on proposal with id %d", uid, pid));
+		//		}
+		usersRepository.delete(user);
+		return ResponseEntity.noContent().build();
+	}  
+
+	private Proposal findProposal(long id) {
+		return proposalsRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("Proposal with id %d not found.", id)));
+	}
+
+	private Section findSection(long id) {
+		return sectionsRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("Section with id %d not found.", id)));
+	}
+
+	private Review findReview(long id) {
+		return reviewsRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("Review with id %d not found.", id)));
+	}
+
+	private Comment findComment(long id) {
+		return commentsRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("Comment with id %d not found.", id)));
+	}
+
+	private User findUser(long id) {
+		return usersRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("User with id %d not found.", id)));
+	}
 
 }

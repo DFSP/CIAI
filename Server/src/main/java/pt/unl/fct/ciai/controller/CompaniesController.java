@@ -49,15 +49,11 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@GetMapping
-	public Resources<Resource<Company>> getCompanies() { //TODO search necessario? que campos?
-		// @RequestParam(value = "search", required = false) String search)
-		List<Resource<Company>> companies = 
-				companiesRepository.findAll()
-				.stream()
-				.map(companyAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(companies,
-				linkTo(methodOn(CompaniesController.class).getCompanies()).withSelfRel());
+	public ResponseEntity<Resources<Resource<Company>>> getCompanies() { 
+		// @RequestParam(required = false) String search) { // TODO search mesmo necessário? que campos?
+		Iterable<Company> companies = companiesRepository.findAll();
+		Resources<Resource<Company>> resources = companyAssembler.toResources(companies);
+		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping
@@ -70,9 +66,10 @@ public class CompaniesController { //implements CompaniesApi {
 	}
 
 	@GetMapping(value = "/{id}")
-	public Resource<Company> getCompany(@PathVariable("id") long id) {
+	public ResponseEntity<Resource<Company>> getCompany(@PathVariable("id") long id) {
 		Company company = findCompany(id);
-		return companyAssembler.toResource(company);
+		Resource<Company> resource = companyAssembler.toResource(company);
+		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping(value = "/{id}")
@@ -87,33 +84,24 @@ public class CompaniesController { //implements CompaniesApi {
 
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> deleteCompany(@PathVariable("id") long id) {
-		Company deletedCompany = findCompany(id);
-		companiesRepository.deleteById(id);
+		Company company = findCompany(id);
+		companiesRepository.delete(company);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping(value = "/{id}/employees")
-	public Resources<Resource<Employee>> getEmployees(@PathVariable("id") long id) { // TODO search mesmo necessário? que campos?	
+	public ResponseEntity<Resources<Resource<Employee>>> getEmployees(@PathVariable("id") long id) { // TODO search mesmo necessário? que campos?	
 		// @RequestParam(value = "search", required = false) String search)
 		List<Resource<Employee>> employees = 
 				findCompany(id).getEmployees()
 				.stream()
 				.map(employeeAssembler::toResource)
 				.collect(Collectors.toList());
-		return new Resources<>(employees,
-				linkTo(methodOn(CompaniesController.class).getEmployees(id)).withSelfRel());	
+		Resources<Resource<Employee>> resources = new Resources<>(employees,
+				linkTo(methodOn(CompaniesController.class).getEmployees(id)).withSelfRel());
+		return ResponseEntity.ok(resources);
 	}
-
-	@GetMapping(value = "/{cid}/employees/{eid}")
-	public Resource<Employee> getEmployee(@PathVariable("id") long cid, @PathVariable long eid) {
-		Company company = findCompany(cid);
-		Employee employee = findEmployee(eid);
-		if (!employee.getCompany().equals(company)) {
-			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
-		}
-		return employeeAssembler.toResource(employee);
-	}
-
+	
 	@PostMapping(value = "/{id}/employees")
 	public ResponseEntity<Resource<Employee>> addEmployee(@PathVariable("id") long id, @RequestBody Employee employee) throws URISyntaxException {	
 		Company company = findCompany(id);
@@ -127,8 +115,19 @@ public class CompaniesController { //implements CompaniesApi {
 				.body(resource);
 	}
 
-	@PutMapping(value = "/{pid}/employees/{eid}")
-	public ResponseEntity<?> updateEmployee(@PathVariable("id") long cid, @PathVariable long eid, @RequestBody Employee newEmployee) {
+	@GetMapping(value = "/{cid}/employees/{eid}")
+	public ResponseEntity<Resource<Employee>> getEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {
+		Company company = findCompany(cid);
+		Employee employee = findEmployee(eid);
+		if (!employee.getCompany().equals(company)) {
+			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
+		}
+		Resource<Employee> resource = employeeAssembler.toResource(employee);
+		return ResponseEntity.ok(resource);
+	}
+
+	@PutMapping(value = "/{cid}/employees/{eid}")
+	public ResponseEntity<?> updateEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid, @RequestBody Employee newEmployee) {
 		Company company = findCompany(cid);
 		Employee oldEmployee = findEmployee(eid);
 		if (newEmployee.getId() != eid) {
@@ -141,23 +140,25 @@ public class CompaniesController { //implements CompaniesApi {
 		return ResponseEntity.noContent().build();
 	}
 
-	@DeleteMapping(value = "/{pid}/employees/{eid}")
-	public ResponseEntity<?> deleteEmployee(@PathVariable("id") long cid, @PathVariable long eid) {		
+	@DeleteMapping(value = "/{cid}/employees/{eid}")
+	public ResponseEntity<?> deleteEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {		
 		Company company = findCompany(cid);
 		Employee employee = findEmployee(eid);
 		if (employee.getCompany().getId() != company.getId()) {
 			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
 		}
-		employeesRepository.deleteById(eid);
+		employeesRepository.delete(employee);
 		return ResponseEntity.noContent().build();
 	}	
 
 	private Company findCompany(long id) {
-		return companiesRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Company with id %d not found", id)));
+		return companiesRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("Company with id %d not found.", id)));
 	}
 
 	private Employee findEmployee(long id) {
-		return employeesRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Employee with id %d not found", id)));
+		return employeesRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(String.format("Employee with id %d not found.", id)));
 	}
 
 }

@@ -3,24 +3,32 @@ package pt.unl.fct.ciai.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "proposals")
 public class Proposal {
-    @Id
-    @GeneratedValue
+	
+    @Id @GeneratedValue
     private long id;
     private boolean isApproved;
-    private String date;
+    @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
+    private Date date;
 
+    @JsonIgnore
     @OneToMany(mappedBy="proposal")//, cascade = CascadeType.ALL)
     private Set<Section> sections;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
     private Set<Review> reviews;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
     private Set<Comment> comments;
 
@@ -28,15 +36,15 @@ public class Proposal {
     @ManyToOne @JoinColumn(name="approver_id")
     private User approver;
     
-    @ManyToMany(mappedBy = "bidingInterests", cascade = CascadeType.ALL)
-    private Set<User> usersForBiding;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "proposalBiddings", cascade = CascadeType.ALL)
+    private Set<User> biddings;
 
     public Proposal() {
     }
 
-    public Proposal(boolean isApproved, String date) {
+    public Proposal(boolean isApproved) {
         this.isApproved = isApproved;
-        this.date = date;
     }
 
     public long getId() {
@@ -55,11 +63,11 @@ public class Proposal {
         isApproved = approved;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -122,18 +130,18 @@ public class Proposal {
         this.approver = approver;
     }
     
-    public Set<User> getUsersForBiding() {
-    	return this.usersForBiding;
+    public Set<User> getBiddings() {
+    	return this.biddings;
     }
     
-    public void addUserForBiding(User user) {
-        if (this.usersForBiding == null)
-            this.usersForBiding = new HashSet<User>();
-        this.usersForBiding.add(user);
+    public void addBidding(User user) {
+        if (this.biddings == null)
+            this.biddings = new HashSet<User>();
+        this.biddings.add(user);
     }
     
-    public void removeUserForBiding(User user) {
-    	if (this.usersForBiding != null)
-    		this.usersForBiding.remove(user);
+    public void removeBidding(User user) {
+    	if (this.biddings != null)
+    		this.biddings.remove(user);
     }
 }

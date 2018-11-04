@@ -4,12 +4,15 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
-@Table(name = "companies")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Table(name = "companies") //TODO apagar renomeações?
 public class Company {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue
 	private long id;
 	private String name;
 	private String city;
@@ -19,10 +22,11 @@ public class Company {
 	private String email;
 	private String fax;
 
+	@JsonIgnore
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private Set<Employee> employees;
 
-	public Company(){}
+	public Company() { }
 
 	public Company(String name, String city, String zipCode, String address, String phone, String email, String fax) {
 		this.name = name;
