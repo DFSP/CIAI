@@ -23,6 +23,10 @@ public class Comment {
     private String title;
     private String text;
     private String date;
+    
+    @ManyToOne
+    @JoinColumn(name = "comments_id")
+    private User author;
 
     public Comment(){}
 
@@ -71,6 +75,14 @@ public class Comment {
 
     public void setProposal(Proposal proposal) {
         this.proposal = proposal;
+    }
+    
+    public User getAuthor() {
+    	return this.author;
+    }
+    
+    public void setAuthor(User u) {
+    	this.author = u;
     }
 
 

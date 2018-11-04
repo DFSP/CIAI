@@ -25,6 +25,9 @@ public class Review {
     private String summary;
     private double classification;
     private String date;
+    
+    @ManyToOne
+    private User author;
 
     public Review(){ }
 
@@ -90,5 +93,13 @@ public class Review {
 
     public void setProposal(Proposal proposal) {
         this.proposal = proposal;
+    }
+    
+    public User getAuthor() {
+    	return this.author;
+    }
+    
+    public void setAuthor(User u) {
+    	this.author = u;
     }
 }
