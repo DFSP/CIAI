@@ -23,14 +23,14 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 		return new Resource<>(user,
 				linkTo(methodOn(UsersController.class).getUser(user.getId())).withSelfRel(),
 				linkTo(methodOn(UsersController.class).getUsers()).withRel("users"),
-				linkTo(methodOn(UsersController.class).getApproverProposals(user.getId())).withRel("users"));
+				linkTo(methodOn(UsersController.class).getApproverProposals(user.getId())).withRel("approverProposals"));
 				
 	}
 
 	@Override
 	public Resources<Resource<User>> toResources(Iterable<? extends User> entities) {
 		List<Resource<User>> resources = 
-				StreamSupport.stream(entities.spliterator(), true)
+				StreamSupport.stream(entities.spliterator(), false)
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(resources,

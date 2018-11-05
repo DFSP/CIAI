@@ -1,5 +1,6 @@
 package pt.unl.fct.ciai.controller;
 
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class UsersController {
 
 	private final UsersRepository usersRepository;

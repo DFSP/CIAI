@@ -1,6 +1,7 @@
 package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "proposals")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Proposal {
 	
     @Id @GeneratedValue
@@ -19,30 +21,25 @@ public class Proposal {
     private boolean isApproved;
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date date;
-
     @JsonIgnore
     @OneToMany(mappedBy="proposal")//, cascade = CascadeType.ALL)
     private Set<Section> sections;
-
     @JsonIgnore
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
     private Set<Review> reviews;
-
     @JsonIgnore
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
     private Set<Comment> comments;
-
     @JsonIgnore
     @ManyToOne @JoinColumn(name="approver_id")
     private User approver;
-    
     @JsonIgnore
     @ManyToMany(mappedBy = "proposalBiddings", cascade = CascadeType.ALL)
     private Set<User> biddings;
-
+	@JsonIgnore
     @ManyToMany(mappedBy = "userInProposals", cascade = CascadeType.ALL)
     private Set<User> members;
-    
+	@JsonIgnore
     @ManyToOne @JoinColumn(name="user_id")
     private User creator;
 

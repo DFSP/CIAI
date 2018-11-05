@@ -21,11 +21,9 @@ public class Company {
 	private String phone;
 	private String email;
 	private String fax;
-
 	@JsonIgnore
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private Set<Employee> employees;
-	
 	@OneToOne(mappedBy = "adminOfCompany", cascade = CascadeType.ALL)
 	private Employee myAdmin;
 

@@ -1,25 +1,25 @@
 package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "sections")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Section {
-    @Id
-    @GeneratedValue
+	
+    @Id @GeneratedValue
     private long id;
     private String title, description, goals, material, workPlan;
     private float budget;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "proposals_id")
     private Proposal proposal;
 
-    public Section() {
-    }
+    public Section() { }
     
     public Section(String title, String description, String goals, String material, String workPlan, float budget) {
     	this.title = title;

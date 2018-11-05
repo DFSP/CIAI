@@ -5,6 +5,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.hateoas.MediaTypes;
 import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.repository.CommentsRepository;
 import pt.unl.fct.ciai.assemblers.CommentResourceAssembler;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/proposals", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/proposals", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class ProposalsController { //Implements proposalControllerApi 
 	//TODO apenas com os metodos get, resto fica protected
 

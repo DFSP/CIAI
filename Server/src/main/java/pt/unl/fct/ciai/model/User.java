@@ -1,6 +1,7 @@
 package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.Set;
 	@JsonSubTypes.Type(value = Employee.class)
 })
 @Table(name = "users")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
 	@Id @GeneratedValue
@@ -26,24 +28,22 @@ public class User {
 	private String role;
 	@JsonIgnore
 	private String password;
-
 	@JsonIgnore
 	@OneToMany(mappedBy="approver") // cascade?
 	private Set<Proposal> proposalsToApprove;
-	
 	@JsonIgnore
 	@ManyToMany
-	private Set<Proposal> proposalBiddings;
-	
+	private Set<Proposal> proposalBiddings;	
+	@JsonIgnore
 	@ManyToMany
-	private Set<Proposal> userInProposals;
-	
+	private Set<Proposal> userInProposals;	
+	@JsonIgnore
 	@OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
-    private Set<Proposal> myOwnProposals;
-	
+    private Set<Proposal> myOwnProposals;	
+	@JsonIgnore
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private Set<Review> authorOfReviews;
-	
+    private Set<Review> authorOfReviews;	
+	@JsonIgnore
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Comment> authorOfComments;
 

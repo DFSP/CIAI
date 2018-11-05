@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.hateoas.MediaTypes;
 
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
@@ -31,7 +31,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping(value = "/partners", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/partners", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class CompaniesController { //implements CompaniesApi {
 
 	private final CompaniesRepository companiesRepository;

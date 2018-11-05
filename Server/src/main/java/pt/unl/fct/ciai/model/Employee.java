@@ -1,21 +1,21 @@
 package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "employees")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee extends User {
 	
 	@Id @GeneratedValue
 	private long id;
-
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "company_id")
 	private Company company;
-
 	private String city;
 	private String address;
 	private String zipCode;
@@ -24,7 +24,7 @@ public class Employee extends User {
 	private String gender;
 	private double salary;
 	private String birthday;
-	
+	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "companies_id")
     private Company adminOfCompany;

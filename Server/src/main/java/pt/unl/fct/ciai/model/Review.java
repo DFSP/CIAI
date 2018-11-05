@@ -1,6 +1,7 @@
 package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
 
@@ -10,31 +11,24 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "reviews")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Review {
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private long id;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "proposals_id")
     private Proposal proposal;
-
-    //private long proposalId;
-    //private long reviewerId;
-
     private String title;
     private String text;
     private String summary;
-    private double classification;
-    
+    private double classification; 
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date date;
-
     @ManyToOne
     private User author;
-
+    
     public Review() { }
 
     public Review(String title, String text, String summary, double classification, String date) {
