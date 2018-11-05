@@ -39,8 +39,8 @@ public class CompaniesControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
-	@Autowired
-	private CompaniesController companiesController;
+//	@Autowired
+//	private CompaniesController companiesController;
 	@MockBean
 	private CompaniesRepository companiesRepository;
 	@MockBean
@@ -549,8 +549,7 @@ public class CompaniesControllerTest {
 		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
 		given(employeesRepository.findById(firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
 		
-		String href = firstEmployeeResource.getLink("self").getHref();
-		mvc.perform(get(href))
+		mvc.perform(get(firstEmployeeResource.getLink("self").getHref()))
 		.andExpect(status().isOk())
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
@@ -568,7 +567,7 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$.gender", is(firstEmployee.getGender())))
 		.andExpect(jsonPath("$.salary", is(firstEmployee.getSalary())))
 		.andExpect(jsonPath("$.birthday", is(firstEmployee.getBirthday())))
-		.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
+		.andExpect(jsonPath("$._links.self.href", is(ROOT + firstEmployeeResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._links.employees.href", is(ROOT + firstEmployeeResource.getLink("employees").getHref())));
 		
 		verify(companiesRepository, times(1)).findById(fct.getId());	
@@ -576,13 +575,109 @@ public class CompaniesControllerTest {
 	}
 
 	@Test
-	public void updateEmployee() throws Exception {
+	public void testUpdateEmployee() throws Exception {
+		Company fct = createFCTCompany();
+		Resource<Company> fctResource = companyAssembler.toResource(fct);
+		Employee firstEmployee = fct.getEmployees().iterator().next();
+		Resource<Employee> firstEmployeeResource = employeeAssembler.toResource(firstEmployee);
 
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(employeesRepository.findById(firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
+
+		mvc.perform(get(firstEmployeeResource.getLink("self").getHref()))
+		.andExpect(jsonPath("$.id", is((int)firstEmployee.getId())))
+		.andExpect(jsonPath("$.firstName", is(firstEmployee.getFirstName())))
+		.andExpect(jsonPath("$.lastName", is(firstEmployee.getLastName())))
+		.andExpect(jsonPath("$.username", is(firstEmployee.getUsername())))
+		.andExpect(jsonPath("$.email", is(firstEmployee.getEmail())))
+		.andExpect(jsonPath("$.role", is(firstEmployee.getRole())))
+		.andExpect(jsonPath("$.city", is(firstEmployee.getCity())))
+		.andExpect(jsonPath("$.address", is(firstEmployee.getAddress())))
+		.andExpect(jsonPath("$.zipCode", is(firstEmployee.getZipCode())))
+		.andExpect(jsonPath("$.cellPhone", is(firstEmployee.getCellPhone())))
+		.andExpect(jsonPath("$.homePhone", is(firstEmployee.getHomePhone())))
+		.andExpect(jsonPath("$.gender", is(firstEmployee.getGender())))
+		.andExpect(jsonPath("$.salary", is(firstEmployee.getSalary())))
+		.andExpect(jsonPath("$.birthday", is(firstEmployee.getBirthday())))
+		.andExpect(jsonPath("$._links.self.href", is(ROOT + firstEmployeeResource.getLink("self").getHref())))
+		.andExpect(jsonPath("$._links.employees.href", is(ROOT + firstEmployeeResource.getLink("employees").getHref())));
+
+		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(employeesRepository, times(1)).findById(fct.getId());
+
+		given(employeesRepository.save(firstEmployee)).willReturn(firstEmployee);
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(employeesRepository.findById(firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
+		
+		firstEmployee.setEmail("outroemail@email.pt");
+		String json = objectMapper.writeValueAsString(firstEmployee);
+		mvc.perform(put(firstEmployeeResource.getLink("self").getHref())
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+		.andExpect(status().isNoContent());
+
+		verify(employeesRepository, times(1)).save(firstEmployee);
+		verify(companiesRepository, times(2)).findById(fct.getId());
+		verify(employeesRepository, times(2)).findById(firstEmployee.getId());
+
+		mvc.perform(get(firstEmployeeResource.getLink("self").getHref()))
+		.andExpect(jsonPath("$.id", is((int)firstEmployee.getId())))
+		.andExpect(jsonPath("$.firstName", is(firstEmployee.getFirstName())))
+		.andExpect(jsonPath("$.lastName", is(firstEmployee.getLastName())))
+		.andExpect(jsonPath("$.username", is(firstEmployee.getUsername())))
+		.andExpect(jsonPath("$.email", is(firstEmployee.getEmail())))
+		.andExpect(jsonPath("$.role", is(firstEmployee.getRole())))
+		.andExpect(jsonPath("$.city", is(firstEmployee.getCity())))
+		.andExpect(jsonPath("$.address", is(firstEmployee.getAddress())))
+		.andExpect(jsonPath("$.zipCode", is(firstEmployee.getZipCode())))
+		.andExpect(jsonPath("$.cellPhone", is(firstEmployee.getCellPhone())))
+		.andExpect(jsonPath("$.homePhone", is(firstEmployee.getHomePhone())))
+		.andExpect(jsonPath("$.gender", is(firstEmployee.getGender())))
+		.andExpect(jsonPath("$.salary", is(firstEmployee.getSalary())))
+		.andExpect(jsonPath("$.birthday", is(firstEmployee.getBirthday())))
+		.andExpect(jsonPath("$._links.self.href", is(ROOT + firstEmployeeResource.getLink("self").getHref())))
+		.andExpect(jsonPath("$._links.employees.href", is(ROOT + firstEmployeeResource.getLink("employees").getHref())));
+
+		verify(companiesRepository, times(3)).findById(fct.getId());
+		verify(employeesRepository, times(3)).findById(firstEmployee.getId());
 	}
 
 	@Test
-	public  void testDeleteEmployee() throws Exception {		
+	public void testDeleteEmployee() throws Exception {		
+		Company fct = createFCTCompany();
+		Resource<Company> fctResource = companyAssembler.toResource(fct);
+		Employee firstEmployee = fct.getEmployees().iterator().next();
+		Resource<Employee> firstEmployeeResource = employeeAssembler.toResource(firstEmployee);
+		
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		
+		when(employeesRepository.findById(firstEmployee.getId()))
+		.thenReturn(Optional.of(firstEmployee))
+		.thenReturn(Optional.of(firstEmployee))
+		.thenReturn(Optional.ofNullable(null));
+		
+		String href = firstEmployeeResource.getLink("self").getHref();
+		
+		mvc.perform(get(href))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.firstName", is(firstEmployee.getFirstName())));
+		
+		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(employeesRepository, times(1)).findById(firstEmployee.getId());
 
+		mvc.perform(delete(href))
+		.andExpect(status().isNoContent());
+
+		verify(companiesRepository, times(2)).findById(fct.getId());
+		verify(employeesRepository, times(2)).findById(firstEmployee.getId());
+		verify(employeesRepository, times(1)).delete(firstEmployee);
+
+		mvc.perform(get(href))
+		.andExpect(status().isNotFound());
+
+		verify(companiesRepository, times(3)).findById(fct.getId());
+		verify(employeesRepository, times(3)).findById(firstEmployee.getId());
 	}
 
 }
