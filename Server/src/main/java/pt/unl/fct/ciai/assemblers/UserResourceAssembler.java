@@ -26,7 +26,7 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 		return new Resource<>(user,
 				linkTo(methodOn(UsersController.class).getUser(user.getId())).withSelfRel(),
 				linkTo(methodOn(UsersController.class).getUsers()).withRel("users"),
-				linkTo(methodOn(UsersController.class).getApproverProposals(user.getId())).withRel("approverProposals"));
+				linkTo(methodOn(UsersController.class).getApproverInProposals(user.getId())).withRel("approverProposals"));
 	}
 
 	@Override

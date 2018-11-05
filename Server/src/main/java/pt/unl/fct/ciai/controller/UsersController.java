@@ -84,8 +84,8 @@ public class UsersController {
 	}
 
 	// Obter a lista de propostas que o User {id} pode aprovar
-	@GetMapping("/{id}/approverInProposals") //TODO
-	public ResponseEntity<Resources<Resource<Proposal>>> getApproverProposals(@PathVariable long id) {
+	@GetMapping("/{id}/approverInProposals")
+	public ResponseEntity<Resources<Resource<Proposal>>> getApproverInProposals(@PathVariable long id) {
 		// @RequestParam(value = "search", required = false) String search)
 		List<Resource<Proposal>> proposals = 
 				findUser(id).getProposalsToApprove()
@@ -93,13 +93,13 @@ public class UsersController {
 				.map(proposalAssembler::toResource)
 				.collect(Collectors.toList());
 		Resources<Resource<Proposal>> resources = new Resources<>(proposals,
-				linkTo(methodOn(UsersController.class).getApproverProposals(id)).withSelfRel());
+				linkTo(methodOn(UsersController.class).getApproverInProposals(id)).withSelfRel());
 		return ResponseEntity.ok(resources);
 	}
 
 	// Add proposta à lista de propostas para o User {id} aprovar
 	@PostMapping("/{id}/approverInProposals")
-	public ResponseEntity<Resource<Proposal>> addApproverProposal(@PathVariable long id, @RequestBody Proposal proposal) throws URISyntaxException {
+	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable long id, @RequestBody Proposal proposal) throws URISyntaxException {
 		User user = findUser(id);
 		proposal.setApprover(user);
 		user.addProposalToApprove(proposal);
@@ -113,7 +113,7 @@ public class UsersController {
 	
 	// Apaga proposta {pid} à lista de propostas que o User {uid} tem de aprovar
 	@DeleteMapping("/{uid}/approverInProposals/{pid}")
-	public ResponseEntity<?> deleteUserApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
+	public ResponseEntity<?> deleteApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
 		User user = findUser(uid);
 		Proposal proposal = findProposal(pid);
 		if (proposal.getApprover().getId() != user.getId()) {

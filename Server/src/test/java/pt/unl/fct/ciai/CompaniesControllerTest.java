@@ -49,7 +49,7 @@ public class CompaniesControllerTest {
 	private CompanyResourceAssembler companyAssembler;
 	@Autowired
 	private EmployeeResourceAssembler employeeAssembler;
-	private ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
 	private static final String ROOT = "http://localhost";
 	
@@ -323,7 +323,7 @@ public class CompaniesControllerTest {
 		
 		fct.setEmail("fct.unl@email.pt");
 		String json = objectMapper.writeValueAsString(fct);
-		mvc.perform(put(String.format("http://localhost/partners/%d", fct.getId()))
+		mvc.perform(put(fctResource.getLink("self").getHref())
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.content(json))
