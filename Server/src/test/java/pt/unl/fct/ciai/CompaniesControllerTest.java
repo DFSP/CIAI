@@ -11,6 +11,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +25,7 @@ import pt.unl.fct.ciai.assemblers.EmployeeResourceAssembler;
 import pt.unl.fct.ciai.controller.CompaniesController;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
+import pt.unl.fct.ciai.model.User;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.*;
@@ -32,11 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = CompaniesController.class, secure = false)
 @Import({CompanyResourceAssembler.class, EmployeeResourceAssembler.class})
 public class CompaniesControllerTest {
+
+	private String COMPANIES_URL = "/partners";
 
 	@Autowired
 	private MockMvc mvc;
@@ -152,23 +157,25 @@ public class CompaniesControllerTest {
 				ResponseEntity.ok(companyAssembler.toResources(Arrays.asList(fct, ist))));
 		given(companiesControllerMock.getCompany(1L)).willReturn(
 				ResponseEntity.ok(companyAssembler.toResource(fct)));
+		given(companiesControllerMock.getCompany(2L)).willReturn(
+				ResponseEntity.ok(companyAssembler.toResource(fct)));
 		given(companiesControllerMock.getEmployees(1L)).willReturn(
 				ResponseEntity.ok(employeeAssembler.toResources(fct.getEmployees(), fct)));
 	}
 
-//	private List<Company> getCompanies() throws Exception {
-//		final MvcResult result = mvc.perform(get("/partners").accept(MediaTypes.HAL_JSON_UTF8_VALUE))
-//				.andExpect(status().isOk())
-//				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-//				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-//				.andExpect(jsonPath("$._embedded.companies", hasSize(2)))
-//				.andReturn();
-//		String listAsString = result.getResponse().getContentAsString();
-//		Resources<Resource<Company>> resources = objectMapper.readValue(listAsString, new TypeReference<Resources<Resource<Company>>>(){});
-//		List<Company> companies = resources.getContent().stream().map(Resource::getContent).collect(Collectors.toList());
-//		return companies;
-//	}
-	
+	//	private List<Company> getCompanies() throws Exception {
+	//		final MvcResult result = mvc.perform(get("/partners").accept(MediaTypes.HAL_JSON_UTF8_VALUE))
+	//				.andExpect(status().isOk())
+	//				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+	//				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+	//				.andExpect(jsonPath("$", hasSize(2)))
+	//				.andReturn();
+	//		String listAsString = result.getResponse().getContentAsString();
+	//		Resources<Resource<Company>> resources = objectMapper.readValue(listAsString, new TypeReference<Resources<Resource<Company>>>(){});
+	//		List<Company> companies = resources.getContent().stream().map(Resource::getContent).collect(Collectors.toList());
+	//		return companies;
+	//	}
+
 	private Resource<Company> getFirstCompany() throws Exception {
 		final MvcResult result = mvc.perform(get("/partners/1").accept(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(status().isOk())
@@ -181,24 +188,23 @@ public class CompaniesControllerTest {
 		return company;
 	}
 
-//	private List<Employee> getEmployees(Company company) throws Exception {
-//		String path = String.format("/partners/%id", company.getId());
-//		final MvcResult result = mvc.perform(get(path).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
-//				.andExpect(status().isOk())
-//				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-//				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-//				.andExpect(jsonPath("$._embedded.employees", hasSize(2)))
-//				.andReturn();
-//		String listAsString = result.getResponse().getContentAsString();
-//		Resources<Resource<Employee>> resources = objectMapper.readValue(listAsString, new TypeReference<Resources<Resource<Employee>>>(){});
-//		List<Employee> employees = resources.getContent().stream().map(Resource::getContent).collect(Collectors.toList());
-//		return employees;
-//	}
+	//	private List<Employee> getEmployees(Company company) throws Exception {
+	//		String path = String.format("/partners/%id", company.getId());
+	//		final MvcResult result = mvc.perform(get(path).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
+	//				.andExpect(status().isOk())
+	//				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+	//				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+	//				.andExpect(jsonPath("$._embedded.employees", hasSize(2)))
+	//				.andReturn();
+	//		String listAsString = result.getResponse().getContentAsString();
+	//		Resources<Resource<Employee>> resources = objectMapper.readValue(listAsString, new TypeReference<Resources<Resource<Employee>>>(){});
+	//		List<Employee> employees = resources.getContent().stream().map(Resource::getContent).collect(Collectors.toList());
+	//		return employees;
+	//	}
 
 	@Test
 	public void testGetCompanies() throws Exception {
-		String companiesURL = "/partners";
-		mvc.perform(get(companiesURL).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
+		mvc.perform(get(COMPANIES_URL).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(status().isOk())
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
@@ -211,8 +217,8 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.companies[0].phone", is("+351 212948300")))
 		.andExpect(jsonPath("$._embedded.companies[0].email", is("fct@email.pt")))
 		.andExpect(jsonPath("$._embedded.companies[0].fax", is("+351 212954461")))
-		.andExpect(jsonPath("$._embedded.companies[0]._links.self.href", is(String.format("%s/1", companiesURL))))
-		.andExpect(jsonPath("$._embedded.companies[0]._links.companies.href", is(companiesURL)))
+		.andExpect(jsonPath("$._embedded.companies[0]._links.self.href", is(String.format("%s/1", COMPANIES_URL))))
+		.andExpect(jsonPath("$._embedded.companies[0]._links.companies.href", is(COMPANIES_URL)))
 		.andExpect(jsonPath("$._embedded.companies[1].id", is(2)))
 		.andExpect(jsonPath("$._embedded.companies[1].name", is("IST")))
 		.andExpect(jsonPath("$._embedded.companies[1].city", is("Lisboa")))
@@ -221,19 +227,81 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.companies[1].phone", is("+351 214233200")))
 		.andExpect(jsonPath("$._embedded.companies[1].email", is("ist@ist.pt")))
 		.andExpect(jsonPath("$._embedded.companies[1].fax", is("+351 214233268")))
-		.andExpect(jsonPath("$._embedded.companies[1]._links.self.href", is(String.format("%s/2", companiesURL))))
-		.andExpect(jsonPath("$._embedded.companies[1]._links.companies.href", is(companiesURL)))
-		.andExpect(jsonPath("$._links.self.href", is(companiesURL)));
+		.andExpect(jsonPath("$._embedded.companies[1]._links.self.href", is(String.format("%s/2", COMPANIES_URL))))
+		.andExpect(jsonPath("$._embedded.companies[1]._links.companies.href", is(COMPANIES_URL)))
+		.andExpect(jsonPath("$._links.self.href", is(COMPANIES_URL)));
 	}
 
 	@Test
 	public void testAddCompany() throws Exception {
 
+		Company iscte = new Company();
+		iscte.setId(3L);
+		iscte.setName("ISCTE");
+		iscte.setCity("Lisboa");
+		iscte.setZipCode("1649-026");
+		iscte.setAddress("Av. das Forças Armadas");
+		iscte.setPhone("+351 210464014");
+		iscte.setEmail("iscte@email.pt");
+		iscte.setFax("+351 217964710");
+		String json = objectMapper.writeValueAsString(iscte);
+		Resource<Company> resource = companyAssembler.toResource(iscte);
+
+		given(companiesControllerMock.addCompany(iscte)).willReturn(
+				ResponseEntity.ok(resource));
+		given(companiesControllerMock.getCompany(3L)).willReturn(
+				ResponseEntity.ok(resource));
+
+		mvc.perform(post(COMPANIES_URL).accept(MediaTypes.HAL_JSON_UTF8_VALUE).contentType(MediaTypes.HAL_JSON_UTF8_VALUE).content(json))
+		.andExpect(status().isOk())
+		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(jsonPath("$.id", is(3)))
+		.andExpect(jsonPath("$.name", is("ISCTE")))
+		.andExpect(jsonPath("$.city", is("Lisboa")))
+		.andExpect(jsonPath("$.zipCode", is("1649-026")))
+		.andExpect(jsonPath("$.address", is("Av. das Forças Armadas")))
+		.andExpect(jsonPath("$.phone", is("+351 210464014")))
+		.andExpect(jsonPath("$.email", is("iscte@email.pt")))
+		.andExpect(jsonPath("$.fax", is("+351 217964710")))
+		.andExpect(jsonPath("$._links.self.href", is(String.format("%s/3", COMPANIES_URL))))
+		.andExpect(jsonPath("$._links.companies.href", is(COMPANIES_URL)))
+		.andExpect(jsonPath("$._links.self.href", is(String.format("%s/3", COMPANIES_URL))));
+
+		mvc.perform(get(String.format("%s/3", COMPANIES_URL)).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(status().isOk())
+		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(jsonPath("$.id", is(3)))
+		.andExpect(jsonPath("$.name", is("ISCTE")))
+		.andExpect(jsonPath("$.city", is("Lisboa")))
+		.andExpect(jsonPath("$.zipCode", is("1649-026")))
+		.andExpect(jsonPath("$.address", is("Av. das Forças Armadas")))
+		.andExpect(jsonPath("$.phone", is("+351 210464014")))
+		.andExpect(jsonPath("$.email", is("iscte@email.pt")))
+		.andExpect(jsonPath("$.fax", is("+351 217964710")))
+		.andExpect(jsonPath("$._links.self.href", is(String.format("%s/3", COMPANIES_URL))))
+		.andExpect(jsonPath("$._links.companies.href", is(COMPANIES_URL)))
+		.andExpect(jsonPath("$._links.self.href", is(String.format("%s/3", COMPANIES_URL))));
 	}
 
 	@Test
 	public void testGetCompany() throws Exception {
-
+		mvc.perform(get(String.format("%s/1", COMPANIES_URL)).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(status().isOk())
+		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(jsonPath("$.id", is(1)))
+		.andExpect(jsonPath("$.name", is("FCT")))
+		.andExpect(jsonPath("$.city", is("Almada")))
+		.andExpect(jsonPath("$.zipCode", is("2825-149")))
+		.andExpect(jsonPath("$.address", is("Calçada de Alfazina 2")))
+		.andExpect(jsonPath("$.phone", is("+351 212948300")))
+		.andExpect(jsonPath("$.email", is("fct@email.pt")))
+		.andExpect(jsonPath("$.fax", is("+351 212954461")))
+		.andExpect(jsonPath("$._links.self.href", is(String.format("%s/1", COMPANIES_URL))))
+		.andExpect(jsonPath("$._links.companies.href", is(COMPANIES_URL)))
+		.andExpect(jsonPath("$._links.self.href", is(String.format("%s/1", COMPANIES_URL))));
 	}
 
 	@Test
@@ -255,7 +323,7 @@ public class CompaniesControllerTest {
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$._embedded.employees", hasSize(3)))
-		
+
 		.andExpect(jsonPath("$._embedded.employees[0].id", is(1)))
 		.andExpect(jsonPath("$._embedded.employees[0].firstName", is("João")))
 		.andExpect(jsonPath("$._embedded.employees[0].lastName", is("Reis")))
@@ -306,13 +374,31 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.employees[2].birthday", is("03/11/2018")))
 		.andExpect(jsonPath("$._embedded.employees[2]._links.self.href", is(String.format("%s/3", href))))
 		.andExpect(jsonPath("$._embedded.employees[2]._links.employees.href", is(href)))
-		
+
 		.andExpect(jsonPath("$._links.self.href", is(href)));
 	}
 
 	@Test
 	public void testAddEmployee() throws Exception {	
-
+		//		Resource<Company> company = this.getFirstCompany();
+		//		long firstId = companies.get(0).getId();
+		//		// Add contact to a company {id}
+		//        User user = new User();
+		//        user.setUsername("NewEmployee");
+		//		Employee employee = new Employee();
+		//		//employee.setUserId(user.getId());
+		//		String json = mapper.writeValueAsString(employee);
+		//		this.mockMvc.perform(post("/companies/" + firstId + "/employees")
+		//				.contentType(MediaType.APPLICATION_JSON_UTF8)
+		//				.content(json))
+		//		.andExpect(status().isOk());
+		//		// Get employees from a company {id}
+		//		this.mockMvc.perform(get("/companies/" + firstId + "/employees"))
+		//		.andExpect(status().isOk())
+		//		.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+		//		.andExpect(jsonPath("$", hasSize(1)))
+		//		.andExpect(jsonPath("$[0].username").value("NewEmployee"));
+		//		//.andExpect(jsonPath("$[0].username".is("NewUser"));
 	}
 
 	@Test
