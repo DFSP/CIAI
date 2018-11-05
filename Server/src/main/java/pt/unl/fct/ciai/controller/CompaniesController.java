@@ -111,7 +111,9 @@ public class CompaniesController { //implements CompaniesApi {
 		employee.setCompany(company);
 		company.addEmployee(employee);
 		companiesRepository.save(company); //TODO verificar se é necessário
+		System.out.println("employe " +employee);
 		Employee newEmployee = employeesRepository.save(employee);
+		System.out.println("new employ " + newEmployee);
 		Resource<Employee> resource = employeeAssembler.toResource(newEmployee);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
