@@ -137,33 +137,16 @@ public class Company {
 			return false;
 		}
 		Company company = (Company) o;
-		return Objects.equals(this.id, company.id) &&
-				Objects.equals(this.name, company.name) &&
-				Objects.equals(this.address, company.address) &&
-				Objects.equals(this.email, company.email) &&
-				Objects.equals(this.fax, company.fax) &&
-				Objects.equals(this.zipCode, company.zipCode) &&
-				Objects.equals(this.phone, company.phone) &&
-				Objects.equals(this.employees, company.employees);
+		return Objects.equals(this.id, company.id);
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, name, address, phone, zipCode, fax, email, employees);
-	}
+
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Company {\n");
-
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("    address: ").append(toIndentedString(address)).append("\n");
-		sb.append("    email: ").append(toIndentedString(email)).append("\n");
-		sb.append("    employees: ").append(toIndentedString(employees)).append("\n");
-		sb.append("}");
-		return sb.toString();
+		return "Company [id=" + id + ", name=" + name + ", city=" + city + ", zipCode=" + zipCode + ", address="
+				+ address + ", phone=" + phone + ", email=" + email + ", fax=" + fax + ", employees=" + employees
+				+ ", myAdmin=" + myAdmin + "]";
 	}
 
 	/**
