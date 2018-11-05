@@ -12,6 +12,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.ProposalsController;
+import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.model.Proposal;
 
 @Component
@@ -35,7 +36,8 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(resources,
-				linkTo(methodOn(ProposalsController.class).getProposals()).withSelfRel());
+				linkTo(methodOn(ProposalsController.class).getProposals()).withSelfRel(),
+				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 
 }

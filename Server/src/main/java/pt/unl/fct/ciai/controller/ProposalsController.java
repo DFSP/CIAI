@@ -2,7 +2,6 @@ package pt.unl.fct.ciai.controller;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.hateoas.MediaTypes;
@@ -24,13 +23,8 @@ import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.SectionsRepository;
 import pt.unl.fct.ciai.repository.UsersRepository;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/proposals", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -84,9 +78,10 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{id}")
-	public Resource<Proposal> getProposal(@PathVariable("id") long id) {
+	public ResponseEntity<Resource<Proposal>> getProposal(@PathVariable("id") long id) {
 		Proposal proposal = findProposal(id);
-		return proposalAssembler.toResource(proposal);
+		Resource<Proposal> resource = proposalAssembler.toResource(proposal);
+		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping("/{id}")
@@ -108,15 +103,12 @@ public class ProposalsController { //Implements proposalControllerApi
 
 	// TODO
 	@GetMapping("/{id}/sections")
-	public Resources<Resource<Section>> getSections(@PathVariable("id") long id) {
+	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id) {
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
-		List<Resource<Section>> sections = 
-				findProposal(id).getSections()
-				.stream()
-				.map(sectionAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(sections,
-				linkTo(methodOn(ProposalsController.class).getSections(id)).withSelfRel());	
+		Proposal proposal = findProposal(id);
+		Iterable<Section> sections = proposal.getSections();
+		Resources<Resource<Section>> resources = sectionAssembler.toResources(sections, proposal);
+		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping("/{id}/sections")
@@ -136,13 +128,14 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{pid}/sections/{sid}")
-	public Resource<Section> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
+	public ResponseEntity<Resource<Section>> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		Proposal proposal = findProposal(pid);
 		Section section = findSection(sid);
 		if (!section.getProposal().equals(proposal)) {
 			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));
 		}
-		return sectionAssembler.toResource(section);
+		Resource<Section> resource = sectionAssembler.toResource(section);
+		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping("/{pid}/sections/{sid}")
@@ -171,15 +164,12 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{id}/reviews")
-	public Resources<Resource<Review>> getReviews(@PathVariable("id") long id) {
+	public ResponseEntity<Resources<Resource<Review>>> getReviews(@PathVariable("id") long id) {
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
-		List<Resource<Review>> reviews = 
-				findProposal(id).getReviews()
-				.stream()
-				.map(reviewAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(reviews,
-				linkTo(methodOn(ProposalsController.class).getReviews(id)).withSelfRel());
+		Proposal proposal = findProposal(id);
+		Iterable<Review> reviews = proposal.getReviews();
+		Resources<Resource<Review>> resources = reviewAssembler.toResources(reviews, proposal);
+		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping("/{id}/reviews")
@@ -199,13 +189,14 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{pid}/reviews/{rid}")
-	public Resource<Review> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {	
+	public ResponseEntity<Resource<Review>> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {	
 		Proposal proposal = findProposal(pid);
 		Review review = findReview(rid);
 		if (!review.getProposal().equals(proposal)) {
 			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));
 		}
-		return reviewAssembler.toResource(review);
+		Resource<Review> resource = reviewAssembler.toResource(review);
+		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping("/{pid}/reviews/{rid}")
@@ -235,15 +226,12 @@ public class ProposalsController { //Implements proposalControllerApi
 
 	//TODO
 	@GetMapping("/{id}/comments")
-	public Resources<Resource<Comment>> getComments(@PathVariable("id") long id) {
+	public ResponseEntity<Resources<Resource<Comment>>> getComments(@PathVariable("id") long id) {
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
-		List<Resource<Comment>> comments = 
-				findProposal(id).getComments()
-				.stream()
-				.map(commentAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(comments,
-				linkTo(methodOn(ProposalsController.class).getComments(id)).withSelfRel());
+		Proposal proposal = findProposal(id);
+		Iterable<Comment> comments = proposal.getComments();
+		Resources<Resource<Comment>> resources = commentAssembler.toResources(comments, proposal);
+		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping("/{id}/comments")
@@ -263,13 +251,14 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{pid}/comments/{cid}")
-	public Resource<Comment> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
+	public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		Proposal proposal = findProposal(pid);
 		Comment comment = findComment(cid);
 		if (!comment.getProposal().equals(proposal)) {
 			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));
 		}
-		return commentAssembler.toResource(comment);
+		Resource<Comment> resource = commentAssembler.toResource(comment);
+		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping("/{pid}/comments/{cid}")
@@ -298,15 +287,12 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{id}/biddings")
-	public Resources<Resource<User>> getBiddingUsers(@PathVariable("id") long id) {
+	public ResponseEntity<Resources<Resource<User>>> getBiddingUsers(@PathVariable("id") long id) {		
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
-		List<Resource<User>> users = 
-				findProposal(id).getBiddings()
-				.stream()
-				.map(userAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(users,
-				linkTo(methodOn(ProposalsController.class).getBiddingUsers(id)).withSelfRel());
+		Proposal proposal = findProposal(id);
+		Iterable<User> users = proposal.getBiddings();
+		Resources<Resource<User>> resources = userAssembler.toResources(users, proposal);
+		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping("/{id}/biddings}")

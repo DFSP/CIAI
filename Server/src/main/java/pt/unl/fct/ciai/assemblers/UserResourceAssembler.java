@@ -11,7 +11,10 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.stereotype.Component;
 
+import pt.unl.fct.ciai.controller.ProposalsController;
+import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.controller.UsersController;
+import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 
 @Component
@@ -24,7 +27,6 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 				linkTo(methodOn(UsersController.class).getUser(user.getId())).withSelfRel(),
 				linkTo(methodOn(UsersController.class).getUsers()).withRel("users"),
 				linkTo(methodOn(UsersController.class).getApproverProposals(user.getId())).withRel("approverProposals"));
-				
 	}
 
 	@Override
@@ -34,7 +36,19 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(resources,
-				linkTo(methodOn(UsersController.class).getUsers()).withSelfRel());
+				linkTo(methodOn(UsersController.class).getUsers()).withSelfRel(),
+				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 
+	public Resources<Resource<User>> toResources(Iterable<? extends User> entities, Proposal proposal) {
+		long pid = proposal.getId();
+		List<Resource<User>> users = 
+				StreamSupport.stream(entities.spliterator(), false)
+				.map(this::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(users,
+				linkTo(methodOn(ProposalsController.class).getBiddingUsers(pid)).withSelfRel(),
+				linkTo(methodOn(RootController.class).root()).withRel("root"));
+	}
+	
 }
