@@ -154,8 +154,6 @@ public class CompaniesControllerTest {
 				ResponseEntity.ok(companyAssembler.toResource(fct)));
 		given(companiesControllerMock.getEmployees(1L)).willReturn(
 				ResponseEntity.ok(employeeAssembler.toResources(fct.getEmployees(), fct)));
-		fct.getEmployees().forEach(e -> System.out.println(e.getFirstName()));
-		System.out.println();
 	}
 
 //	private List<Company> getCompanies() throws Exception {
@@ -251,13 +249,7 @@ public class CompaniesControllerTest {
 	@Test
 	public void testGetEmployees() throws Exception {
 		Resource<Company> company = this.getFirstCompany();
-		String href = company.getLink("employees").getHref();
-		
-		MvcResult r = mvc.perform(get(href).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(status().isOk())
-		.andReturn();
-		System.out.println(r.getResponse().getContentAsString());
-		
+		String href = company.getLink("employees").getHref();	
 		mvc.perform(get(href).accept(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(status().isOk())
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
@@ -312,7 +304,7 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.employees[2].gender", is("M")))
 		.andExpect(jsonPath("$._embedded.employees[2].salary", is(500.0)))
 		.andExpect(jsonPath("$._embedded.employees[2].birthday", is("03/11/2018")))
-		.andExpect(jsonPath("$._embedded.employees[2]._links.self.href", is(String.format("%s/2", href))))
+		.andExpect(jsonPath("$._embedded.employees[2]._links.self.href", is(String.format("%s/3", href))))
 		.andExpect(jsonPath("$._embedded.employees[2]._links.employees.href", is(href)))
 		
 		.andExpect(jsonPath("$._links.self.href", is(href)));

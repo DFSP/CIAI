@@ -24,6 +24,7 @@ public class Company {
 	@JsonIgnore
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private Set<Employee> employees;
+	@JsonIgnore
 	@OneToOne(mappedBy = "adminOfCompany", cascade = CascadeType.ALL)
 	private Employee myAdmin;
 
@@ -41,7 +42,7 @@ public class Company {
 
 	public Company addEmployee(Employee employee) {
 		if (this.employees == null) {
-			this.employees = new HashSet<Employee>();
+			this.employees = new LinkedHashSet<>();
 		}
 		this.employees.add(employee);
 		return this;
