@@ -12,6 +12,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.CompaniesController;
+import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.model.Company;
 
 @Component
@@ -32,7 +33,8 @@ public class CompanyResourceAssembler implements ResourcesAssembler<Company, Res
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(resources,
-				linkTo(methodOn(CompaniesController.class).getCompanies()).withSelfRel());
+				linkTo(methodOn(CompaniesController.class).getCompanies()).withSelfRel(),
+				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	
 	
