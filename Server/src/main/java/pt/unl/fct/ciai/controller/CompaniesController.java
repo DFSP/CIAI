@@ -32,7 +32,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "/partners", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class CompaniesController { //implements CompaniesApi {
+public class CompaniesController { //implements CompaniesApi { TODO
 
 	private final CompaniesRepository companiesRepository;
 	private final EmployeesRepository employeesRepository;

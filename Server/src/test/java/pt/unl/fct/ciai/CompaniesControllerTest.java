@@ -12,6 +12,8 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.unl.fct.ciai.assemblers.CompanyResourceAssembler;
@@ -680,4 +682,62 @@ public class CompaniesControllerTest {
 		verify(employeesRepository, times(3)).findById(firstEmployee.getId());
 	}
 
+	@Test
+	public void testBadRequestUpdateCompany() throws Exception {
+		Company fct = createFCTCompany();
+		Resource<Company> fctResource = companyAssembler.toResource(fct);
+
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+
+		mvc.perform(get(fctResource.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)fct.getId())))
+				.andExpect(jsonPath("$.name", is(fct.getName())))
+				.andExpect(jsonPath("$.city", is(fct.getCity())))
+				.andExpect(jsonPath("$.zipCode", is(fct.getZipCode())))
+				.andExpect(jsonPath("$.address", is(fct.getAddress())))
+				.andExpect(jsonPath("$.phone", is(fct.getPhone())))
+				.andExpect(jsonPath("$.email", is(fct.getEmail())))
+				.andExpect(jsonPath("$.fax", is(fct.getFax())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + fctResource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.companies.href", is(ROOT + fctResource.getLink("companies").getHref())))
+				.andExpect(jsonPath("$._links.employees.href", is(ROOT + fctResource.getLink("employees").getHref())));
+
+		verify(companiesRepository, times(1)).findById(fct.getId());
+
+		given(companiesRepository.save(fct)).willReturn(fct);
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+
+		fct.setEmail("fct.unl@email.pt");
+		fct.setId(2);
+		String json = objectMapper.writeValueAsString(fct);
+		mvc.perform(put(fctResource.getLink("self").getHref())
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isBadRequest());
+	}
+	
+	private MvcResult performGet(Company company) throws Exception {
+		Resource<Company> resourceCompany = companyAssembler.toResource(company);
+		return mvc.perform(get(resourceCompany.getLink("self").getHref()))
+		.andExpect(status().isOk())
+		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(jsonPath("$.id", is((int)company.getId())))
+		.andExpect(jsonPath("$.name", is(company.getName())))
+		.andExpect(jsonPath("$.city", is(company.getCity())))
+		.andExpect(jsonPath("$.zipCode", is(company.getZipCode())))
+		.andExpect(jsonPath("$.address", is(company.getAddress())))
+		.andExpect(jsonPath("$.phone", is(company.getPhone())))
+		.andExpect(jsonPath("$.email", is(company.getEmail())))
+		.andExpect(jsonPath("$.fax", is(company.getFax())))
+		.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceCompany.getLink("self").getHref())))
+		.andExpect(jsonPath("$._links.companies.href", is(ROOT + resourceCompany.getLink("companies").getHref())))
+		.andExpect(jsonPath("$._links.employees.href", is(ROOT + resourceCompany.getLink("employees").getHref())))
+		.andReturn();
+	}
+	
 }

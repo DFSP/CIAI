@@ -12,7 +12,9 @@ public class Section {
 	
     @Id @GeneratedValue
     private long id;
-    private String title, description, goals, material, workPlan;
+    private String goals;
+    private String material; //TODO lista se nao complicar muito as queries
+    private String workPlan;
     private float budget;
     @JsonIgnore
     @ManyToOne
@@ -21,9 +23,7 @@ public class Section {
 
     public Section() { }
     
-    public Section(String title, String description, String goals, String material, String workPlan, float budget) {
-    	this.title = title;
-    	this.description = description;
+    public Section(String goals, String material, String workPlan, float budget) {
     	this.goals = goals;
     	this.material = material;
     	this.workPlan = workPlan;
@@ -37,22 +37,6 @@ public class Section {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getGoals() {

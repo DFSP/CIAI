@@ -31,6 +31,7 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -73,7 +74,7 @@ public class UsersControllerTest {
 		Proposal proposal = new Proposal();
 		proposal.setId(1L);
 		proposal.setApproved(false);
-		proposal.setDate(new Date());
+		proposal.setCreationDate(new Date());
 		return proposal;
 	}
 	
@@ -201,18 +202,7 @@ public class UsersControllerTest {
 
 		verify(usersRepository, times(1)).save(manuel);
 
-		mvc.perform(get(manuelResource.getLink("self").getHref()))
-		.andExpect(status().isOk())
-		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(jsonPath("$.id", is((int)manuel.getId())))
-		.andExpect(jsonPath("$.firstName", is(manuel.getFirstName())))
-		.andExpect(jsonPath("$.lastName", is(manuel.getLastName())))
-		.andExpect(jsonPath("$.username", is(manuel.getUsername())))
-		.andExpect(jsonPath("$.email", is(manuel.getEmail())))
-		.andExpect(jsonPath("$.role", is(manuel.getRole())))
-		.andExpect(jsonPath("$._links.self.href", is(ROOT + manuelResource.getLink("self").getHref())))
-		.andExpect(jsonPath("$._links.users.href", is(ROOT + manuelResource.getLink("users").getHref())));
+		performGet(manuel);
 
 		verify(usersRepository, times(1)).findById(manuel.getId());
 	}
@@ -220,23 +210,11 @@ public class UsersControllerTest {
 	@Test
 	public void testGetUser() throws Exception {
 		User manuel = createManuelUser();
-		Resource<User> manuelResource = userAssembler.toResource(manuel);
 		
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
-
-		mvc.perform(get(manuelResource.getLink("self").getHref()))
-		.andExpect(status().isOk())
-		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(jsonPath("$.id", is((int)manuel.getId())))
-		.andExpect(jsonPath("$.firstName", is(manuel.getFirstName())))
-		.andExpect(jsonPath("$.lastName", is(manuel.getLastName())))
-		.andExpect(jsonPath("$.username", is(manuel.getUsername())))
-		.andExpect(jsonPath("$.email", is(manuel.getEmail())))
-		.andExpect(jsonPath("$.role", is(manuel.getRole())))
-		.andExpect(jsonPath("$._links.self.href", is(ROOT + manuelResource.getLink("self").getHref())))
-		.andExpect(jsonPath("$._links.users.href", is(ROOT + manuelResource.getLink("users").getHref())));
-
+		
+		performGet(manuel);
+		
 		verify(usersRepository, times(1)).findById(manuel.getId());
 	}
 
@@ -247,18 +225,7 @@ public class UsersControllerTest {
 		
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
 
-		mvc.perform(get(manuelResource.getLink("self").getHref()))
-		.andExpect(status().isOk())
-		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(jsonPath("$.id", is((int)manuel.getId())))
-		.andExpect(jsonPath("$.firstName", is(manuel.getFirstName())))
-		.andExpect(jsonPath("$.lastName", is(manuel.getLastName())))
-		.andExpect(jsonPath("$.username", is(manuel.getUsername())))
-		.andExpect(jsonPath("$.email", is(manuel.getEmail())))
-		.andExpect(jsonPath("$.role", is(manuel.getRole())))
-		.andExpect(jsonPath("$._links.self.href", is(ROOT + manuelResource.getLink("self").getHref())))
-		.andExpect(jsonPath("$._links.users.href", is(ROOT + manuelResource.getLink("users").getHref())));
+		performGet(manuel);
 
 		verify(usersRepository, times(1)).findById(manuel.getId());
 
@@ -276,18 +243,7 @@ public class UsersControllerTest {
 		verify(usersRepository, times(1)).save(manuel);
 		verify(usersRepository, times(2)).findById(manuel.getId());
 
-		mvc.perform(get(manuelResource.getLink("self").getHref()))
-		.andExpect(status().isOk())
-		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(jsonPath("$.id", is((int)manuel.getId())))
-		.andExpect(jsonPath("$.firstName", is(manuel.getFirstName())))
-		.andExpect(jsonPath("$.lastName", is(manuel.getLastName())))
-		.andExpect(jsonPath("$.username", is(manuel.getUsername())))
-		.andExpect(jsonPath("$.email", is(manuel.getEmail())))
-		.andExpect(jsonPath("$.role", is(manuel.getRole())))
-		.andExpect(jsonPath("$._links.self.href", is(ROOT + manuelResource.getLink("self").getHref())))
-		.andExpect(jsonPath("$._links.users.href", is(ROOT + manuelResource.getLink("users").getHref())));
+		performGet(manuel);
 
 		verify(usersRepository, times(3)).findById(manuel.getId());
 	}
@@ -304,9 +260,7 @@ public class UsersControllerTest {
 
 		String href = manuelResource.getLink("self").getHref();
 		
-		mvc.perform(get(href))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$.firstName", is(manuel.getFirstName())));
+		performGet(manuel);
 
 		verify(usersRepository, times(1)).findById(manuel.getId());
 
@@ -341,7 +295,6 @@ public class UsersControllerTest {
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$._embedded.proposals", hasSize(1)))
 		.andExpect(jsonPath("$._embedded.proposals[0].id", is((int)proposal.getId())))
-//		.andExpect(jsonPath("$._embedded.proposals[0].date", is(proposal.getDate())))
 		.andExpect(jsonPath("$._embedded.proposals[0].approved", is(proposal.isApproved())))
 		.andExpect(jsonPath("$._embedded.proposals[0]._links.self.href", is(ROOT + proposalResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.proposals[0]._links.proposals.href", is(ROOT + proposalResource.getLink("proposals").getHref())))
@@ -374,7 +327,7 @@ public class UsersControllerTest {
 		Proposal proposal = new Proposal();
 		proposal.setId(2L);
 		proposal.setApproved(true);
-		proposal.setDate(new Date());
+		proposal.setCreationDate(new Date());
 		proposal.setApprover(manuel);
 		manuel.addProposalToApprove(proposal);
 
@@ -451,6 +404,22 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._embedded.proposals").doesNotExist());
 
 		verify(usersRepository, times(3)).findById(manuel.getId());
+	}
+	
+	private MvcResult performGet(User user) throws Exception {
+		Resource<User> userResource = userAssembler.toResource(user);
+		return mvc.perform(get(userResource.getLink("self").getHref()))
+		.andExpect(status().isOk())
+		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+		.andExpect(jsonPath("$.id", is((int)user.getId())))
+		.andExpect(jsonPath("$.firstName", is(user.getFirstName())))
+		.andExpect(jsonPath("$.lastName", is(user.getLastName())))
+		.andExpect(jsonPath("$.username", is(user.getUsername())))
+		.andExpect(jsonPath("$.email", is(user.getEmail())))
+		.andExpect(jsonPath("$.role", is(user.getRole())))
+		.andExpect(jsonPath("$._links.self.href", is(ROOT + userResource.getLink("self").getHref())))
+		.andExpect(jsonPath("$._links.users.href", is(ROOT + userResource.getLink("users").getHref()))).andReturn();
 	}
 	
 }
