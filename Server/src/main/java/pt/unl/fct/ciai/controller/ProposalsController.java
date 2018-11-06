@@ -61,9 +61,14 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping
-	public ResponseEntity<Resources<Resource<Proposal>>> getProposals() {
-		// @RequestParam(required = false) String search) { // TODO search mesmo necessário?
-		Iterable<Proposal> proposals = proposalsRepository.findAll();
+	public ResponseEntity<Resources<Resource<Proposal>>> getProposals(@RequestParam(required = false) String search) {
+
+		Iterable<Proposal> proposals;
+		if(search!=null){
+			proposals = proposalsRepository.searchProposals(search);
+		}
+		else
+			proposals = proposalsRepository.findAll();
 		Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
 		return ResponseEntity.ok(resources);
 	}
@@ -103,10 +108,16 @@ public class ProposalsController { //Implements proposalControllerApi
 
 	// TODO
 	@GetMapping("/{id}/sections")
-	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id) {
+	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id,
+																	@RequestParam (value="search")String search) {
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
 		Proposal proposal = findProposal(id);
-		Iterable<Section> sections = proposal.getSections();
+		Iterable<Section> sections;
+
+		if(search!=null)
+			sections = proposalsRepository.searchSections(search);
+		else
+			sections = proposal.getSections();
 		Resources<Resource<Section>> resources = sectionAssembler.toResources(sections, proposal);
 		return ResponseEntity.ok(resources);
 	}

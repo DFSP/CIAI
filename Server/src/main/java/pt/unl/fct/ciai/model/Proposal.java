@@ -23,7 +23,7 @@ public class Proposal {
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date date;
     @JsonIgnore
-    @OneToMany(mappedBy="proposal")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="proposal", cascade = CascadeType.ALL)
     private Set<Section> sections;
     @JsonIgnore
     @OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)

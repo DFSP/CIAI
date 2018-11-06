@@ -17,7 +17,7 @@ public class RootController {
 		resourceSupport.add(linkTo(methodOn(RootController.class).root()).withSelfRel());
 		resourceSupport.add(linkTo(methodOn(UsersController.class).getUsers()).withRel("users"));
 		resourceSupport.add(linkTo(methodOn(CompaniesController.class).getCompanies()).withRel("companies"));
-		resourceSupport.add(linkTo(methodOn(ProposalsController.class).getProposals()).withRel("proposals"));
+		resourceSupport.add(linkTo(methodOn(ProposalsController.class).getProposals(null)).withRel("proposals"));
 		return ResponseEntity.ok(resourceSupport);
 	}
 
