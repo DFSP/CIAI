@@ -106,11 +106,9 @@ public class ProposalsController { //Implements proposalControllerApi
 		return ResponseEntity.noContent().build();
 	}
 
-	// TODO
 	@GetMapping("/{id}/sections")
 	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id,
 																	@RequestParam (value="search")String search) {
-		// TODO search mesmo necessario? @RequestParam(required = false) String search){
 		Proposal proposal = findProposal(id);
 		Iterable<Section> sections;
 
@@ -175,10 +173,15 @@ public class ProposalsController { //Implements proposalControllerApi
 	}
 
 	@GetMapping("/{id}/reviews")
-	public ResponseEntity<Resources<Resource<Review>>> getReviews(@PathVariable("id") long id) {
-		// TODO search mesmo necessario? @RequestParam(required = false) String search){
+	public ResponseEntity<Resources<Resource<Review>>> getReviews(@PathVariable("id") long id,
+																  @RequestParam (value="search")String search) {
 		Proposal proposal = findProposal(id);
-		Iterable<Review> reviews = proposal.getReviews();
+		Iterable<Review> reviews;
+
+		if(search!=null)
+			reviews = proposalsRepository.searchReviews(search);
+		else
+			reviews = proposal.getReviews();
 		Resources<Resource<Review>> resources = reviewAssembler.toResources(reviews, proposal);
 		return ResponseEntity.ok(resources);
 	}
@@ -237,10 +240,15 @@ public class ProposalsController { //Implements proposalControllerApi
 
 	//TODO
 	@GetMapping("/{id}/comments")
-	public ResponseEntity<Resources<Resource<Comment>>> getComments(@PathVariable("id") long id) {
-		// TODO search mesmo necessario? @RequestParam(required = false) String search){
+	public ResponseEntity<Resources<Resource<Comment>>> getComments(@PathVariable("id") long id,
+																	@RequestParam (value="search")String search) {
 		Proposal proposal = findProposal(id);
-		Iterable<Comment> comments = proposal.getComments();
+		Iterable<Comment> comments;
+
+		if(search!=null)
+			comments = proposalsRepository.searchComments(search);
+		else
+			comments = proposal.getComments();
 		Resources<Resource<Comment>> resources = commentAssembler.toResources(comments, proposal);
 		return ResponseEntity.ok(resources);
 	}
