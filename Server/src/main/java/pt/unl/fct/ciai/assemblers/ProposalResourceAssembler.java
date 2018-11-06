@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
+import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.model.Proposal;
 
 @Component
@@ -20,13 +21,17 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 
 	@Override
 	public Resource<Proposal> toResource(Proposal proposal) {
-		return new Resource<>(proposal,
+		Resource<Proposal> resource = new Resource<>(proposal,
 				linkTo(methodOn(ProposalsController.class).getProposal(proposal.getId())).withSelfRel(),
 				linkTo(methodOn(ProposalsController.class).getProposals()).withRel("proposals"),
 				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId())).withRel("reviews"),
 				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId())).withRel("comments"),
 				linkTo(methodOn(ProposalsController.class).getSections(proposal.getId())).withRel("sections"),
 				linkTo(methodOn(ProposalsController.class).getBiddingUsers(proposal.getId())).withRel("biddings"));
+		proposal.getApprover().ifPresent(approver -> 
+		resource.add(linkTo(methodOn(UsersController.class).getUser(approver.getId())).withRel("approver")));
+		//TODO adicionar mais links baseados noutros campos
+		return resource;
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -124,8 +125,8 @@ public class Proposal {
         return this;
     }
 
-    public User getApprover() {
-        return approver;
+    public Optional<User> getApprover() {
+        return Optional.ofNullable(this.approver);
     }
 
     public void setApprover(User approver) {
@@ -154,4 +155,27 @@ public class Proposal {
     public User getCreator() {
     	return this.creator;
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Proposal other = (Proposal) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+    
 }

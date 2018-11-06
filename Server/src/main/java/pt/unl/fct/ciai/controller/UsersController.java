@@ -3,7 +3,6 @@ package pt.unl.fct.ciai.controller;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -116,11 +115,13 @@ public class UsersController {
 	public ResponseEntity<?> deleteApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
 		User user = findUser(uid);
 		Proposal proposal = findProposal(pid);
-		if (proposal.getApprover().getId() != user.getId()) {
+		if (proposal.getApprover().map(User::getId).orElse(-1L) != user.getId()) {
 			throw new BadRequestException(String.format("User id %d is not an approver of Proposal with id %d", uid, pid));
 		}
 		user.removeProposalToApprove(proposal);
 		usersRepository.save(user); //TODO: (need to save user?)
+		proposal.setApprover(null);
+		proposalsRepository.save(proposal);
 		return ResponseEntity.noContent().build();
 	}
 
