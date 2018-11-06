@@ -10,5 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Documented
 @PreAuthorize(CanModifyCompany.Condition)
 public @interface CanModifyCompany {
-    String Condition = "@SecurityService.isCompanyAdmin(principal, #id)";
+    String Condition = "(@SecurityService.isCompanyAdmin(principal, #id)"
+                    + " and @SecurityService.isPrincipal(principal, #id))";
 }

@@ -8,6 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanModifyEmployee.Condition)
+@PreAuthorize(CanDeleteEmployee.Condition)
 public @interface CanDeleteEmployee {
+    String Condition = "(@SecurityService.isCompanyAdmin(principal, #id) "
+            + " and @SecurityService.isSystemAdmin(principal, #id) "
+            + " and @SecurityService.isPrincipal(principal, #id))"; //TODO ----> CHECK COM LUIS ----> OR OU AND
 }
