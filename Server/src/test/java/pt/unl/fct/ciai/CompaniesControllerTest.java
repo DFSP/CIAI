@@ -352,6 +352,72 @@ public class CompaniesControllerTest {
 	}
 
 	@Test
+	public void testUpdateCompany_BadRequest() throws Exception {
+		Company fct = createFCTCompany();
+		Resource<Company> fctResource = companyAssembler.toResource(fct);
+
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+
+		mvc.perform(get(fctResource.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)fct.getId())))
+				.andExpect(jsonPath("$.name", is(fct.getName())))
+				.andExpect(jsonPath("$.city", is(fct.getCity())))
+				.andExpect(jsonPath("$.zipCode", is(fct.getZipCode())))
+				.andExpect(jsonPath("$.address", is(fct.getAddress())))
+				.andExpect(jsonPath("$.phone", is(fct.getPhone())))
+				.andExpect(jsonPath("$.email", is(fct.getEmail())))
+				.andExpect(jsonPath("$.fax", is(fct.getFax())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + fctResource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.companies.href", is(ROOT + fctResource.getLink("companies").getHref())))
+				.andExpect(jsonPath("$._links.employees.href", is(ROOT + fctResource.getLink("employees").getHref())));
+
+		verify(companiesRepository, times(1)).findById(fct.getId());
+
+		given(companiesRepository.save(fct)).willReturn(fct);
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+
+		fct.setEmail("fct.unl@email.pt");
+		fct.setId(2);
+		String json = objectMapper.writeValueAsString(fct);
+		mvc.perform(put(fctResource.getLink("self").getHref())
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void testUpdateCompany_NotFound() throws Exception {
+		Company fct = createFCTCompany();
+		Resource<Company> fctResource = companyAssembler.toResource(fct);
+
+		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+
+		mvc.perform(get("http://localhost/partners/2"))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)fct.getId())))
+				.andExpect(jsonPath("$.name", is(fct.getName())))
+				.andExpect(jsonPath("$.city", is(fct.getCity())))
+				.andExpect(jsonPath("$.zipCode", is(fct.getZipCode())))
+				.andExpect(jsonPath("$.address", is(fct.getAddress())))
+				.andExpect(jsonPath("$.phone", is(fct.getPhone())))
+				.andExpect(jsonPath("$.email", is(fct.getEmail())))
+				.andExpect(jsonPath("$.fax", is(fct.getFax())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + fctResource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.companies.href", is(ROOT + fctResource.getLink("companies").getHref())))
+				.andExpect(jsonPath("$._links.employees.href", is(ROOT + fctResource.getLink("employees").getHref())));
+
+		verify(companiesRepository, times(1)).findById(fct.getId());
+
+
+	}
+
+	@Test
 	public void testDeleteCompany() throws Exception {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
