@@ -1,6 +1,5 @@
 package pt.unl.fct.ciai.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,9 +13,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Entity
-@Table(name = "proposals")
-@JsonIgnoreProperties(ignoreUnknown = true, value = {
-		"sections", "staff", "members", "approver", "reviews", "comments", "biddings", "creator"})
+@JsonIgnoreProperties(value = {
+		"sections", "staff", "members", "approver", "reviews", "comments", "biddings", "creator"
+		}, ignoreUnknown = true)
 public class Proposal {
 
 	public enum ProposalState {
@@ -44,7 +43,7 @@ public class Proposal {
 	private Set<Comment> comments;
 	@ManyToMany(mappedBy = "proposalBiddings", cascade = CascadeType.ALL)
 	private Set<User> biddings;
-	@ManyToOne @JoinColumn(name="user_id")
+	@ManyToOne @JoinColumn(name="creator_id")
 	private User creator;
 
 	public Proposal() { }
@@ -265,28 +264,6 @@ public class Proposal {
 	public Proposal creator(User creator) {
 		setCreator(creator);
 		return this;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Proposal other = (Proposal) obj;
-		if (id != other.id)
-			return false;
-		return true;
 	}
 
 }

@@ -8,6 +8,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanModifyCompany.Condition)
+@PreAuthorize(CanAddEmployee.Condition)
 public @interface CanAddEmployee {
+    String Condition = "(@SecurityService.isCompanyAdmin(principal, #cid) "
+            + " and @SecurityService.isUserOfSystem(principal, #eid)" //TODO ---> #uid??
+            + " and @SecurityService.isPrincipal(principal, #eid))";
+
 }
