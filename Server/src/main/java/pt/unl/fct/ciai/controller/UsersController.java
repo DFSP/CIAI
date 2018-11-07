@@ -103,8 +103,10 @@ public class UsersController {
 		proposal.setApprover(user);
 		user.addProposalToApprove(proposal);
 		usersRepository.save(user); //TODO verificar se é necessário
-		Proposal newEmployee = proposalsRepository.save(proposal);
-		Resource<Proposal> resource = proposalAssembler.toResource(newEmployee);
+		System.out.println();
+		Proposal newProposal = proposalsRepository.save(proposal);
+		System.out.println(newProposal);
+		Resource<Proposal> resource = proposalAssembler.toResource(newProposal);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);

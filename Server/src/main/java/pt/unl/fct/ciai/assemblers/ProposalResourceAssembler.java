@@ -24,8 +24,8 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 		Resource<Proposal> resource = new Resource<>(proposal,
 				linkTo(methodOn(ProposalsController.class).getProposal(proposal.getId())).withSelfRel(),
 				linkTo(methodOn(ProposalsController.class).getProposals(null)).withRel("proposals"),
-				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId())).withRel("reviews"),
-				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId())).withRel("comments"),
+				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId(), null)).withRel("reviews"),
+				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId(), null)).withRel("comments"),
 				linkTo(methodOn(ProposalsController.class).getSections(proposal.getId(), null)).withRel("sections"),
 				linkTo(methodOn(ProposalsController.class).getBiddingUsers(proposal.getId())).withRel("biddings"));
 		proposal.getApprover().ifPresent(approver -> 

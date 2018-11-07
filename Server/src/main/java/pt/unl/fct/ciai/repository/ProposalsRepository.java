@@ -18,15 +18,22 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     Iterable<Proposal> searchProposals(@Param(value = "search") String search);
 
+    @Query("SELECT s "
+    		+ "FROM Proposal p JOIN p.sections s "
+    		+ "WHERE p.id = :id")
+    Iterable<Section> findSections(@Param(value = "id") long id);
+    
     @Query("Select s "
             + "FROM Proposal p JOIN p.sections s "
-            + "WHERE s.id LIKE CONCAT('%',:search,'%')"
+            + "WHERE p.id = :id "
+            + "AND "
+            + "s.id LIKE CONCAT('%',:search,'%')"
             + "OR s.goals LIKE CONCAT('%',:search,'%')"
             + "OR s.material LIKE CONCAT('%',:search,'%')"
             + "OR s.workPlan LIKE CONCAT('%',:search,'%')"
             + "OR s.budget LIKE CONCAT('%',:search,'%')"
     )
-    Iterable<Section> searchSections(@Param(value = "search") String search);
+    Iterable<Section> searchSections(@Param(value = "id") long id, @Param(value = "search") String search);
 
     @Query("Select r "
             + "FROM Proposal p JOIN p.reviews r "

@@ -25,6 +25,7 @@ import pt.unl.fct.ciai.repository.UsersRepository;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 @RestController
 @RequestMapping(value = "/proposals", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -108,14 +109,9 @@ public class ProposalsController { //Implements proposalControllerApi
 
 	@GetMapping("/{id}/sections")
 	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id,
-																	@RequestParam (value="search")String search) {
+																	@RequestParam (value="search") String search) {
 		Proposal proposal = findProposal(id);
-		Iterable<Section> sections;
-
-		if(search!=null)
-			sections = proposalsRepository.searchSections(search);
-		else
-			sections = proposal.getSections();
+		Iterable<Section> sections = search == null ? proposalsRepository.findSections(id) : proposalsRepository.searchSections(id, search);
 		Resources<Resource<Section>> resources = sectionAssembler.toResources(sections, proposal);
 		return ResponseEntity.ok(resources);
 	}
@@ -176,12 +172,12 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resources<Resource<Review>>> getReviews(@PathVariable("id") long id,
 																  @RequestParam (value="search")String search) {
 		Proposal proposal = findProposal(id);
-		Iterable<Review> reviews;
+		Iterable<Review> reviews = proposal.getReviews().orElse(Collections.emptySet());
 
-		if(search!=null)
-			reviews = proposalsRepository.searchReviews(search);
-		else
-			reviews = proposal.getReviews();
+//		if(search!=null)
+//			reviews = proposalsRepository.searchReviews(search);
+//		else
+//			reviews = proposal.getReviews();
 		Resources<Resource<Review>> resources = reviewAssembler.toResources(reviews, proposal);
 		return ResponseEntity.ok(resources);
 	}
@@ -243,12 +239,12 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resources<Resource<Comment>>> getComments(@PathVariable("id") long id,
 																	@RequestParam (value="search")String search) {
 		Proposal proposal = findProposal(id);
-		Iterable<Comment> comments;
+		Iterable<Comment> comments = proposal.getComments().orElse(Collections.emptySet());
 
-		if(search!=null)
-			comments = proposalsRepository.searchComments(search);
-		else
-			comments = proposal.getComments();
+//		if(search!=null)
+//			comments = proposalsRepository.searchComments(search);
+//		else
+//			comments = proposal.getComments();
 		Resources<Resource<Comment>> resources = commentAssembler.toResources(comments, proposal);
 		return ResponseEntity.ok(resources);
 	}
@@ -309,7 +305,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resources<Resource<User>>> getBiddingUsers(@PathVariable("id") long id) {		
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
 		Proposal proposal = findProposal(id);
-		Iterable<User> users = proposal.getBiddings();
+		Iterable<User> users = proposal.getBiddings().orElse(Collections.emptySet());
 		Resources<Resource<User>> resources = userAssembler.toResources(users, proposal);
 		return ResponseEntity.ok(resources);
 	}

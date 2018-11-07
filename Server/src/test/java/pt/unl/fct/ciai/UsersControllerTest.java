@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -61,23 +60,20 @@ public class UsersControllerTest {
 	private final ObjectMapper objectMapper;
 
 	private static final String ROOT = "http://localhost";
-	
+
 	public UsersControllerTest() {
 		objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new Jackson2HalModule());
 	}
-	
-
-//	private Set<Proposal> proposalsToApprove;
 
 	private Proposal createProposal() {
-		Proposal proposal = new Proposal();
-		proposal.setId(1L);
-		proposal.setApproved(false);
-		proposal.setCreationDate(new Date());
+		Proposal proposal = new Proposal().id(1L)
+				.title("A proposal title")
+				.description("A very detailed description about this proposal")
+				.approved();
 		return proposal;
 	}
-	
+
 	private User createJoaoUser() {
 		User joao = new User();
 		joao.setId(1L);
@@ -89,7 +85,7 @@ public class UsersControllerTest {
 		joao.setPassword("password");
 		return joao;
 	}
-	
+
 	private User createLuisUser() {
 		User luis = new User();
 		luis.setId(2L);
@@ -101,7 +97,7 @@ public class UsersControllerTest {
 		luis.setPassword("password");
 		return luis;
 	}
-	
+
 	private User createDanielUser() {
 		User daniel = new User();
 		daniel.setId(3L);
@@ -113,7 +109,7 @@ public class UsersControllerTest {
 		daniel.setPassword("password");
 		return daniel;
 	}
-	
+
 	private User createManuelUser() {
 		User manuel = new User();
 		manuel.setId(4L);
@@ -127,7 +123,7 @@ public class UsersControllerTest {
 		manuel.addProposalToApprove(proposal);
 		return manuel;
 	}
-	
+
 	@Test
 	public void testGetUsers() throws Exception {
 		User joao = createJoaoUser();		
@@ -136,7 +132,7 @@ public class UsersControllerTest {
 		Resource<User> joaoResource = userAssembler.toResource(joao);
 		Resource<User> luisResource = userAssembler.toResource(luis);
 		Resource<User> danielResource = userAssembler.toResource(daniel);
-		
+
 		given(usersRepository.findAll()).willReturn(Arrays.asList(joao, luis, daniel));
 
 		String href = joaoResource.getLink("users").getHref();
@@ -210,11 +206,11 @@ public class UsersControllerTest {
 	@Test
 	public void testGetUser() throws Exception {
 		User manuel = createManuelUser();
-		
+
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
-		
+
 		performGet(manuel);
-		
+
 		verify(usersRepository, times(1)).findById(manuel.getId());
 	}
 
@@ -222,7 +218,7 @@ public class UsersControllerTest {
 	public void testUpdateUser() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
-		
+
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
 
 		performGet(manuel);
@@ -231,7 +227,7 @@ public class UsersControllerTest {
 
 		given(usersRepository.save(manuel)).willReturn(manuel);
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
-		
+
 		manuel.setEmail("manuel@email.pt");
 		String json = objectMapper.writeValueAsString(manuel);
 		mvc.perform(put(manuelResource.getLink("self").getHref())
@@ -259,7 +255,7 @@ public class UsersControllerTest {
 		.thenReturn(Optional.ofNullable(null));
 
 		String href = manuelResource.getLink("self").getHref();
-		
+
 		performGet(manuel);
 
 		verify(usersRepository, times(1)).findById(manuel.getId());
@@ -283,19 +279,19 @@ public class UsersControllerTest {
 
 		Proposal proposal = manuel.getProposalsToApprove().iterator().next();
 		Resource<Proposal> proposalResource = proposalAssembler.toResource(proposal);
-		
+
 		given(usersRepository.findById(manuel.getId()))
 		.willReturn(Optional.of(manuel));
 
 		String href = manuelResource.getLink("approverInProposals").getHref();
-		
+
 		mvc.perform(get(href))
 		.andExpect(status().isOk())
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$._embedded.proposals", hasSize(1)))
 		.andExpect(jsonPath("$._embedded.proposals[0].id", is((int)proposal.getId())))
-		.andExpect(jsonPath("$._embedded.proposals[0].approved", is(proposal.isApproved())))
+		.andExpect(jsonPath("$._embedded.proposals[0].state", is(proposal.getState().toString())))
 		.andExpect(jsonPath("$._embedded.proposals[0]._links.self.href", is(ROOT + proposalResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.proposals[0]._links.proposals.href", is(ROOT + proposalResource.getLink("proposals").getHref())))
 		.andExpect(jsonPath("$._embedded.proposals[0]._links.reviews.href", is(ROOT + proposalResource.getLink("reviews").getHref())))
@@ -312,7 +308,7 @@ public class UsersControllerTest {
 	public void testAddApproverInProposal() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
-		
+
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
 
 		String href = manuelResource.getLink("approverInProposals").getHref();
@@ -323,21 +319,21 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._embedded.proposals", hasSize(1)));
 
 		verify(usersRepository, times(1)).findById(manuel.getId());
-		
-		Proposal proposal = new Proposal();
-		proposal.setId(2L);
-		proposal.setApproved(true);
-		proposal.setCreationDate(new Date());
-		proposal.setApprover(manuel);
+
+		Proposal proposal = new Proposal().id(2L)
+				.title("a cool proposal")
+				.description("a cool proposal to do cool stuff")
+				.approver(manuel);
 		manuel.addProposalToApprove(proposal);
 
 		Resource<Proposal> proposalResource = proposalAssembler.toResource(proposal);
-		
+
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
 		when(usersRepository.save(manuel)).thenReturn(manuel);
 		when(proposalsRepository.save(proposal)).thenReturn(proposal);
-		
+
 		String json = objectMapper.writeValueAsString(proposal);
+		System.out.println(json);
 		mvc.perform(post(href)
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -346,8 +342,7 @@ public class UsersControllerTest {
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$.id", is((int)proposal.getId())))
-//		.andExpect(jsonPath("$.date", is(proposal.getDate())))
-		.andExpect(jsonPath("$.approved", is(proposal.isApproved())))
+		.andExpect(jsonPath("$.state", is(proposal.getState().toString())))
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + proposalResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._links.proposals.href", is(ROOT + proposalResource.getLink("proposals").getHref())))
 		.andExpect(jsonPath("$._links.reviews.href", is(ROOT + proposalResource.getLink("reviews").getHref())))
@@ -355,39 +350,39 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._links.sections.href", is(ROOT + proposalResource.getLink("sections").getHref())))
 		.andExpect(jsonPath("$._links.biddings.href", is(ROOT + proposalResource.getLink("biddings").getHref())))
 		.andExpect(jsonPath("$._links.approver.href", is(ROOT + proposalResource.getLink("approver").getHref())));
-		
+
 		verify(usersRepository, times(2)).findById(manuel.getId());
 		verify(usersRepository, times(1)).save(manuel);
 		verify(proposalsRepository, times(1)).save(proposal);
-		
+
 		mvc.perform(get(href))
 		.andExpect(status().isOk())
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$._embedded.proposals", hasSize(2)));
-		
+
 		verify(usersRepository, times(3)).findById(manuel.getId());
 	}
-	
+
 	@Test
 	public void testDeleteApproverInProposal() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 		Proposal proposal = manuel.getProposalsToApprove().iterator().next();
-		
+
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
-		
+
 		String href = manuelResource.getLink("approverInProposals").getHref();
-		
+
 		mvc.perform(get(href))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$._embedded.proposals", hasSize(1)));
-		
+
 		verify(usersRepository, times(1)).findById(manuel.getId());
 
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
 		given(proposalsRepository.findById(proposal.getId())).willReturn(Optional.of(proposal));
-		
+
 		mvc.perform(delete(href+"/"+proposal.getId()))
 		.andExpect(status().isNoContent());
 
@@ -395,31 +390,68 @@ public class UsersControllerTest {
 		verify(proposalsRepository, times(1)).save(proposal);
 		verify(usersRepository, times(2)).findById(manuel.getId());
 		verify(proposalsRepository, times(1)).findById(proposal.getId());
-		
+
 		manuel.removeProposalToApprove(proposal);
 		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
-		
+
 		mvc.perform(get(href))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$._embedded.proposals").doesNotExist());
 
 		verify(usersRepository, times(3)).findById(manuel.getId());
 	}
-	
+
+	@Test
+	public void testNotFoundEmployee() throws Exception {
+		User manuel = createManuelUser();
+		Resource<User> manuelResource = userAssembler.toResource(manuel);
+
+		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
+
+		mvc.perform(get("http://localhost/users/2"))
+		.andExpect(status().isNotFound());
+
+		verify(usersRepository, times(1)).findById(2L);
+	}
+
+	@Test
+	public void testBadRequestUpdateUser() throws Exception {
+		User manuel = createManuelUser();
+		Resource<User> manuelResource = userAssembler.toResource(manuel);
+		String href = manuelResource.getLink("self").getHref();
+
+		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
+
+		performGet(manuel);
+
+		verify(usersRepository, times(1)).findById(manuel.getId());
+
+		given(usersRepository.save(manuel)).willReturn(manuel);
+		given(usersRepository.findById(manuel.getId())).willReturn(Optional.of(manuel));
+
+		manuel.setId(2L);
+		String json = objectMapper.writeValueAsString(manuel);
+		mvc.perform(put(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+		.andExpect(status().isBadRequest());
+	}
+
 	private MvcResult performGet(User user) throws Exception {
 		Resource<User> userResource = userAssembler.toResource(user);
 		return mvc.perform(get(userResource.getLink("self").getHref()))
-		.andExpect(status().isOk())
-		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-		.andExpect(jsonPath("$.id", is((int)user.getId())))
-		.andExpect(jsonPath("$.firstName", is(user.getFirstName())))
-		.andExpect(jsonPath("$.lastName", is(user.getLastName())))
-		.andExpect(jsonPath("$.username", is(user.getUsername())))
-		.andExpect(jsonPath("$.email", is(user.getEmail())))
-		.andExpect(jsonPath("$.role", is(user.getRole())))
-		.andExpect(jsonPath("$._links.self.href", is(ROOT + userResource.getLink("self").getHref())))
-		.andExpect(jsonPath("$._links.users.href", is(ROOT + userResource.getLink("users").getHref()))).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)user.getId())))
+				.andExpect(jsonPath("$.firstName", is(user.getFirstName())))
+				.andExpect(jsonPath("$.lastName", is(user.getLastName())))
+				.andExpect(jsonPath("$.username", is(user.getUsername())))
+				.andExpect(jsonPath("$.email", is(user.getEmail())))
+				.andExpect(jsonPath("$.role", is(user.getRole())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + userResource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.users.href", is(ROOT + userResource.getLink("users").getHref()))).andReturn();
 	}
-	
+
 }

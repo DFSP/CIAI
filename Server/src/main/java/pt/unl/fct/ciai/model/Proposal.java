@@ -1,5 +1,6 @@
 package pt.unl.fct.ciai.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,13 +48,16 @@ public class Proposal {
 	@ManyToOne @JoinColumn(name="creator_id")
 	private User creator;
 
-	public Proposal() { }
+	public Proposal() {
+		this.state = ProposalState.PENDING_APPROVAL;
+	}
 
 	public Proposal(String title, String description) {
+		this();
 		this.title = title;
 		this.description = description;
 	}
-
+	
 	public long getId() {
 		return id;
 	}
@@ -94,6 +99,21 @@ public class Proposal {
 
 	public ProposalState getState() {
 		return state;
+	}
+	
+	@JsonIgnore
+	public boolean isPendingApproval() {
+		return state == ProposalState.PENDING_APPROVAL;
+	}
+	
+	@JsonIgnore
+	public boolean isApproved() {
+		return state == ProposalState.APPROVED;
+	}
+	
+	@JsonIgnore
+	public boolean isRejected() {
+		return state == ProposalState.REJECTED;
 	}
 
 	public void setApproved() throws IllegalStateException {
@@ -264,6 +284,23 @@ public class Proposal {
 	public Proposal creator(User creator) {
 		setCreator(creator);
 		return this;
+	}
+
+	@Override
+	public int hashCode() {
+		 return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Proposal other = (Proposal) obj;
+		return id == other.id;
 	}
 
 }

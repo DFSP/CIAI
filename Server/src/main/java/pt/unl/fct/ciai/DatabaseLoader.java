@@ -125,7 +125,7 @@ public class DatabaseLoader {
 			//users.save(ecmaUser);
 
 			Section section1 = new Section();
-			section1.setTitle("Section1 -> title");
+			//section1.setTitle("Section1 -> title");
 			/*System.out.println("1- Proposal have 0 sections");
 			System.out.println();
 			System.out.println("-----------ADDING SECTION TO PROPOSAL----------");
