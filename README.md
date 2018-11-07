@@ -1,10 +1,7 @@
 # CIAI
 
-TODO:  
+Projeto prático da unidade curricular Conceção e Implementação de Aplicações para a Internet.
 
-    1. Adicionar services. e.g. CompaniesController -> CompaniesService -> CompaniesRepository.  
-	Controller faz invocação de métodos da classe CompaniesService e error handling.  
-	Service apenas faz invocação de métodos da classe CompaniesRepository.  
-	
-	FEITO 2. Mudar classe Employee para subclasse de User:  
-	class Employee extends User
+João Reis 43914
+Daniel Pimenta 45404
+Luis Martins 45640
