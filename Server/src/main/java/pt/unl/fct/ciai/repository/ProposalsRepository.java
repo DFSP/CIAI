@@ -20,8 +20,8 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
 
     @Query("SELECT s "
     		+ "FROM Proposal p JOIN p.sections s "
-    		+ "WHERE p.id = :id")
-    Iterable<Section> findSections(@Param(value = "id") long id);
+    		+ "WHERE p.id = :id") //TODO ver se é mesmo necessario o query explicito
+    Iterable<Section> getSectionsByProposalId(@Param(value = "id") long id);
     
     @Query("Select s "
             + "FROM Proposal p JOIN p.sections s "

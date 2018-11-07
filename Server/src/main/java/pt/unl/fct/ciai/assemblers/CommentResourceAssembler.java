@@ -27,7 +27,7 @@ public class CommentResourceAssembler implements ResourceAssembler<Comment, Reso
 		long pid = comment.getProposal().getId();
 		return new Resource<>(comment,
 				linkTo(methodOn(ProposalsController.class).getComment(pid, cid)).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getComments(pid)).withRel("comments"));
+				linkTo(methodOn(ProposalsController.class).getComments(pid, null)).withRel("comments"));
 	}
 	
 	public Resources<Resource<Comment>> toResources(Iterable<? extends Comment> entities, Proposal proposal) {
@@ -37,7 +37,7 @@ public class CommentResourceAssembler implements ResourceAssembler<Comment, Reso
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(comments,
-				linkTo(methodOn(ProposalsController.class).getComments(cid)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getComments(cid, null)).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

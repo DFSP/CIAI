@@ -111,7 +111,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id,
 																	@RequestParam (value="search") String search) {
 		Proposal proposal = findProposal(id);
-		Iterable<Section> sections = search == null ? proposalsRepository.findSections(id) : proposalsRepository.searchSections(id, search);
+		Iterable<Section> sections = search == null ? proposalsRepository.getSectionsByProposalId(id) : proposalsRepository.searchSections(id, search);
 		Resources<Resource<Section>> resources = sectionAssembler.toResources(sections, proposal);
 		return ResponseEntity.ok(resources);
 	}
