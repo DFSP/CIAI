@@ -1,13 +1,7 @@
 # CIAI
 
-TODO:  
+Projeto prático da unidade curricular Conceção e Implementação de Aplicações para a Internet.  
 
-    1. Adicionar services. e.g. CompaniesController -> CompaniesService -> CompaniesRepository. 
-	Controller faz invocação de métodos da classe CompaniesService.
-	Service faz invocação de métodos da classe CompaniesRepository.  
-	
-	2. Segurança
-	
-	3. Testes para ProposalsController
-	
-	4. Adicionar mais links
+	João Reis 43914  
+	Daniel Pimenta 45404  
+	Luis Martins 45640
