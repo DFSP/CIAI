@@ -90,9 +90,8 @@ public class DatabaseLoader {
 
 			Employee fctEmployee = new Employee();
 			fctEmployee.setCompany(fct);
-			//fctEmployee.setUserId(fctUser.getId());
-			istEmployee.setUsername("fctUser");
-			istEmployee.setPassword(encoder.encode("password3"));
+			fctEmployee.setUsername("fctUser");
+			fctEmployee.setPassword(encoder.encode("password3"));
 			fct.addEmployee(fctEmployee);
 			employees.save(fctEmployee);
 
@@ -143,6 +142,12 @@ public class DatabaseLoader {
 			/*System.out.println("5- Proposal have now "+proposal1.getSections().size()+" sections");
 			System.out.println("6- Section1 is associated with Proposal? > "+proposal1.getSections().contains(section1));
 			System.out.println("7- Section1 exists in the system? > "+sections.existsById(section1.getId()));*/
+
+			istEmployee.addApproveProposal(proposal1);
+			proposal1.setApprover(istEmployee);
+			users.save(istEmployee);
+			proposals.save(proposal1);
+
 		};
 	}
 	

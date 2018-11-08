@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.exceptions;
+package pt.unl.fct.ciai.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

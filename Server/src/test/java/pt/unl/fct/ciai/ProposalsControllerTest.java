@@ -12,11 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pt.unl.fct.ciai.assemblers.CommentResourceAssembler;
-import pt.unl.fct.ciai.assemblers.ProposalResourceAssembler;
-import pt.unl.fct.ciai.assemblers.ReviewResourceAssembler;
-import pt.unl.fct.ciai.assemblers.SectionResourceAssembler;
-import pt.unl.fct.ciai.assemblers.UserResourceAssembler;
+import pt.unl.fct.ciai.assembler.CommentResourceAssembler;
+import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
+import pt.unl.fct.ciai.assembler.ReviewResourceAssembler;
+import pt.unl.fct.ciai.assembler.SectionResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserResourceAssembler;
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.repository.CommentsRepository;
 import pt.unl.fct.ciai.repository.ProposalsRepository;

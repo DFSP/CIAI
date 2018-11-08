@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.assemblers;
+package pt.unl.fct.ciai.assembler;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;

@@ -1,4 +1,4 @@
-package pt.unl.fct.ciai.assemblers;
+package pt.unl.fct.ciai.assembler;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -47,7 +47,7 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(users,
-				linkTo(methodOn(ProposalsController.class).getBiddingUsers(pid)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getReviewBiddings(pid, "")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

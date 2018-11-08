@@ -1,8 +1,9 @@
-package pt.unl.fct.ciai.assemblers;
+package pt.unl.fct.ciai.assembler;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -16,7 +17,6 @@ import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.model.Proposal;
-import pt.unl.fct.ciai.model.Review;
 
 @Component
 public class CommentResourceAssembler implements ResourceAssembler<Comment, Resource<Comment>> { //TODO resourcesAssembler

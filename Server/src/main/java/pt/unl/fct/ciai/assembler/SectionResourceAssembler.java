@@ -1,8 +1,9 @@
-package pt.unl.fct.ciai.assemblers;
+package pt.unl.fct.ciai.assembler;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -24,9 +25,9 @@ public class SectionResourceAssembler implements ResourceAssembler<Section, Reso
 	public Resource<Section> toResource(Section section) {
 		long sid = section.getId();
 		long pid = section.getProposal().get().getId(); //TODO o que fazer quando getProposal retorna null?
-		return new Resource<>(section,
-				linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));
+		return new Resource<>(section, Collections.emptyList());
+			//	linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
+			//	linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));
 	}
 	
 	public Resources<Resource<Section>> toResources(Iterable<? extends Section> entities, Proposal proposal) {

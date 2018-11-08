@@ -1,18 +1,18 @@
-package pt.unl.fct.ciai.advices;
+package pt.unl.fct.ciai.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import pt.unl.fct.ciai.exceptions.ConflictException;
+import pt.unl.fct.ciai.exception.BadRequestException;
 
-public class ConflictAdvice {
+public class BadRequestAdvice {
 
 	@ResponseBody
-	@ExceptionHandler(ConflictException.class)
-	@ResponseStatus(HttpStatus.CONFLICT)
-	String conflictHandler(ConflictException ex) {
+	@ExceptionHandler(BadRequestException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	String badRequestHandler(BadRequestException ex) {
 		return ex.getMessage();
 	}
 	

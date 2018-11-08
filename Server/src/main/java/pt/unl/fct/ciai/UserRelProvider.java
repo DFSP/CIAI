@@ -2,7 +2,6 @@ package pt.unl.fct.ciai;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.core.EvoInflectorRelProvider;
-import org.springframework.stereotype.Component;
 import org.springframework.core.Ordered;
 
 import pt.unl.fct.ciai.model.User;

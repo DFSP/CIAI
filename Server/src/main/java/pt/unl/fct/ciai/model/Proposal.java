@@ -23,6 +23,7 @@ public class Proposal {
 	private long id;
 	private String title;
 	private String description;
+	@Enumerated(EnumType.STRING)
 	private ProposalState state;
 	@Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
 	private Date creationDate;
@@ -180,6 +181,17 @@ public class Proposal {
 		return this;
 	}
 
+	public Proposal updateSection(Section section) {
+		Set<Section> sections = this.getSections().orElseThrow(() ->
+				new IllegalStateException(String.format("Proposal %d has no sections", getId())));
+		if (!sections.remove(section)) {
+			throw new IllegalArgumentException(
+					String.format("Proposal %d doesn't have a section %d", getId(), section.getId()));
+		}
+		sections.add(section); //TODO global vs local
+		return this;
+	}
+
 	public Optional<Set<User>> getStaff() {
 		return Optional.ofNullable(staff);
 	}
@@ -271,6 +283,17 @@ public class Proposal {
 		return this;
 	}
 
+	public Proposal updateReview(Review review) {
+		Set<Review> reviews = this.getReviews().orElseThrow(() ->
+				new IllegalStateException(String.format("Proposal %d has no reviews", getId())));
+		if (!reviews.remove(review)) {
+			throw new IllegalArgumentException(
+					String.format("Proposal %d doesn't have a review %d", getId(), review.getId()));
+		}
+		reviews.add(review); //TODO verificar se mudança local tambem afeta o global
+		return this;
+	}
+
 	public Optional<Set<Comment>> getComments() {
 		return Optional.ofNullable(comments);
 	}
@@ -297,6 +320,17 @@ public class Proposal {
 		return this;
 	}
 
+	public Proposal updateComment(Comment comment) {
+		Set<Comment> comments = this.getComments().orElseThrow(() ->
+				new IllegalStateException(String.format("Proposal %d has no comments", getId())));
+		if (!comments.remove(comment)) {
+			throw new IllegalArgumentException(
+					String.format("Proposal %d doesn't have a comment %d", getId(), comment.getId()));
+		}
+		comments.add(comment); //TODO verificar se mudança local tambem afeta o global
+		return this;
+	}
+
 	public Optional<Set<User>> getReviewBiddings() {
 		return Optional.ofNullable(this.reviewBiddings);
 	}
@@ -320,6 +354,17 @@ public class Proposal {
 
 	public Proposal removeReviewBidding(User bidding) {
 		this.getReviewBiddings().ifPresent(reviewBiddings -> reviewBiddings.remove(bidding));
+		return this;
+	}
+
+	public Proposal updateReviewBidding(User bidding) {
+		Set<User> biddings = this.getReviewBiddings().orElseThrow(() ->
+				new IllegalStateException(String.format("Proposal %d has no review biddings", getId())));
+		if (!biddings.remove(bidding)) {
+			throw new IllegalArgumentException(
+					String.format("Proposal %d doesn't have a bidding %d", getId(), bidding.getId()));
+		}
+		biddings.add(bidding); //TODO verificar se mudança local tambem afeta o global
 		return this;
 	}
 

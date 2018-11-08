@@ -4,16 +4,20 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
-import pt.unl.fct.ciai.assemblers.ProposalResourceAssembler;
-import pt.unl.fct.ciai.assemblers.UserResourceAssembler;
-import pt.unl.fct.ciai.exceptions.BadRequestException;
-import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.api.UsersApi;
+import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserResourceAssembler;
+import pt.unl.fct.ciai.exception.BadRequestException;
+import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.ProposalsRepository;
 import pt.unl.fct.ciai.repository.UsersRepository;
+import pt.unl.fct.ciai.service.ProposalsService;
+import pt.unl.fct.ciai.service.UsersService;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -22,21 +26,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class UsersController {
+public class UsersController implements UsersApi {
 
-	private final UsersRepository usersRepository;
-	private final ProposalsRepository proposalsRepository;
+	private final UsersService usersService;
+	private final ProposalsService proposalsService;
 
 	private final UserResourceAssembler userAssembler;
 	private final ProposalResourceAssembler proposalAssembler;
 
-	public UsersController(UsersRepository users, ProposalsRepository proposals,
-			UserResourceAssembler userAssembler, ProposalResourceAssembler proposalAssembler) {
-		this.usersRepository = users;
-		this.proposalsRepository = proposals;
+	public UsersController(UsersService usersService, ProposalsService proposalsService,
+						   UserResourceAssembler userAssembler, ProposalResourceAssembler proposalAssembler) {
+		this.usersService = usersService;
+		this.proposalsService = proposalsService;
 		this.userAssembler = userAssembler;
 		this.proposalAssembler = proposalAssembler;
 	}
@@ -44,14 +49,14 @@ public class UsersController {
 	@GetMapping
 	public ResponseEntity<Resources<Resource<User>>> getUsers() {
 		// @RequestParam(required = false) String search) { // TODO search mesmo necessário?
-		Iterable<User> users = usersRepository.findAll();
+		Iterable<User> users = usersService.getUsers();
 		Resources<Resource<User>> resources = userAssembler.toResources(users);
 		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping
 	public ResponseEntity<Resource<User>> addUser(@RequestBody User user) throws URISyntaxException {
-		User newUser = usersRepository.save(user);
+		User newUser = usersService.addUser(user);
 		Resource<User> resource = userAssembler.toResource(newUser);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
@@ -60,7 +65,7 @@ public class UsersController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Resource<User>> getUser(@PathVariable long id) {
-		User user = findUser(id);
+		User user = usersService.getUser(id);
 		Resource<User> resource = userAssembler.toResource(user);
 		return ResponseEntity.ok(resource);
 	}
@@ -70,25 +75,21 @@ public class UsersController {
 		if (id != newUser.getId()) {
 			throw new BadRequestException(String.format("Path id %d does not match user id %d", id, newUser.getId()));
 		}
-		User oldUser = findUser(id);
-		usersRepository.save(newUser);
+		usersService.updateUser(id, newUser);
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable long id) {
-		User user = findUser(id);
-		usersRepository.delete(user);
+		usersService.deleteUser(id);
 		return ResponseEntity.noContent().build();
 	}
 
-	// Obter a lista de propostas que o User {id} pode aprovar
 	@GetMapping("/{id}/approverInProposals")
 	public ResponseEntity<Resources<Resource<Proposal>>> getApproverInProposals(@PathVariable long id) {
 		// @RequestParam(value = "search", required = false) String search)
-		List<Resource<Proposal>> proposals = 
-				findUser(id).getApproveProposals().get() //TODO
-				.stream()
+		List<Resource<Proposal>> proposals =
+				StreamSupport.stream(usersService.getApproverInProposals(id).spliterator(), false)
 				.map(proposalAssembler::toResource)
 				.collect(Collectors.toList());
 		Resources<Resource<Proposal>> resources = new Resources<>(proposals,
@@ -96,45 +97,19 @@ public class UsersController {
 		return ResponseEntity.ok(resources);
 	}
 
-	// Add proposta à lista de propostas para o User {id} aprovar
 	@PostMapping("/{id}/approverInProposals")
 	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable long id, @RequestBody Proposal proposal) throws URISyntaxException {
-		User user = findUser(id);
-		proposal.setApprover(user);
-		user.addApproveProposal(proposal);
-		usersRepository.save(user); //TODO verificar se é necessário
-		System.out.println();
-		Proposal newProposal = proposalsRepository.save(proposal);
-		System.out.println(newProposal);
+		Proposal newProposal = usersService.addApproverInProposal(id, proposal);
 		Resource<Proposal> resource = proposalAssembler.toResource(newProposal);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);
 	}
-	
-	// Apaga proposta {pid} à lista de propostas que o User {uid} tem de aprovar
+
 	@DeleteMapping("/{uid}/approverInProposals/{pid}")
 	public ResponseEntity<?> deleteApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
-		User user = findUser(uid);
-		Proposal proposal = findProposal(pid);
-		if (proposal.getApprover().map(User::getId).orElse(-1L) != user.getId()) {
-			throw new BadRequestException(String.format("User id %d is not an approver of Proposal with id %d", uid, pid));
-		}
-		user.removeApproveProposal(proposal);
-		usersRepository.save(user); //TODO: (need to save user?)
-		proposal.setApprover(null);
-		proposalsRepository.save(proposal);
+		usersService.deleteApproverInProposal(uid, pid);
 		return ResponseEntity.noContent().build();
-	}
-
-	private User findUser(long id) {
-		return usersRepository.findById(id)
-				.orElseThrow(() -> new NotFoundException(String.format("User with id %d not found.", id)));
-	}
-
-	private Proposal findProposal(long id) {
-		return proposalsRepository.findById(id)
-				.orElseThrow(() -> new NotFoundException(String.format("Proposal with id %d not found.", id)));
 	}
 
 }

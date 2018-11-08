@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pt.unl.fct.ciai.assemblers.CompanyResourceAssembler;
-import pt.unl.fct.ciai.assemblers.EmployeeResourceAssembler;
+import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
+import pt.unl.fct.ciai.assembler.EmployeeResourceAssembler;
 import pt.unl.fct.ciai.controller.CompaniesController;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;

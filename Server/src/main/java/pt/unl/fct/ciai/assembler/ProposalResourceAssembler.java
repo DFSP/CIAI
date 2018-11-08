@@ -1,8 +1,9 @@
-package pt.unl.fct.ciai.assemblers;
+package pt.unl.fct.ciai.assembler;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -27,7 +28,7 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId(), "")).withRel("reviews"),
 				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId(), "")).withRel("comments"),
 				linkTo(methodOn(ProposalsController.class).getSections(proposal.getId(), "")).withRel("sections"),
-				linkTo(methodOn(ProposalsController.class).getBiddingUsers(proposal.getId())).withRel("reviewBiddings"));
+				linkTo(methodOn(ProposalsController.class).getReviewBiddings(proposal.getId(), "")).withRel("reviewBiddings"));
 		proposal.getApprover().ifPresent(approver -> 
 		resource.add(linkTo(methodOn(UsersController.class).getUser(approver.getId())).withRel("approver")));
 		//TODO adicionar mais links baseados noutros campos

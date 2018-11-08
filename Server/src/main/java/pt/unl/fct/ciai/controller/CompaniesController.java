@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.hateoas.MediaTypes;
 
+import pt.unl.fct.ciai.api.CompaniesApi;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
-import pt.unl.fct.ciai.assemblers.CompanyResourceAssembler;
-import pt.unl.fct.ciai.assemblers.EmployeeResourceAssembler;
-import pt.unl.fct.ciai.exceptions.BadRequestException;
-import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
+import pt.unl.fct.ciai.assembler.EmployeeResourceAssembler;
+import pt.unl.fct.ciai.exception.BadRequestException;
+import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.repository.CompaniesRepository;
 import pt.unl.fct.ciai.repository.EmployeesRepository;
 
@@ -32,7 +33,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "/partners", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class CompaniesController { //implements CompaniesApi { TODO
+public class CompaniesController implements CompaniesApi {
 
 	private final CompaniesRepository companiesRepository;
 	private final EmployeesRepository employeesRepository;
