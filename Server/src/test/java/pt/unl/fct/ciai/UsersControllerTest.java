@@ -137,7 +137,7 @@ public class UsersControllerTest {
 		Resource<User> luisResource = userAssembler.toResource(luis);
 		Resource<User> danielResource = userAssembler.toResource(daniel);
 
-		given(usersService.getUsers()).willReturn(Arrays.asList(joao, luis, daniel));
+		given(usersService.getUsers("")).willReturn(Arrays.asList(joao, luis, daniel));
 
 		String href = joaoResource.getLink("users").getHref();
 		mvc.perform(get(href))
@@ -172,7 +172,7 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 		.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(usersService, times(1)).getUsers();
+		verify(usersService, times(1)).getUsers("");
 	}
 
 	@Test
@@ -181,7 +181,7 @@ public class UsersControllerTest {
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
 		given(usersService.addUser(manuel)).willReturn(manuel);
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		String json = objectMapper.writeValueAsString(manuel);
 		mvc.perform(post(manuelResource.getLink("users").getHref())
@@ -211,7 +211,7 @@ public class UsersControllerTest {
 	public void testGetUser() throws Exception {
 		User manuel = createManuelUser();
 
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		performGet(manuel);
 
@@ -228,14 +228,14 @@ public class UsersControllerTest {
 		User manuel = objectMapper.readValue(json, User.class);
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		performGet(manuel);
 
 		verify(usersService, times(1)).getUser(manuel.getId());
 
 		given(usersService.addUser(manuel)).willReturn(manuel);
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		mvc.perform(put(manuelResource.getLink("self").getHref())
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -255,7 +255,9 @@ public class UsersControllerTest {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
-		when(usersService.getUser(manuel.getId())).thenReturn(manuel).thenThrow(NotFoundException.class);
+		when(usersService.getUser(manuel.getId()))
+				.thenReturn(Optional.of(manuel))
+				.thenThrow(NotFoundException.class);
 
 		String href = manuelResource.getLink("self").getHref();
 
@@ -282,7 +284,7 @@ public class UsersControllerTest {
 		Proposal proposal = manuel.getApproveProposals().get().iterator().next();
 		Resource<Proposal> proposalResource = proposalAssembler.toResource(proposal);
 
-		given(usersService.getApproverInProposals(manuel.getId())).willReturn(Collections.singleton(proposal));
+		given(usersService.getApproverInProposals(manuel.getId(), "")).willReturn(Collections.singleton(proposal));
 
 		String href = manuelResource.getLink("approverInProposals").getHref();
 
@@ -302,7 +304,7 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._embedded.proposals[0]._links.approver.href", is(ROOT + proposalResource.getLink("approver").getHref())))
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + href)));
 
-		verify(usersService, times(1)).getApproverInProposals(manuel.getId());
+		verify(usersService, times(1)).getApproverInProposals(manuel.getId(), "");
 	}
 
 	//@Test
@@ -310,7 +312,7 @@ public class UsersControllerTest {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		String href = manuelResource.getLink("approverInProposals").getHref();
 		mvc.perform(get(href))
@@ -329,7 +331,7 @@ public class UsersControllerTest {
 
 		Resource<Proposal> proposalResource = proposalAssembler.toResource(proposal);
 
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 		given(usersService.addUser(manuel)).willReturn(manuel);
 		given(proposalsService.addProposal(proposal)).willReturn(proposal);
 
@@ -371,7 +373,9 @@ public class UsersControllerTest {
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 		Proposal proposal = manuel.getApproveProposals().get().iterator().next();
 
-		when(usersService.getUser(manuel.getId())).thenReturn(manuel).thenReturn(manuel);
+		when(usersService.getUser(manuel.getId()))
+				.thenReturn(Optional.of(manuel))
+				.thenReturn(Optional.of(manuel));
 		given(proposalsService.getProposal(proposal.getId())).willReturn(Optional.of(proposal));
 
 		String href = manuelResource.getLink("approverInProposals").getHref();
@@ -391,7 +395,7 @@ public class UsersControllerTest {
 	//	verify(proposalsRepository, times(1)).findById(proposal.getId());
 
 		manuel.removeApproveProposal(proposal);
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		mvc.perform(get(href))
 		.andExpect(status().isOk())
@@ -405,7 +409,7 @@ public class UsersControllerTest {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		mvc.perform(get("http://localhost/users/2"))
 		.andExpect(status().isNotFound());
@@ -418,14 +422,14 @@ public class UsersControllerTest {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 		String href = manuelResource.getLink("self").getHref();
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		performGet(manuel);
 
 		verify(usersService, times(1)).getUser(manuel.getId());
 
 		given(usersService.addUser(manuel)).willReturn(manuel);
-		given(usersService.getUser(manuel.getId())).willReturn(manuel);
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		manuel.setId(2L);
 		String json = objectMapper.writeValueAsString(manuel);

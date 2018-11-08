@@ -18,6 +18,7 @@ import pt.unl.fct.ciai.repository.UsersRepository;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,58 +36,67 @@ public class UsersService {
         this.proposalsRepository = proposalsRepository;
     }
 
-    public Iterable<User> getUsers() { //TODO search
-        Iterable<User> users = usersRepository.findAll();
-        return users;
+    public Iterable<User> getUsers(String search) {
+        return search == null ?
+                usersRepository.findAll() :
+                usersRepository.search(search);
     }
 
     public User addUser(User user) {
-        User newUser = usersRepository.save(user);
-        return newUser;
+        return usersRepository.save(user);
     }
 
-    public User getUser(long id) {
-        User user = usersRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("User with id %d not found.", id)));
-        return user;
+    public Optional<User> getUser(long id) {
+        return usersRepository.findById(id);
     }
 
     public void updateUser(long id, User newUser) {
-        User oldUser = getUser(id);
+        getUserIfPresent(id);
         usersRepository.save(newUser);
     }
 
     public void deleteUser(long id) {
-        User user = getUser(id);
+        User user = getUserIfPresent(id);
         usersRepository.delete(user);
     }
 
-    public Iterable<Proposal> getApproverInProposals(long id) {
-        Iterable<Proposal> proposals = usersRepository.getApproveProposals(id);
-        return proposals;
+    public Iterable<Proposal> getApproverInProposals(long id, String search) {
+        return search ==  null ?
+                usersRepository.getApproveProposals(id) :
+                usersRepository.searchApproveProposals(id, search);
     }
 
-    public Proposal addApproverInProposal(long id, Proposal proposal) {
+    public Proposal addApproverInProposal(long uid, Proposal proposal) {
         //TODO approver apenas pode ser um staff da proposal
-        User user = getUser(id);
+        User user = getUserIfPresent(uid);
         proposal.setApprover(user);
         user.addApproveProposal(proposal);
         usersRepository.save(user); //TODO verificar se é necessário este save
-        Proposal newProposal = proposalsRepository.save(proposal);
-        return newProposal;
+        return proposalsRepository.save(proposal);
+    }
+
+    public Optional<Proposal> getApproverInProposal(long uid, long pid) {
+        return Optional.ofNullable(usersRepository.getApproverInProposal(uid, pid));
     }
 
     public void deleteApproverInProposal(long uid, long pid) {
-        User user = getUser(uid);
-        Proposal proposal = proposalsRepository.findById(pid)
-                .orElseThrow(() -> new NotFoundException(String.format("Proposal with id %d not found.", pid)));
-        if (proposal.getApprover().map(User::getId).orElse(-1L) != user.getId()) {
-            throw new BadRequestException(String.format("User id %d is not an approver of Proposal with id %d", uid, pid));
-        }
+        User user = getUserIfPresent(uid);
+        Proposal proposal = getProposalIfPresent(uid, pid);
         user.removeApproveProposal(proposal);
-        usersRepository.save(user); //TODO verificar se é necessário este save
         proposal.setApprover(null);
+        usersRepository.save(user); //TODO necessario os 2?
         proposalsRepository.save(proposal);
+    }
+
+    private User getUserIfPresent(long id) {
+        return this.getUser(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %d not found.", id)));
+    }
+
+    private Proposal getProposalIfPresent(long uid, long pid) {
+        return this.getApproverInProposal(uid, pid)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Proposal with id %d is not being approved by user with id %d.", pid, uid)));
     }
 
 }

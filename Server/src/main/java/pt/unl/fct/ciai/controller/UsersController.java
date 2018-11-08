@@ -4,7 +4,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import pt.unl.fct.ciai.api.UsersApi;
@@ -14,48 +13,39 @@ import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.repository.ProposalsRepository;
-import pt.unl.fct.ciai.repository.UsersRepository;
-import pt.unl.fct.ciai.service.ProposalsService;
 import pt.unl.fct.ciai.service.UsersService;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class UsersController implements UsersApi {
 
 	private final UsersService usersService;
-	private final ProposalsService proposalsService;
 
 	private final UserResourceAssembler userAssembler;
 	private final ProposalResourceAssembler proposalAssembler;
 
-	public UsersController(UsersService usersService, ProposalsService proposalsService,
+	public UsersController(UsersService usersService,
 						   UserResourceAssembler userAssembler, ProposalResourceAssembler proposalAssembler) {
 		this.usersService = usersService;
-		this.proposalsService = proposalsService;
 		this.userAssembler = userAssembler;
 		this.proposalAssembler = proposalAssembler;
 	}
 
 	@GetMapping
-	public ResponseEntity<Resources<Resource<User>>> getUsers() {
-		// @RequestParam(required = false) String search) { // TODO search mesmo necessário?
-		Iterable<User> users = usersService.getUsers();
+	public ResponseEntity<Resources<Resource<User>>> getUsers(@RequestParam(required = false) String search) {
+		Iterable<User> users = usersService.getUsers(search);
 		Resources<Resource<User>> resources = userAssembler.toResources(users);
 		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping
 	public ResponseEntity<Resource<User>> addUser(@RequestBody User user) throws URISyntaxException {
+		if (user.getId() > 0) {
+			throw new BadRequestException("A new user has to have a non positive id.");
+		}
 		User newUser = usersService.addUser(user);
 		Resource<User> resource = userAssembler.toResource(newUser);
 		return ResponseEntity
@@ -64,46 +54,57 @@ public class UsersController implements UsersApi {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Resource<User>> getUser(@PathVariable long id) {
-		User user = usersService.getUser(id);
+	public ResponseEntity<Resource<User>> getUser(@PathVariable("id") long id) {
+		User user = usersService.getUser(id).orElseThrow(() ->
+				new NotFoundException(String.format("User with id %d not found.", id)));
 		Resource<User> resource = userAssembler.toResource(user);
 		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody User newUser) {
-		if (id != newUser.getId()) {
-			throw new BadRequestException(String.format("Path id %d does not match user id %d", id, newUser.getId()));
+	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User newUser) {
+		if (newUser.getId() != id) {
+			throw new BadRequestException(String.format("User id %d and path id %d don't match", newUser.getId(), id));
 		}
 		usersService.updateUser(id, newUser);
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable long id) {
+	public ResponseEntity<?> deleteUser(@PathVariable("id") long id) {
 		usersService.deleteUser(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/{id}/approverInProposals")
-	public ResponseEntity<Resources<Resource<Proposal>>> getApproverInProposals(@PathVariable long id) {
-		// @RequestParam(value = "search", required = false) String search)
-		List<Resource<Proposal>> proposals =
-				StreamSupport.stream(usersService.getApproverInProposals(id).spliterator(), false)
-				.map(proposalAssembler::toResource)
-				.collect(Collectors.toList());
-		Resources<Resource<Proposal>> resources = new Resources<>(proposals,
-				linkTo(methodOn(UsersController.class).getApproverInProposals(id)).withSelfRel());
+	public ResponseEntity<Resources<Resource<Proposal>>> getApproverInProposals(
+			@PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+		User user = usersService.getUser(id).orElseThrow(() ->
+				new NotFoundException(String.format("User with id %d not found.", id)));
+		Iterable<Proposal> proposals = usersService.getApproverInProposals(id, search);
+		Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals); //TODO, user?
 		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping("/{id}/approverInProposals")
-	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable long id, @RequestBody Proposal proposal) throws URISyntaxException {
+	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable("id") long id,
+																	@RequestBody Proposal proposal)
+			throws URISyntaxException {
+		//TODO proposal must exist
 		Proposal newProposal = usersService.addApproverInProposal(id, proposal);
 		Resource<Proposal> resource = proposalAssembler.toResource(newProposal);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);
+	}
+
+	@GetMapping("/{uid}/approverInProposals/{pid}")
+	public ResponseEntity<Resource<Proposal>> getApproverInProposal(@PathVariable("uid") long uid,
+																	@PathVariable("pid") long pid) {
+		Proposal proposal = usersService.getApproverInProposal(uid, pid).orElseThrow(() ->
+				new BadRequestException(String.format("Proposal id %d is not being approved by user id %d", pid, uid)));
+		Resource<Proposal> resource = proposalAssembler.toResource(proposal);
+		return ResponseEntity.ok(resource);
 	}
 
 	@DeleteMapping("/{uid}/approverInProposals/{pid}")

@@ -18,10 +18,31 @@ public interface UsersRepository extends CrudRepository<User, Long> {
             + "OR u.username LIKE CONCAT('%',:search,'%')"
             + "OR u.email LIKE CONCAT('%',:search,'%')"
             + "OR u.role LIKE CONCAT('%',:search,'%')")
-    Iterable<User> searchUsers(@Param(value = "search") String search);
+    Iterable<User> search(@Param(value = "search") String search);
+
+
+    // ApproveProposals queries
 
     @Query("SELECT p " +
             "FROM User u JOIN u.approveProposals p " +
             "WHERE u.id = :id")
     Iterable<Proposal> getApproveProposals(@Param(value = "id") long id);
+
+    @Query("SELECT p "
+            + "FROM User u JOIN u.approveProposals p "
+            + "WHERE u.id = :uid "
+            + "AND "
+            + "p.id LIKE CONCAT('%',:search,'%') "
+            + "OR p.title LIKE CONCAT('%',:search,'%') "
+            + "OR p.description LIKE CONCAT('%',:search,'%') "
+            + "OR p.state LIKE CONCAT('%',:search,'%') "
+            + "OR p.creationDate LIKE CONCAT('%',:search,'%')"
+    )
+    Iterable<Proposal> searchApproveProposals(@Param(value = "uid") long uid, @Param(value = "search") String search);
+
+    @Query("SELECT p "
+            + "FROM User u JOIN u.approveProposals p "
+            + "WHERE u.id = :uid AND p.id = :pid"
+    )
+    Proposal getApproverInProposal(long uid, long pid);
 }
