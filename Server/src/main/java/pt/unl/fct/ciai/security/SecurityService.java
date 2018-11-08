@@ -54,8 +54,9 @@ public class SecurityService {
 	}
 
     public boolean isCompanyAdmin(User user, long id) {
-    	Optional<Company> company = companies.findById(id);
-    	return company.isPresent() && company.get().getAdmin().getUsername().equals(user.getUsername());
+    	/*Optional<Company> company = companies.findById(id);
+    	return company.isPresent() && company.get().getAdmin().getUsername().equals(user.getUsername());*/
+    	return false; // TODO mudar para query
     }
     
     public boolean isMemberOfMyCompany(long cid, long eid) {
@@ -67,13 +68,13 @@ public class SecurityService {
     public boolean isMemberOfProposal(long pid, long uid) {
     	Optional<pt.unl.fct.ciai.model.User> u = users.findById(uid);
     	Optional<Proposal> p = proposals.findById(pid);
-    	return u.isPresent() && p.isPresent() && u.get().getUserInProposals().contains(p.get());
+    	return u.isPresent() && p.isPresent() && u.get().getProposals().get().contains(p.get()); //TODO
     }
     
     public boolean isCreatorOfProposal(long pid, long uid) {
     	Optional<pt.unl.fct.ciai.model.User> u = users.findById(uid);
     	Optional<Proposal> p = proposals.findById(pid);
-    	return u.isPresent() && p.isPresent() && p.get().getCreator().equals(u.get());
+    	return u.isPresent() && p.isPresent() && p.get().getProposer().equals(u.get());
     }
     
     public boolean isAuthorOfReview(long rid, long uid) {

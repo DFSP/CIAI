@@ -23,10 +23,10 @@ public class ReviewResourceAssembler implements ResourceAssembler<Review, Resour
 	@Override
 	public Resource<Review> toResource(Review review) {
 		long rid = review.getId();
-		long pid = review.getProposal().getId();
+		long pid = review.getProposal().get().getId(); //TODO get() pode retornar null, o que fazer nesse caso?
 		return new Resource<>(review,
 				linkTo(methodOn(ProposalsController.class).getReview(pid, rid)).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getReviews(pid, null)).withRel("reviews"));
+				linkTo(methodOn(ProposalsController.class).getReviews(pid, "")).withRel("reviews"));
 	}
 	
 	public Resources<Resource<Review>> toResources(Iterable<? extends Review> entities, Proposal proposal) {
@@ -36,7 +36,7 @@ public class ReviewResourceAssembler implements ResourceAssembler<Review, Resour
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(reviews,
-				linkTo(methodOn(ProposalsController.class).getReviews(cid, null)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getReviews(cid, "")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

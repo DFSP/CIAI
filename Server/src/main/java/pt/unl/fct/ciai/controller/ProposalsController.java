@@ -136,7 +136,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resource<Section>> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		Proposal proposal = findProposal(pid);
 		Section section = findSection(sid);
-		if (!section.getProposal().equals(proposal)) {
+		if (!section.getProposal().get().equals(proposal)) { //TODO get pode retornar null
 			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));
 		}
 		Resource<Section> resource = sectionAssembler.toResource(section);
@@ -150,7 +150,7 @@ public class ProposalsController { //Implements proposalControllerApi
 		if (newSection.getId() != sid) {
 			throw new BadRequestException(String.format("Request body section id %d and path paramenter sid %d don't match.", newSection.getId(), sid));
 		}
-		if (oldSection.getProposal().getId() != proposal.getId()) {
+		if (oldSection.getProposal().map(Proposal::getId).orElse(-1L) != proposal.getId()) {
 			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));	
 		}
 		sectionsRepository.save(newSection);
@@ -161,7 +161,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<?> deleteSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		Proposal proposal = findProposal(pid);
 		Section section = findSection(sid);
-		if (section.getProposal().getId() != proposal.getId()) {
+		if (section.getProposal().map(Proposal::getId).orElse(-1L) != proposal.getId()) {
 			throw new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid));
 		}
 		sectionsRepository.delete(section);
@@ -202,7 +202,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resource<Review>> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {	
 		Proposal proposal = findProposal(pid);
 		Review review = findReview(rid);
-		if (!review.getProposal().equals(proposal)) {
+		if (!review.getProposal().get().equals(proposal)) { //TODO get pode retornar null
 			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));
 		}
 		Resource<Review> resource = reviewAssembler.toResource(review);
@@ -216,7 +216,7 @@ public class ProposalsController { //Implements proposalControllerApi
 		if (newReview.getId() != rid) {
 			throw new BadRequestException(String.format("Request body review id %d and path paramenter rid %d don't match.", newReview.getId(), rid));
 		}
-		if (oldReview.getProposal().getId() != proposal.getId()) {
+		if (oldReview.getProposal().map(Proposal::getId).orElse(-1L) != proposal.getId()) {
 			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));	
 		}
 		reviewsRepository.save(newReview);
@@ -227,7 +227,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<?> deleteReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
 		Proposal proposal = findProposal(pid);
 		Review review = findReview(rid);
-		if (review.getProposal().getId() != proposal.getId()) {
+		if (review.getProposal().map(Proposal::getId).orElse(-1L) != proposal.getId()) {
 			throw new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid));
 		}
 		reviewsRepository.delete(review);
@@ -269,7 +269,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		Proposal proposal = findProposal(pid);
 		Comment comment = findComment(cid);
-		if (!comment.getProposal().equals(proposal)) {
+		if (!comment.getProposal().get().equals(proposal)) { //TODO mudar para query getProposalByCommentId
 			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));
 		}
 		Resource<Comment> resource = commentAssembler.toResource(comment);
@@ -280,10 +280,10 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<?> updateComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid, @RequestBody Comment newComment) {
 		Proposal proposal = findProposal(pid);
 		Comment oldComment = findComment(cid);
-		if (newComment.getId() != cid) {
+		if (newComment.getId() != oldComment.getId()) {
 			throw new BadRequestException(String.format("Request body comment id %d and path paramenter rid %d don't match.", newComment.getId(), cid));
 		}
-		if (oldComment.getProposal().getId() != proposal.getId()) {
+		if (oldComment.getProposal().get().getId() != proposal.getId()) { // TODO mudar para query
 			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));	
 		}
 		commentsRepository.save(newComment);
@@ -294,7 +294,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<?> deleteComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		Proposal proposal = findProposal(pid);
 		Comment comment = findComment(cid);
-		if (comment.getProposal().getId() != proposal.getId()) {
+		if (comment.getProposal().get().getId() != proposal.getId()) { //TODO mudar para query
 			throw new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid));
 		}
 		commentsRepository.delete(comment);
@@ -305,7 +305,7 @@ public class ProposalsController { //Implements proposalControllerApi
 	public ResponseEntity<Resources<Resource<User>>> getBiddingUsers(@PathVariable("id") long id) {		
 		// TODO search mesmo necessario? @RequestParam(required = false) String search){
 		Proposal proposal = findProposal(id);
-		Iterable<User> users = proposal.getBiddings().orElse(Collections.emptySet());
+		Iterable<User> users = proposal.getReviewBiddings().orElse(Collections.emptySet());
 		Resources<Resource<User>> resources = userAssembler.toResources(users, proposal);
 		return ResponseEntity.ok(resources);
 	}
@@ -316,8 +316,8 @@ public class ProposalsController { //Implements proposalControllerApi
 		//				if (proposal.getSections().contains(user)) { //TODO
 		//					throw new ConflictException(String.format("User already associated with proposal id %d.", id));
 		//				}
-		//user.addBidding(proposal); TODO
-		proposal.addBidding(user);
+		//user.addReviewBidding(proposal); TODO
+		proposal.addReviewBidding(user);
 		proposalsRepository.save(proposal); //TODO verificar se é necessário
 		User newUser = usersRepository.save(user);
 		Resource<User> resource = userAssembler.toResource(newUser);

@@ -68,9 +68,9 @@ public class DatabaseLoader {
 			istEmployee.setZipCode("1234-999");
 			istEmployee.setCellPhone("+351 919999999");
 			istEmployee.setHomePhone("+351 221000000");
-			istEmployee.setGender("M");
+			istEmployee.setGender('M');
 			istEmployee.setSalary(500.0);
-			istEmployee.setBirthday(new Date().toString());
+			istEmployee.setBirthday(new Date());
 			ist.addEmployee(istEmployee);
 			employees.save(istEmployee);
 
@@ -104,23 +104,25 @@ public class DatabaseLoader {
 			Review review1 = new Review();
 			review1.setClassification(5);
 			review1.setTitle("Review1");
+			review1.setText("A review");
 			review1.setSummary("Very good review");
 			//reviews.save(review1);
 
 
-			Proposal proposal1 = new Proposal();
+			Proposal proposal1 = new Proposal()
+					.title("Uma proposta")
+					.description("Uma descrição de uma proposta");
 			review1.setProposal(proposal1);
 			proposal1.addReview(review1);
-			//proposal1.setDate("12-12-2012");
 			proposals.save(proposal1);
 
-			ecmaUser.addProposalToApprove(proposal1);
-			/*System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
-			System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
+			ecmaUser.addApproveProposal(proposal1);
+			/*System.out.println("ecmaUser have to approve " + ecmaUser.getApproveProposals().size() + " proposals.");
+			System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getApproveProposals().contains(proposal1));
 			System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));*/
-			ecmaUser.removeProposalToApprove(proposal1);
-			/*System.out.println("ecmaUser have to approve " + ecmaUser.getProposalsToApprove().size() + " proposals.");
-			System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getProposalsToApprove().contains(proposal1));
+			//ecmaUser.removeApproveProposal(proposal1);
+			/*System.out.println("ecmaUser have to approve " + ecmaUser.getApproveProposals().size() + " proposals.");
+			System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getApproveProposals().contains(proposal1));
 			System.out.println("Proposal exists in the system? > " + proposals.existsById(proposal1.getId()));*/
 			//users.save(ecmaUser);
 

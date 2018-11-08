@@ -23,7 +23,7 @@ public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Re
 	@Override
 	public Resource<Employee> toResource(Employee employee) {
 		long eid = employee.getId();
-		long cid = employee.getCompany().getId();
+		long cid = employee.getCompany().get().getId(); //TODO o que fazer quando retorna null?
 		return new Resource<>(employee,
 			linkTo(methodOn(CompaniesController.class).getEmployee(cid, eid)).withSelfRel(),
 			linkTo(methodOn(CompaniesController.class).getEmployees(cid)).withRel("employees"));

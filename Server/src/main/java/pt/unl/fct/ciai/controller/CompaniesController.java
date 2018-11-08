@@ -95,7 +95,7 @@ public class CompaniesController { //implements CompaniesApi { TODO
 	public ResponseEntity<Resources<Resource<Employee>>> getEmployees(@PathVariable("id") long id) { // TODO search mesmo necessário? que campos?	
 		// @RequestParam(value = "search", required = false) String search)
 		List<Resource<Employee>> employees = 
-				findCompany(id).getEmployees()
+				findCompany(id).getEmployees().get() //TODO pode retornar null
 				.stream()
 				.map(employeeAssembler::toResource)
 				.collect(Collectors.toList());
@@ -124,7 +124,7 @@ public class CompaniesController { //implements CompaniesApi { TODO
 	public ResponseEntity<Resource<Employee>> getEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {
 		Company company = findCompany(cid);
 		Employee employee = findEmployee(eid);
-		if (!employee.getCompany().equals(company)) {
+		if (!employee.getCompany().get().equals(company)) { //TODO get pode retornar null
 			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
 		}
 		Resource<Employee> resource = employeeAssembler.toResource(employee);
@@ -139,7 +139,7 @@ public class CompaniesController { //implements CompaniesApi { TODO
 		if (newEmployee.getId() != eid) {
 			throw new BadRequestException(String.format("Request body employee id %d and path paramenter eid %d don't match.", newEmployee.getId(), eid));
 		}
-		if (oldEmployee.getCompany().getId() != company.getId()) {
+		if (oldEmployee.getCompany().map(Company::getId).orElse(-1L) != company.getId()) {
 			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));	
 		}
 		employeesRepository.save(newEmployee);
@@ -151,7 +151,7 @@ public class CompaniesController { //implements CompaniesApi { TODO
 	public ResponseEntity<?> deleteEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {		
 		Company company = findCompany(cid);
 		Employee employee = findEmployee(eid);
-		if (employee.getCompany().getId() != company.getId()) {
+		if (employee.getCompany().map(Company::getId).orElse(-1L) != company.getId()) {
 			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
 		}
 		employeesRepository.delete(employee);

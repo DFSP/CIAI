@@ -23,10 +23,10 @@ public class SectionResourceAssembler implements ResourceAssembler<Section, Reso
 	@Override
 	public Resource<Section> toResource(Section section) {
 		long sid = section.getId();
-		long pid = section.getProposal().getId();
+		long pid = section.getProposal().get().getId(); //TODO o que fazer quando getProposal retorna null?
 		return new Resource<>(section,
 				linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getSections(pid, null)).withRel("sections"));
+				linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));
 	}
 	
 	public Resources<Resource<Section>> toResources(Iterable<? extends Section> entities, Proposal proposal) {
@@ -36,7 +36,7 @@ public class SectionResourceAssembler implements ResourceAssembler<Section, Reso
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(sections,
-				linkTo(methodOn(ProposalsController.class).getSections(pid, null)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 

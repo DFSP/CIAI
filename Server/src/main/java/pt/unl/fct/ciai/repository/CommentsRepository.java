@@ -12,7 +12,7 @@ public interface CommentsRepository extends CrudRepository<Comment, Long> {
             + "WHERE c.id LIKE CONCAT('%',:search,'%') "
             + "OR c.title LIKE CONCAT('%',:search,'%') "
             + "OR c.text LIKE CONCAT('%',:search,'%') "
-            + "OR c.date LIKE CONCAT('%',:search,'%') "
+            + "OR c.creationDate LIKE CONCAT('%',:search,'%') "
     )
     Iterable<Comment> searchComments(@Param(value = "search") String search);
 }

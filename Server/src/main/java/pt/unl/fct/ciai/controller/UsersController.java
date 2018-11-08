@@ -87,7 +87,7 @@ public class UsersController {
 	public ResponseEntity<Resources<Resource<Proposal>>> getApproverInProposals(@PathVariable long id) {
 		// @RequestParam(value = "search", required = false) String search)
 		List<Resource<Proposal>> proposals = 
-				findUser(id).getProposalsToApprove()
+				findUser(id).getApproveProposals().get() //TODO
 				.stream()
 				.map(proposalAssembler::toResource)
 				.collect(Collectors.toList());
@@ -101,7 +101,7 @@ public class UsersController {
 	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable long id, @RequestBody Proposal proposal) throws URISyntaxException {
 		User user = findUser(id);
 		proposal.setApprover(user);
-		user.addProposalToApprove(proposal);
+		user.addApproveProposal(proposal);
 		usersRepository.save(user); //TODO verificar se é necessário
 		System.out.println();
 		Proposal newProposal = proposalsRepository.save(proposal);
@@ -120,7 +120,7 @@ public class UsersController {
 		if (proposal.getApprover().map(User::getId).orElse(-1L) != user.getId()) {
 			throw new BadRequestException(String.format("User id %d is not an approver of Proposal with id %d", uid, pid));
 		}
-		user.removeProposalToApprove(proposal);
+		user.removeApproveProposal(proposal);
 		usersRepository.save(user); //TODO: (need to save user?)
 		proposal.setApprover(null);
 		proposalsRepository.save(proposal);

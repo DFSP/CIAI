@@ -7,16 +7,14 @@ import pt.unl.fct.ciai.model.Section;
 
 public interface SectionsRepository extends CrudRepository<Section, Long> {
 
-
     @Query("SELECT s "
             + "FROM Section s "
             + "WHERE s.id LIKE CONCAT('%',:search,'%') "
-            + "OR s.title LIKE CONCAT('%',:search,'%') "
-            + "OR s.description LIKE CONCAT('%',:search,'%') "
             + "OR s.goals LIKE CONCAT('%',:search,'%') "
             + "OR s.material LIKE CONCAT('%',:search,'%') "
             + "OR s.workPlan LIKE CONCAT('%',:search,'%') "
             + "OR s.budget LIKE CONCAT('%',:search,'%') "
     )
     Iterable<Section> searchSections(@Param(value = "search") String search);
+
 }

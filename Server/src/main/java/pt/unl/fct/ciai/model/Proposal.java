@@ -8,16 +8,11 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
-@JsonIgnoreProperties(value = {
-		"sections", "staff", "members", "approver", "reviews", "comments", "biddings", "creator"
-		}, ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Proposal {
 
 	public enum ProposalState {
@@ -31,22 +26,30 @@ public class Proposal {
 	private ProposalState state;
 	@Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
 	private Date creationDate;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy="proposal", cascade = CascadeType.ALL)
 	private Set<Section> sections;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToMany(mappedBy = "proposals")
 	private Set<User> staff;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToMany(mappedBy = "proposals")
-	private Set<User> members;
+	private Set<Employee> members;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne @JoinColumn(name="approver_id")
 	private User approver;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
 	private Set<Review> reviews;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
 	private Set<Comment> comments;
-	@ManyToMany(mappedBy = "proposalBiddings", cascade = CascadeType.ALL)
-	private Set<User> biddings;
-	@ManyToOne @JoinColumn(name="creator_id")
-	private User creator;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToMany(mappedBy = "biddings", cascade = CascadeType.ALL)
+	private Set<User> reviewBiddings;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToOne @JoinColumn(name="proposer_id")
+	private User proposer;
 
 	public Proposal() {
 		this.state = ProposalState.PENDING_APPROVAL;
@@ -155,7 +158,6 @@ public class Proposal {
 		return Optional.ofNullable(sections);
 	}
 
-	@JsonProperty
 	public void setSections(Set<Section> sections) {
 		this.sections = sections;
 	}
@@ -174,7 +176,72 @@ public class Proposal {
 	}
 
 	public Proposal removeSection(Section section) {
-		this.sections.remove(section);
+		this.getSections().ifPresent((sections -> sections.remove(section)));
+		return this;
+	}
+
+	public Optional<Set<User>> getStaff() {
+		return Optional.ofNullable(staff);
+	}
+
+	public void setStaff(Set<User> staff) {
+		this.staff = staff;
+	}
+
+	public Proposal staff(Set<User> staff) {
+		setStaff(staff);
+		return this;
+	}
+
+	public Proposal addStaff(User user) {
+		if (this.staff == null) {
+			this.staff = new HashSet<User>();
+		}
+		this.staff.add(user);
+		return this;
+	}
+
+	public Proposal removeStaff(User user) {
+		this.getStaff().ifPresent(staff -> staff.remove(user));
+		return this;
+	}
+
+	public Optional<Set<Employee>> getMembers() {
+		return Optional.ofNullable(this.members);
+	}
+
+	public void setMembers(Set<Employee> members) {
+		this.members = members;
+	}
+
+	public Proposal member(Set<Employee> member) {
+		setMembers(member);
+		return this;
+	}
+
+	public Proposal addMember(Employee member) {
+		if (this.members == null) {
+			this.members = new HashSet<Employee>();
+		}
+		this.members.add(member);
+		return this;
+	}
+
+	public Proposal removeMember(Employee member) {
+		this.getMembers().ifPresent(members -> members.remove(member));
+		return this;
+	}
+
+	public Optional<User> getApprover() {
+		return Optional.ofNullable(this.approver);
+	}
+
+	public void setApprover(User approver) {
+		this.approver = approver;
+	}
+
+	public Proposal approver(User approver) {
+		setApprover(approver);
 		return this;
 	}
 
@@ -182,7 +249,6 @@ public class Proposal {
 		return Optional.ofNullable(reviews);
 	}
 
-	@JsonProperty
 	public void setReviews(Set<Review> reviews) {
 		this.reviews = reviews;
 	}
@@ -201,7 +267,7 @@ public class Proposal {
 	}
 
 	public Proposal removeReview(Review review) {
-		this.reviews.remove(review);
+		this.getReviews().ifPresent(reviews -> reviews.remove(review));
 		return this;
 	}
 
@@ -209,7 +275,6 @@ public class Proposal {
 		return Optional.ofNullable(comments);
 	}
 
-	@JsonProperty
 	public void setComments(Set<Comment> comments) {
 		this.comments = comments;
 	}
@@ -228,61 +293,46 @@ public class Proposal {
 	}
 
 	public Proposal removeComment(Comment comment) {
-		this.comments.remove(comment);
+		this.getComments().ifPresent(comments -> comments.remove(comment));
 		return this;
 	}
 
-	public Optional<User> getApprover() {
-		return Optional.ofNullable(this.approver);
+	public Optional<Set<User>> getReviewBiddings() {
+		return Optional.ofNullable(this.reviewBiddings);
 	}
 
-	@JsonProperty
-	public void setApprover(User approver) {
-		this.approver = approver;
+	public void setReviewBiddings(Set<User> reviewBiddings) {
+		this.reviewBiddings = reviewBiddings;
 	}
 
-	public Proposal approver(User approver) {
-		setApprover(approver);
+	public Proposal reviewBiddings(Set<User> biddings) {
+		setReviewBiddings(biddings);
 		return this;
 	}
 
-	public Optional<Set<User>> getBiddings() {
-		return Optional.ofNullable(this.biddings);
-	}
-
-	@JsonProperty
-	public void setBiddings(Set<User> biddings) {
-		this.biddings = biddings;
-	}
-
-	public Proposal biddings(Set<User> biddings) {
-		setBiddings(biddings);
-		return this;
-	}
-
-	public void addBidding(User user) {
-		if (this.biddings == null) {
-			this.biddings = new HashSet<User>();
+	public Proposal addReviewBidding(User user) {
+		if (this.reviewBiddings == null) {
+			this.reviewBiddings = new HashSet<User>();
 		}
-		this.biddings.add(user);
+		this.reviewBiddings.add(user);
+		return this;
 	}
 
-	public void removeBidding(User user) {
-		if (this.biddings != null)
-			this.biddings.remove(user);
+	public Proposal removeReviewBidding(User bidding) {
+		this.getReviewBiddings().ifPresent(reviewBiddings -> reviewBiddings.remove(bidding));
+		return this;
 	}
 
-	public Optional<User> getCreator() {
-		return Optional.ofNullable(this.creator);
+	public Optional<User> getProposer() {
+		return Optional.ofNullable(this.proposer);
 	}
 
-	@JsonProperty
-	public void setCreator(User user) {
-		this.creator = user;
+	public void setProposer(User user) {
+		this.proposer = user;
 	}
 
-	public Proposal creator(User creator) {
-		setCreator(creator);
+	public Proposal proposer(User proposer) {
+		setProposer(proposer);
 		return this;
 	}
 
@@ -303,4 +353,36 @@ public class Proposal {
 		return id == other.id;
 	}
 
+	@Override
+	public String toString() {
+		return "Proposal{" +
+				"id=" + id +
+				", title='" + title + '\'' +
+				", description='" + description + '\'' +
+				", state=" + state +
+				", creationDate=" + creationDate +
+				", sections=" + getSections()
+				.map(p -> p.stream().map(Section::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				", staff=" + getStaff()
+				.map(p -> p.stream().map(User::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				", members=" + getMembers()
+				.map(p -> p.stream().map(Employee::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				", approver=" + getApprover().map(User::getId)
+				.orElse(null) +
+				", reviews=" + getReviews()
+				.map(p -> p.stream().map(Review::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				", comments=" + getComments()
+				.map(p -> p.stream().map(Comment::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				", reviewBiddings=" + getReviewBiddings()
+				.map(p -> p.stream().map(User::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				", proposer=" + getProposer().map(User::getId)
+				.orElse(null) +
+				'}';
+	}
 }

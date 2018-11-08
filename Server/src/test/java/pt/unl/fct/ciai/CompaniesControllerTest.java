@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -85,9 +86,9 @@ public class CompaniesControllerTest {
 		joao.setZipCode("1234-992");
 		joao.setCellPhone("+351 918888888");
 		joao.setHomePhone("+351 221212121");
-		joao.setGender("M");
+		joao.setGender('M');
 		joao.setSalary(1000.0);
-		joao.setBirthday("01/11/2018");
+		joao.setBirthday(new Date());
 		fct.addEmployee(joao);		
 
 		Employee luis = new Employee();	
@@ -104,9 +105,9 @@ public class CompaniesControllerTest {
 		luis.setZipCode("1234-1111");
 		luis.setCellPhone("+351 912222222");
 		luis.setHomePhone("+351 221111111");
-		luis.setGender("M");
+		luis.setGender('M');
 		luis.setSalary(1500.0);
-		luis.setBirthday("05/11/2018");
+		luis.setBirthday(new Date());
 		fct.addEmployee(luis);
 
 		Employee daniel = new Employee();
@@ -123,9 +124,9 @@ public class CompaniesControllerTest {
 		daniel.setZipCode("1234-999");
 		daniel.setCellPhone("+351 919999999");
 		daniel.setHomePhone("+351 221000000");
-		daniel.setGender("M");
-		daniel.setSalary(500.0);
-		daniel.setBirthday("03/11/2018");
+		daniel.setGender('M');
+		daniel.setSalary(750.0);
+		daniel.setBirthday(new Date());
 		fct.addEmployee(daniel);
 
 		return fct;
@@ -155,9 +156,9 @@ public class CompaniesControllerTest {
 		manuel.setZipCode("4321-999");
 		manuel.setCellPhone("+351 912345678");
 		manuel.setHomePhone("+351 222111222");
-		manuel.setGender("M");
+		manuel.setGender('M');
 		manuel.setSalary(1250.0);
-		manuel.setBirthday("04/11/2018");
+		manuel.setBirthday(new Date());
 		ist.addEmployee(manuel);
 
 		return ist;
@@ -356,7 +357,7 @@ public class CompaniesControllerTest {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 
-		Iterator<Employee> it = fct.getEmployees().iterator();
+		Iterator<Employee> it = fct.getEmployees().get().iterator();
 		
 		Employee joao = it.next();
 		Resource<Employee> joaoResource = employeeAssembler.toResource(joao);
@@ -461,9 +462,9 @@ public class CompaniesControllerTest {
 		andre.setZipCode("4322-939");
 		andre.setCellPhone("+351 916785678");
 		andre.setHomePhone("+351 212117922");
-		andre.setGender("M");
+		andre.setGender('M');
 		andre.setSalary(1250.0);
-		andre.setBirthday("06/11/2018");
+		andre.setBirthday(new Date());
 		andre.setCompany(fct);
 		Resource<Employee> andreResource = employeeAssembler.toResource(andre);
 		
@@ -513,7 +514,7 @@ public class CompaniesControllerTest {
 	public void testGetEmployee() throws Exception {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
-		Employee firstEmployee = fct.getEmployees().iterator().next();
+		Employee firstEmployee = fct.getEmployees().get().iterator().next();
 		Resource<Employee> firstEmployeeResource = employeeAssembler.toResource(firstEmployee);
 		
 		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
@@ -527,9 +528,10 @@ public class CompaniesControllerTest {
 
 	@Test
 	public void testUpdateEmployee() throws Exception {
+		//TODO gerar company a partir do json para nao perder os jsonproperties write only
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
-		Employee firstEmployee = fct.getEmployees().iterator().next();
+		Employee firstEmployee = fct.getEmployees().get().iterator().next();
 		Resource<Employee> firstEmployeeResource = employeeAssembler.toResource(firstEmployee);
 		String href = firstEmployeeResource.getLink("self").getHref();
 
@@ -567,7 +569,7 @@ public class CompaniesControllerTest {
 	public void testDeleteEmployee() throws Exception {		
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
-		Employee firstEmployee = fct.getEmployees().iterator().next();
+		Employee firstEmployee = fct.getEmployees().get().iterator().next();
 		String href = employeeAssembler.toResource(firstEmployee).getLink("self").getHref();
 		
 		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));

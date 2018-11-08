@@ -23,11 +23,11 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 	public Resource<Proposal> toResource(Proposal proposal) {
 		Resource<Proposal> resource = new Resource<>(proposal,
 				linkTo(methodOn(ProposalsController.class).getProposal(proposal.getId())).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getProposals(null)).withRel("proposals"),
-				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId(), null)).withRel("reviews"),
-				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId(), null)).withRel("comments"),
-				linkTo(methodOn(ProposalsController.class).getSections(proposal.getId(), null)).withRel("sections"),
-				linkTo(methodOn(ProposalsController.class).getBiddingUsers(proposal.getId())).withRel("biddings"));
+				linkTo(methodOn(ProposalsController.class).getProposals("")).withRel("proposals"),
+				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId(), "")).withRel("reviews"),
+				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId(), "")).withRel("comments"),
+				linkTo(methodOn(ProposalsController.class).getSections(proposal.getId(), "")).withRel("sections"),
+				linkTo(methodOn(ProposalsController.class).getBiddingUsers(proposal.getId())).withRel("reviewBiddings"));
 		proposal.getApprover().ifPresent(approver -> 
 		resource.add(linkTo(methodOn(UsersController.class).getUser(approver.getId())).withRel("approver")));
 		//TODO adicionar mais links baseados noutros campos
@@ -41,7 +41,7 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(resources,
-				linkTo(methodOn(ProposalsController.class).getProposals(null)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getProposals("")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 

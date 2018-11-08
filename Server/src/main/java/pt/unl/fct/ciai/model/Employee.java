@@ -2,38 +2,41 @@ package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
-@Table(name = "employees")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee extends User {
 	
 	@Id @GeneratedValue
 	private long id;
-	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "company_id")
-	private Company company;
 	private String city;
 	private String address;
 	private String zipCode;
 	private String cellPhone;
 	private String homePhone;
-	private String gender;
+	private char gender;
 	private double salary;
-	private String birthday;
-	@JsonIgnore
+	private Date birthday;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToOne
+	@JoinColumn(name = "company_id")
+	private Company company;
+/*	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToOne
-	@JoinColumn(name = "companies_id")
-    private Company adminOfCompany;
+	@JoinColumn(name = "company_id")
+    private Company adminOfCompany;*/  // pode ser feito com if (getrole == admin) then is admin of company
 	
 	public Employee() { }
 
 	public Employee(String firstName, String lastName, String username, String email, String role, String password,
 			String city, String address, String zipCode, String cellPhone,
-			String homePhone, String gender, double salary, String birthday) {
+			String homePhone, char gender, double salary, Date birthday) {
 		super(firstName, lastName, username, email, role, password);
 		this.city = city;
 		this.address = address;
@@ -46,114 +49,163 @@ public class Employee extends User {
 	}
 
 	public long getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
+	public Employee id(long id) {
+		setId(id);
+		return this;
+	}
+
 	public String getCity() {
-		return city;
+		return this.city;
 	}
 
 	public void setCity(String city) {
 		this.city = city;
 	}
 
+	public Employee city(String city) {
+		setCity(city);
+		return this;
+	}
+
 	public String getAddress() {
-		return address;
+		return this.address;
 	}
 
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
+	public Employee address(String address) {
+		setAddress(address);
+		return this;
+	}
+
 	public String getZipCode() {
-		return zipCode;
+		return this.zipCode;
 	}
 
 	public void setZipCode(String zipCode) {
 		this.zipCode = zipCode;
 	}
 
+	public Employee zipCode(String zipCode) {
+		setZipCode(zipCode);
+		return this;
+	}
+
 	public String getCellPhone() {
-		return cellPhone;
+		return this.cellPhone;
 	}
 
 	public void setCellPhone(String cellPhone) {
 		this.cellPhone = cellPhone;
 	}
 
+	public Employee cellPhone(String cellPhone) {
+		setCellPhone(cellPhone);
+		return this;
+	}
+
 	public String getHomePhone() {
-		return homePhone;
+		return this.homePhone;
 	}
 
 	public void setHomePhone(String homePhone) {
 		this.homePhone = homePhone;
 	}
 
-	public String getGender() {
-		return gender;
+	public Employee homePhone(String homePhone) {
+		setHomePhone(homePhone);
+		return this;
 	}
 
-	public void setGender(String gender) {
+	public char getGender() {
+		return this.gender;
+	}
+
+	public void setGender(char gender) {
 		this.gender = gender;
 	}
 
+	public Employee gender(char gender) {
+		setGender(gender);
+		return this;
+	}
+
 	public double getSalary() {
-		return salary;
+		return this.salary;
 	}
 
 	public void setSalary(double salary) {
 		this.salary = salary;
 	}
 
-	public String getBirthday() {
-		return birthday;
+	public Employee salary(double salary) {
+		setSalary(salary);
+		return this;
 	}
 
-	public void setBirthday(String birthday) {
+	public Date getBirthday() {
+		return this.birthday;
+	}
+
+	public void setBirthday(Date birthday) {
 		this.birthday = birthday;
 	}
 
-	public Company getCompany() {
-		return company;
+	public Employee birthday(Date birthday) {
+		setBirthday(birthday);
+		return this;
+	}
+
+	public Optional<Company> getCompany() {
+		return Optional.ofNullable(company);
 	}
 
 	public void setCompany(Company company) {
 		this.company = company;
 	}
 
+	public Employee company(Company company) {
+		setCompany(company);
+		return this;
+	}
+
 	@Override
-	public String toString() {
-		return "Employee [id=" + id + ", city=" + city + ", address=" + address + ", zipCode="
-				+ zipCode + ", cellPhone=" + cellPhone + ", homePhone=" + homePhone + ", gender=" + gender + ", salary="
-				+ salary + ", birthday=" + birthday + "]";
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		Employee employee = (Employee) o;
+		return id == employee.id;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
+		return Objects.hash(super.hashCode(), id);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Employee other = (Employee) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}	
-	
-	
-	
+	public String toString() {
+		return "Employee{" +
+				"id=" + id +
+				", city='" + city + '\'' +
+				", address='" + address + '\'' +
+				", zipCode='" + zipCode + '\'' +
+				", cellPhone='" + cellPhone + '\'' +
+				", homePhone='" + homePhone + '\'' +
+				", gender=" + gender +
+				", salary=" + salary +
+				", birthday=" + birthday +
+				", company=" + getCompany().map(Company::getId).orElse(null) +
+				'}';
+	}
+
 }

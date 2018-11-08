@@ -13,8 +13,10 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     @Query("SELECT p "
             + "FROM Proposal p "
             + "WHERE p.id LIKE CONCAT('%',:search,'%') "
-            + "OR p.isApproved LIKE CONCAT('%',:search,'%') "
-            + "OR p.date LIKE CONCAT('%',:search,'%') "
+            + "OR p.title LIKE CONCAT('%',:search,'%') "
+            + "OR p.description LIKE CONCAT('%',:search,'%') "
+            + "OR p.state LIKE CONCAT('%',:search,'%') "
+            + "OR p.creationDate LIKE CONCAT('%',:search,'%') "
     )
     Iterable<Proposal> searchProposals(@Param(value = "search") String search);
 
@@ -42,17 +44,17 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "OR r.text LIKE CONCAT('%',:search,'%')"
             + "OR r.summary LIKE CONCAT('%',:search,'%')"
             + "OR r.classification LIKE CONCAT('%',:search,'%')"
-            + "OR r.date LIKE CONCAT('%',:search,'%')"
+            + "OR r.creationDate LIKE CONCAT('%',:search,'%')"
     )
-    Iterable<Review> searchReviews(@Param(value = "search") String search);
+    Iterable<Review> searchReviews(@Param(value = "search") String search); //TODO falta id do proposal
 
     @Query("Select c "
             + "FROM Proposal p JOIN p.comments c "
             + "WHERE c.id LIKE CONCAT('%',:search,'%')"
             + "OR c.title LIKE CONCAT('%',:search,'%')"
             + "OR c.text LIKE CONCAT('%',:search,'%')"
-            + "OR c.date LIKE CONCAT('%',:search,'%')"
+            + "OR c.creationDate LIKE CONCAT('%',:search,'%')"
     )
-    Iterable<Comment> searchComments(@Param(value = "search") String search);
+    Iterable<Comment> searchComments(@Param(value = "search") String search); //TODO falta id do proposal
 
 }
