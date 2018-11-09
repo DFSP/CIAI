@@ -62,11 +62,11 @@ public class UsersController implements UsersApi {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User newUser) {
-		if (newUser.getId() != id) {
-			throw new BadRequestException(String.format("User id %d and path id %d don't match", newUser.getId(), id));
+	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+		if (user.getId() != id) {
+			throw new BadRequestException(String.format("User id %d and path id %d don't match", user.getId(), id));
 		}
-		usersService.updateUser(id, newUser);
+		usersService.updateUser(user);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -91,8 +91,8 @@ public class UsersController implements UsersApi {
 																	@RequestBody Proposal proposal)
 			throws URISyntaxException {
 		//TODO proposal must exist
-		Proposal newProposal = usersService.addApproverInProposal(id, proposal);
-		Resource<Proposal> resource = proposalAssembler.toResource(newProposal);
+		Proposal updatedProposal = usersService.addApproverInProposal(id, proposal);
+		Resource<Proposal> resource = proposalAssembler.toResource(updatedProposal);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);

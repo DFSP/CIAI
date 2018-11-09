@@ -75,11 +75,11 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal newProposal) {  	
-		if (newProposal.getId() != id) {
-			throw new BadRequestException(String.format("Proposal id %d and path id %d don't match.", newProposal.getId(), id));
+	public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal proposal) {
+		if (proposal.getId() != id) {
+			throw new BadRequestException(String.format("Proposal id %d and path id %d don't match.", proposal.getId(), id));
 		}
-		proposalsService.updateProposal(newProposal);
+		proposalsService.updateProposal(proposal);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -121,11 +121,11 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/sections/{sid}")
-	public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section newSection) {
-		if (newSection.getId() != sid) {
-			throw new BadRequestException(String.format("Section id %d and path id %d don't match.", newSection.getId(), sid));
+	public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section section) {
+		if (section.getId() != sid) {
+			throw new BadRequestException(String.format("Section id %d and path id %d don't match.", section.getId(), sid));
 		}
-		proposalsService.updateSection(pid, newSection);
+		proposalsService.updateSection(pid, section);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -159,6 +159,7 @@ public class ProposalsController implements ProposalsApi {
 
 	@GetMapping("/{pid}/reviews/{rid}")
 	public ResponseEntity<Resource<Review>> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
+		//TODO bad request ou not found? ver tambem outros casos
 		Review review = proposalsService.getReview(pid, rid).orElseThrow(() ->
 				new BadRequestException(String.format("Review id %d does not belong to proposal with id %d", rid, pid)));
 		Resource<Review> resource = reviewAssembler.toResource(review);
@@ -166,11 +167,11 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/reviews/{rid}")
-	public ResponseEntity<?> updateReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review newReview) {
-		if (newReview.getId() != rid) {
-			throw new BadRequestException(String.format("Review id %d and path id %d don't match.", newReview.getId(), rid));
+	public ResponseEntity<?> updateReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review review) {
+		if (review.getId() != rid) {
+			throw new BadRequestException(String.format("Review id %d and path id %d don't match.", review.getId(), rid));
 		}
-		proposalsService.updateReview(pid, newReview);
+		proposalsService.updateReview(pid, review);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -212,11 +213,12 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/comments/{cid}")
-	public ResponseEntity<?> updateComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid, @RequestBody Comment newComment) {
-		if (newComment.getId() != cid) {
-			throw new BadRequestException(String.format("Comment id %d and path id %d don't match.", newComment.getId(), cid));
+	public ResponseEntity<?> updateComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid,
+										   @RequestBody Comment comment) {
+		if (comment.getId() != cid) {
+			throw new BadRequestException(String.format("Comment id %d and path id %d don't match.", comment.getId(), cid));
 		}
-		proposalsService.updateComment(pid, newComment);
+		proposalsService.updateComment(pid, comment);
 		return ResponseEntity.noContent().build();
 	}
 

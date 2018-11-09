@@ -26,7 +26,7 @@ public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Re
 		long cid = employee.getCompany().get().getId(); //TODO o que fazer quando retorna null?
 		return new Resource<>(employee,
 			linkTo(methodOn(CompaniesController.class).getEmployee(cid, eid)).withSelfRel(),
-			linkTo(methodOn(CompaniesController.class).getEmployees(cid)).withRel("employees"));
+			linkTo(methodOn(CompaniesController.class).getEmployees(cid, "")).withRel("employees"));
 	}	
 	
 	public Resources<Resource<Employee>> toResources(Iterable<? extends Employee> entities, Company company) {
@@ -36,7 +36,7 @@ public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Re
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(employees,
-				linkTo(methodOn(CompaniesController.class).getEmployees(cid)).withSelfRel(),
+				linkTo(methodOn(CompaniesController.class).getEmployees(cid, "")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

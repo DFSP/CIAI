@@ -22,8 +22,8 @@ public class CompanyResourceAssembler implements ResourcesAssembler<Company, Res
 	public Resource<Company> toResource(Company company) {
 		return new Resource<>(company,
 				linkTo(methodOn(CompaniesController.class).getCompany(company.getId())).withSelfRel(),
-				linkTo(methodOn(CompaniesController.class).getCompanies()).withRel("companies"),
-				linkTo(methodOn(CompaniesController.class).getEmployees(company.getId())).withRel("employees"));
+				linkTo(methodOn(CompaniesController.class).getCompanies("")).withRel("companies"),
+				linkTo(methodOn(CompaniesController.class).getEmployees(company.getId(), "")).withRel("employees"));
 	}
 	
 	@Override
@@ -33,7 +33,7 @@ public class CompanyResourceAssembler implements ResourcesAssembler<Company, Res
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(resources,
-				linkTo(methodOn(CompaniesController.class).getCompanies()).withSelfRel(),
+				linkTo(methodOn(CompaniesController.class).getCompanies("")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

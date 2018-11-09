@@ -1,29 +1,13 @@
 package pt.unl.fct.ciai.service;
 
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
-import pt.unl.fct.ciai.assembler.UserResourceAssembler;
-import pt.unl.fct.ciai.controller.UsersController;
-import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.ProposalsRepository;
 import pt.unl.fct.ciai.repository.UsersRepository;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Service
 public class UsersService {
@@ -50,9 +34,9 @@ public class UsersService {
         return usersRepository.findById(id);
     }
 
-    public void updateUser(long id, User newUser) {
-        getUserIfPresent(id);
-        usersRepository.save(newUser);
+    public void updateUser(User user) {
+        getUserIfPresent(user.getId());
+        usersRepository.save(user);
     }
 
     public void deleteUser(long id) {

@@ -243,7 +243,7 @@ public class UsersControllerTest {
 				.content(json))
 		.andExpect(status().isNoContent());
 
-		verify(usersService, times(1)).updateUser(manuel.getId(), manuel);
+		verify(usersService, times(1)).updateUser(manuel);
 
 		performGet(manuel);
 

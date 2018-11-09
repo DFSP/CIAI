@@ -166,6 +166,17 @@ public class Company {
 		return this;
 	}
 
+	public Company updateEmployee(Employee employee) {
+		Set<Employee> employees = this.getEmployees().orElseThrow(() ->
+				new IllegalStateException(String.format("Company %d has no employees", getId())));
+		if (!employees.remove(employee)) {
+			throw new IllegalArgumentException(
+					String.format("Company %d doesn't have an employee %d", getId(), employee.getId()));
+		}
+		employees.add(employee); //TODO verificar se mudança local tambem afeta o global
+		return this;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

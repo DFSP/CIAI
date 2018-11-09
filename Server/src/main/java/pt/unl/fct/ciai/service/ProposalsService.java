@@ -39,9 +39,9 @@ public class ProposalsService {
         return proposalsRepository.findById(id);
     }
 
-    public Proposal updateProposal(Proposal newProposal) {
-        getProposalIfPresent(newProposal.getId());
-        return proposalsRepository.save(newProposal);
+    public Proposal updateProposal(Proposal proposal) {
+        getProposalIfPresent(proposal.getId());
+        return proposalsRepository.save(proposal);
     }
 
     public void deleteProposal(long id) {
@@ -66,15 +66,15 @@ public class ProposalsService {
         return Optional.ofNullable(proposalsRepository.getSection(pid, sid));
     }
 
-    public Section updateSection(long pid, Section newSection) {
+    public Section updateSection(long pid, Section section) {
         Proposal proposal = getProposalIfPresent(pid);
-        if (!proposalsRepository.existsSection(pid, newSection.getId())) {
+        if (!proposalsRepository.existsSection(pid, section.getId())) {
             throw new BadRequestException(String.format(
-                    "Section with id %d doesn't belong to proposal with id %d", newSection.getId(), pid));
+                    "Section with id %d doesn't belong to proposal with id %d", section.getId(), pid));
         }
-        proposal.updateSection(newSection);
+        proposal.updateSection(section);
         proposalsRepository.save(proposal);
-        return sectionsRepository.save(newSection);
+        return sectionsRepository.save(section);
     }
 
     public void deleteSection(long pid, long sid) {
@@ -101,15 +101,15 @@ public class ProposalsService {
         return Optional.ofNullable(proposalsRepository.getReview(pid, rid));
     }
 
-    public Review updateReview(long pid, Review newReview) {
+    public Review updateReview(long pid, Review review) {
         Proposal proposal = getProposalIfPresent(pid);
-        if (!proposalsRepository.existsReview(pid, newReview.getId())) {
+        if (!proposalsRepository.existsReview(pid, review.getId())) {
             throw new BadRequestException(String.format(
-                    "Review with id %d doesn't belong to proposal with id %d", newReview.getId(), pid));
+                    "Review with id %d doesn't belong to proposal with id %d", review.getId(), pid));
         }
-        proposal.updateReview(newReview);
+        proposal.updateReview(review);
         proposalsRepository.save(proposal);
-        return reviewsRepository.save(newReview);
+        return reviewsRepository.save(review);
     }
 
     public void deleteReview(long pid, long rid) {
@@ -136,15 +136,15 @@ public class ProposalsService {
         return Optional.ofNullable(proposalsRepository.getComment(pid, cid));
     }
 
-    public Comment updateComment(long pid, Comment newComment) {
+    public Comment updateComment(long pid, Comment comment) {
         Proposal proposal = getProposalIfPresent(pid);
-        if (!proposalsRepository.existsComment(pid, newComment.getId())) {
+        if (!proposalsRepository.existsComment(pid, comment.getId())) {
             throw new BadRequestException(String.format(
-                    "Comment with id %d doesn't belong to proposal with id %d", newComment.getId(), pid));
+                    "Comment with id %d doesn't belong to proposal with id %d", comment.getId(), pid));
         }
-        proposal.updateComment(newComment);
+        proposal.updateComment(comment);
         proposalsRepository.save(proposal);
-        return commentsRepository.save(newComment);
+        return commentsRepository.save(comment);
     }
 
     public void deleteComment(long pid, long cid) {
