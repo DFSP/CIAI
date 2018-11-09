@@ -31,13 +31,12 @@ public class DatabaseLoader {
 			CommentsRepository comments, PasswordEncoder encoder) {
 		
 		return args -> {
-			// Create ecma user
-			User ecmaUser = new User();
-			ecmaUser.setFirstName("ecma");
-			ecmaUser.setLastName("User");
-			ecmaUser.setUsername("ecmaUser");
-			ecmaUser.setPassword(encoder.encode("password1"));
-			users.save(ecmaUser);
+			// Create system admin user
+			User sysAdmin = new User()
+					.username("admin")
+					.password(encoder.encode("password"))
+					.role(User.Role.SYS_ADMIN);
+			users.save(sysAdmin);
 			
 			// Create ist company
 			Company ist = new Company();
@@ -62,7 +61,7 @@ public class DatabaseLoader {
 			istEmployee.setUsername("dpimenta");
 			istEmployee.setPassword(encoder.encode("password"));
 			istEmployee.setEmail("dpimenta@email.com");
-			istEmployee.setRole("admin");
+			istEmployee.setRole(User.Role.COMPANY_ADMIN);
 			istEmployee.setCity("Almada");
 			istEmployee.setAddress("Caparica");
 			istEmployee.setZipCode("1234-999");
@@ -115,7 +114,7 @@ public class DatabaseLoader {
 			proposal1.addReview(review1);
 			proposals.save(proposal1);
 
-			ecmaUser.addApproveProposal(proposal1);
+			//ecmaUser.addApproveProposal(proposal1);
 			/*System.out.println("ecmaUser have to approve " + ecmaUser.getApproveProposals().size() + " proposals.");
 			System.out.println("Proposal is still to be approved by user? > " + ecmaUser.getApproveProposals().contains(proposal1));
 			System.out.println("Proposal exists? > " + proposals.existsById(proposal1.getId()));*/

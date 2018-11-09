@@ -33,7 +33,7 @@ public class Employee extends User {
 	
 	public Employee() { }
 
-	public Employee(String firstName, String lastName, String username, String email, String role, String password,
+	public Employee(String firstName, String lastName, String username, String email, Role role, String password,
 			String city, String address, String zipCode, String cellPhone,
 			String homePhone, char gender, double salary, Date birthday) {
 		super(firstName, lastName, username, email, role, password);

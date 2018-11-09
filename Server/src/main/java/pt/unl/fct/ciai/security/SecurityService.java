@@ -48,10 +48,9 @@ public class SecurityService {
 		return u.isPresent() && u.get().getUsername().equals(user.getUsername());
 	}
 
-    public boolean isSystemAdmin(User user, long id) {
-		Optional<pt.unl.fct.ciai.model.User> u = users.findById(id);
-		return u.isPresent() && u.get().getRole().equals("ADMIN");
-	}
+    /*public boolean isSystemAdmin(long id) {
+    	return users.hasRole(id, pt.unl.fct.ciai.model.User.Role.SYS_ADMIN);
+	}*/
 
     public boolean isCompanyAdmin(User user, long id) {
     	/*Optional<Company> company = companies.findById(id);

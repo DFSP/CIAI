@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
+    public enum Role {
+        SYS_ADMIN, COMPANY_ADMIN
+    }
+
     @Id
     @GeneratedValue
     private long id;
@@ -26,7 +30,8 @@ public class User {
     private String lastName;
     private String username;
     private String email;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -52,7 +57,7 @@ public class User {
     }
 
     public User(String firstName, String lastName, String username,
-                String email, String role, String password) {
+                String email, Role role, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -126,15 +131,15 @@ public class User {
         return this;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public User role(String role) {
+    public User role(Role role) {
         setRole(role);
         return this;
     }

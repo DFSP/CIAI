@@ -10,6 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Documented
 @PreAuthorize(CanDeleteCompany.Condition)
 public @interface CanDeleteCompany {
-    String Condition = "(@SecurityService.isSystemAdmin(principal, #id)"
-                    + " and @SecurityService.isPrincipal(principal, #id))";
+   // String Condition = "hasRole(T(pt.unl.fct.ciai.model.User.Role).SYS_ADMIN.name())";
+   String Condition = "hasRole('SYS_ADMIN')";
 }

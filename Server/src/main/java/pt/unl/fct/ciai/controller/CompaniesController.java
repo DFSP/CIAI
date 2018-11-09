@@ -16,6 +16,8 @@ import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
 import pt.unl.fct.ciai.assembler.EmployeeResourceAssembler;
 import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
+import pt.unl.fct.ciai.security.CanAddCompany;
+import pt.unl.fct.ciai.security.CanDeleteCompany;
 import pt.unl.fct.ciai.service.CompaniesService;
 
 @RestController
@@ -42,6 +44,7 @@ public class CompaniesController implements CompaniesApi {
 	}
 
 	@PostMapping
+	@CanAddCompany
 	public ResponseEntity<Resource<Company>> addCompany(@RequestBody Company company) throws URISyntaxException {
 		if (company.getId() > 0) {
 			throw new BadRequestException("A new company has to have a non positive id.");
@@ -72,7 +75,7 @@ public class CompaniesController implements CompaniesApi {
 	}
 
 	@DeleteMapping(value = "/{id}")
-	// @CanDeleteCompany
+	@CanDeleteCompany
 	public ResponseEntity<?> deleteCompany(@PathVariable("id") long id) {
 		companiesService.deleteCompany(id);
 		return ResponseEntity.noContent().build();
