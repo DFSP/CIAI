@@ -198,7 +198,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
 		verify(proposalsRepository, times(1)).findAll();
-		
+
 	}
 
 	@Test

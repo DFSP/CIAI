@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 @Documented
 @PreAuthorize(CanAddCompany.Condition)
 public @interface CanAddCompany {
-    String Condition = "hasRole(T(pt.unl.fct.ciai.model.User.Role).SYS_ADMIN.name())";
+    String Condition = "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name())";
 }

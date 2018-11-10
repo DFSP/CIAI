@@ -10,9 +10,14 @@ import java.util.Optional;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Section {
-	
+
+    //TODO definir quais campos são not null
+    //TODO definir campos unique -> @Column(unique = true)
+
     @Id @GeneratedValue
     private long id;
+    private String title;
+    private String description;
     private String goals; //TODO String[] se nao complicar muito as queries
     private String material; //TODO String[] se nao complicar muito as queries
     private String workPlan;
@@ -23,7 +28,9 @@ public class Section {
 
     public Section() { }
     
-    public Section(String goals, String material, String workPlan, float budget) {
+    public Section(String title, String description, String goals, String material, String workPlan, float budget) {
+        this.title = title;
+        this.description = description;
     	this.goals = goals;
     	this.material = material;
     	this.workPlan = workPlan;
@@ -40,6 +47,32 @@ public class Section {
 
     public Section id(long id) {
         setId(id);
+        return this;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Section title(String title) {
+        setTitle(title);
+        return this;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Section description(String description) {
+        setDescription(description);
         return this;
     }
 
@@ -125,6 +158,8 @@ public class Section {
     public String toString() {
         return "Section{" +
                 "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
                 ", goals='" + goals + '\'' +
                 ", material='" + material + '\'' +
                 ", workPlan='" + workPlan + '\'' +

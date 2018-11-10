@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -19,15 +20,18 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
+    //TODO definir quais campos são not null -> @NotNull
+    //TODO definir campos unique -> @Column(unique = true)
+
     public enum Role {
         ROLE_SYS_ADMIN, ROLE_COMPANY_ADMIN
     }
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private long id;
     private String firstName;
     private String lastName;
+    @Column(unique = true)
     private String username;
     private String email;
     @Enumerated(EnumType.STRING)

@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Proposal {
 
+	//TODO definir quais campos são not null
+	//TODO definir campos unique -> @Column(unique = true)
+
 	public enum ProposalState {
 		PENDING_APPROVAL, APPROVED, REJECTED;
 	}

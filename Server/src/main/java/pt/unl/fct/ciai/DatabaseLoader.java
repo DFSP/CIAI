@@ -26,12 +26,17 @@ public class DatabaseLoader {
 								   CommentsRepository comments, PasswordEncoder encoder) {
 
 		return args -> {
+
+			//TODO adicionar mais entidades com os campos preenchidos
+			// (se possivel usando os metodos builders (e.g. sysAdmin e ist))
+
 			// Create system admin user
 			User sysAdmin = new User()
 					.username("admin")
 					.password(encoder.encode("password"))
 					.role(User.Role.ROLE_SYS_ADMIN);
 			users.save(sysAdmin);
+
 
 			//	-	-	-	-	-	-	-	COMPANIES	-	-	-	-	-	-	-
 			// IST
