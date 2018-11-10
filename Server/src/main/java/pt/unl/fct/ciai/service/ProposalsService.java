@@ -28,6 +28,7 @@ public class ProposalsService {
     }
 
     public Iterable<Proposal> getProposals(String search) {
+        //TODO esconder proposals não aprovadas (com uma query)
         return search == null ? proposalsRepository.findAll() : proposalsRepository.search(search);
     }
 
@@ -36,6 +37,7 @@ public class ProposalsService {
     }
 
     public Optional<Proposal> getProposal(long id) {
+        //TODO esconder proposals não aprovadas (com uma query)
         return proposalsRepository.findById(id);
     }
 

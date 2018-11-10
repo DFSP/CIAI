@@ -31,6 +31,10 @@ public class DatabaseLoader {
 			CommentsRepository comments, PasswordEncoder encoder) {
 		
 		return args -> {
+
+			//TODO adicionar mais entidades com os campos preenchidos
+			// (se possivel usando os metodos builders (e.g. sysAdmin e ist))
+
 			// Create system admin user
 			User sysAdmin = new User()
 					.username("admin")
@@ -39,10 +43,10 @@ public class DatabaseLoader {
 			users.save(sysAdmin);
 			
 			// Create ist company
-			Company ist = new Company();
-			ist.setName("ist");
-			ist.setEmail("ist@ist.pt");
-			ist.setAddress("lisboa");
+			Company ist = new Company()
+					.name("ist")
+					.email("ist@ist.pt")
+					.address("lisboa");
 			companies.save(ist);
 			
 			// Create user
