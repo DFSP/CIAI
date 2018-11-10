@@ -330,7 +330,6 @@ public class CompaniesControllerTest {
 
 		when(companiesRepository.findById(fct.getId()))
 		.thenReturn(Optional.of(fct))
-		.thenReturn(Optional.of(fct))
 		.thenReturn(Optional.ofNullable(null));
 
 		String href = fctResource.getLink("self").getHref();
