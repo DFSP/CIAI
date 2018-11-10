@@ -22,6 +22,8 @@ import java.net.URISyntaxException;
 @RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class UsersController implements UsersApi {
 
+	//TODO ver o que faz o @Valid nos parametros entitade dos posts e puts
+
 	private final UsersService usersService;
 
 	private final UserResourceAssembler userAssembler;

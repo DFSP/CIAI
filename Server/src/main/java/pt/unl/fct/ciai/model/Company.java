@@ -12,6 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Company {
 
+	//TODO definir quais campos são not null
+	//TODO definir campos unique -> @Column(unique = true)
+
 	@Id @GeneratedValue
 	private long id;
 	private String name;

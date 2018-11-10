@@ -51,4 +51,6 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     )
     Proposal getApproverInProposal(long uid, long pid);
 
+   // boolean isCompanyAdmin()
+
 }

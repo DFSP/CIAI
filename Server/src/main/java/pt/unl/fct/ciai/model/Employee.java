@@ -11,7 +11,10 @@ import java.util.Optional;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee extends User {
-	
+
+	//TODO definir quais campos são not null
+	//TODO definir campos unique -> @Column(unique = true)
+
 	@Id @GeneratedValue
 	private long id;
 	private String city;

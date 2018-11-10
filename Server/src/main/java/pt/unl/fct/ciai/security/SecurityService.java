@@ -53,12 +53,11 @@ public class SecurityService {
 	}*/
 
     public boolean isCompanyAdmin(User user, long id) {
-    	/*Optional<Company> company = companies.findById(id);
-    	return company.isPresent() && company.get().getAdmin().getUsername().equals(user.getUsername());*/
-    	return false; // TODO mudar para query
-    }
-    
-    public boolean isMemberOfMyCompany(long cid, long eid) {
+		pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
+		return u != null && u.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_SYS_ADMIN;
+	}
+
+	public boolean isMemberOfMyCompany(long cid, long eid) {
     	Optional<Employee> e = employees.findById(eid);
     	Optional<Company> c = companies.findById(cid);
     	return e.isPresent() && c.isPresent() && e.get().getCompany().equals(c.get());

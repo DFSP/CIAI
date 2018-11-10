@@ -15,8 +15,10 @@ import org.hibernate.annotations.CreationTimestamp;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Comment {
 
-    @Id
-    @GeneratedValue
+    //TODO definir quais campos são not null
+    //TODO definir campos unique -> @Column(unique = true)
+
+    @Id @GeneratedValue
     private long id;
     private String title;
     private String text;
