@@ -81,7 +81,7 @@ public class CompaniesControllerTest {
 		joao.setUsername("jreis");
 		joao.setPassword("password");
 		joao.setEmail("jreis@email.com");
-		joao.setRole(User.Role.COMPANY_ADMIN);
+		joao.setRole(User.Role.ROLE_COMPANY_ADMIN);
 		joao.setCity("Almada");
 		joao.setAddress("Caparica");
 		joao.setZipCode("1234-992");
@@ -100,7 +100,7 @@ public class CompaniesControllerTest {
 		luis.setUsername("lmartins");
 		luis.setPassword("password");
 		luis.setEmail("lmartins@email.com");
-		luis.setRole(User.Role.COMPANY_ADMIN);
+		luis.setRole(User.Role.ROLE_COMPANY_ADMIN);
 		luis.setCity("Almada");
 		luis.setAddress("Caparica");
 		luis.setZipCode("1234-1111");
@@ -119,7 +119,7 @@ public class CompaniesControllerTest {
 		daniel.setUsername("dpimenta");
 		daniel.setPassword("password");
 		daniel.setEmail("dpimenta@email.com");
-		daniel.setRole(User.Role.COMPANY_ADMIN);
+		daniel.setRole(User.Role.ROLE_COMPANY_ADMIN);
 		daniel.setCity("Almada");
 		daniel.setAddress("Caparica");
 		daniel.setZipCode("1234-999");

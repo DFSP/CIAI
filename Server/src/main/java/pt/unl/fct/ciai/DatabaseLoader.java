@@ -35,7 +35,7 @@ public class DatabaseLoader {
 			User sysAdmin = new User()
 					.username("admin")
 					.password(encoder.encode("password"))
-					.role(User.Role.SYS_ADMIN);
+					.role(User.Role.ROLE_SYS_ADMIN);
 			users.save(sysAdmin);
 			
 			// Create ist company
@@ -61,7 +61,7 @@ public class DatabaseLoader {
 			istEmployee.setUsername("dpimenta");
 			istEmployee.setPassword(encoder.encode("password"));
 			istEmployee.setEmail("dpimenta@email.com");
-			istEmployee.setRole(User.Role.COMPANY_ADMIN);
+			istEmployee.setRole(User.Role.ROLE_COMPANY_ADMIN);
 			istEmployee.setCity("Almada");
 			istEmployee.setAddress("Caparica");
 			istEmployee.setZipCode("1234-999");

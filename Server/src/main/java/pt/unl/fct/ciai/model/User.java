@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class User {
 
     public enum Role {
-        SYS_ADMIN, COMPANY_ADMIN
+        ROLE_SYS_ADMIN, ROLE_COMPANY_ADMIN
     }
 
     @Id

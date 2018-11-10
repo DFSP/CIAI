@@ -85,7 +85,7 @@ public class UsersControllerTest {
 		joao.setLastName("Reis");
 		joao.setUsername("jreis");
 		joao.setEmail("jreis@email.com");
-		joao.setRole(User.Role.COMPANY_ADMIN);
+		joao.setRole(User.Role.ROLE_COMPANY_ADMIN);
 		joao.setPassword("password");
 		return joao;
 	}
@@ -97,7 +97,7 @@ public class UsersControllerTest {
 		luis.setLastName("Martins");
 		luis.setUsername("lmartins");
 		luis.setEmail("lmartins@email.com");
-		luis.setRole(User.Role.COMPANY_ADMIN);
+		luis.setRole(User.Role.ROLE_COMPANY_ADMIN);
 		luis.setPassword("password");
 		return luis;
 	}
@@ -109,7 +109,7 @@ public class UsersControllerTest {
 		daniel.setLastName("Pimenta");
 		daniel.setUsername("dpimenta");
 		daniel.setEmail("dpimenta@email.com");
-		daniel.setRole(User.Role.COMPANY_ADMIN);
+		daniel.setRole(User.Role.ROLE_COMPANY_ADMIN);
 		daniel.setPassword("password");
 		return daniel;
 	}
