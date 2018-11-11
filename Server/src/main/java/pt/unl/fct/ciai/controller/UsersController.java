@@ -64,6 +64,7 @@ public class UsersController implements UsersApi {
 	}
 
 	@PutMapping("/{id}")
+	// @CanModifyUser
 	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
 		if (user.getId() != id) {
 			throw new BadRequestException(String.format("User id %d and path id %d don't match", user.getId(), id));
@@ -73,6 +74,7 @@ public class UsersController implements UsersApi {
 	}
 
 	@DeleteMapping("/{id}")
+	// @CanDeleteUser
 	public ResponseEntity<?> deleteUser(@PathVariable("id") long id) {
 		usersService.deleteUser(id);
 		return ResponseEntity.noContent().build();
@@ -89,6 +91,7 @@ public class UsersController implements UsersApi {
 	}
 
 	@PostMapping("/{id}/approverInProposals")
+	// @CanAddApprover
 	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable("id") long id,
 																	@RequestBody Proposal proposal)
 			throws URISyntaxException {
@@ -110,6 +113,7 @@ public class UsersController implements UsersApi {
 	}
 
 	@DeleteMapping("/{uid}/approverInProposals/{pid}")
+	// @CanDeleteApprover
 	public ResponseEntity<?> deleteApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
 		usersService.deleteApproverInProposal(uid, pid);
 		return ResponseEntity.noContent().build();

@@ -45,7 +45,8 @@ public class SecurityService {
 
     public boolean isCompanyAdmin(User user, long id) {
 		pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-		return u != null && u.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN && companies.existsEmployee(id, u.getId());
+		return u != null && u.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN && 
+				companies.existsEmployee(id, u.getId());
 	}
 
 	public boolean membersOfSameCompany(User user, long uid) {
