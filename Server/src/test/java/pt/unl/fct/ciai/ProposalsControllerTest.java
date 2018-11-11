@@ -411,13 +411,63 @@ public class ProposalsControllerTest {
 
 
 	@Test
-	public void testGetSection() {
-		//TODO
+	public void testGetSection() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Section s1 = create_Section_1();
+		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		given(sectionsRepository.findById(s1.getId()))
+				.willReturn(Optional.of(s1));
+
+		performGetSection(s1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(sectionsRepository, times(1)).findById(s1.getId());
+
 	}
 
 	@Test
-	public void testUpdateSection() {
-		//TODO
+	public void testUpdateSection() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		Section s1 = create_Section_1();
+		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
+		String href = s1Resource.getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		given(sectionsRepository.findById(s1.getId()))
+				.willReturn(Optional.of(s1));
+
+		performGetSection(s1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(sectionsRepository, times(1)).findById(s1.getId());
+
+		given(sectionsRepository.save(s1)).willReturn(s1);
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(sectionsRepository.findById(p1.getId())).willReturn(Optional.of(s1));
+
+		s1.setTitle("Novo titulo");
+		String json = objectMapper.writeValueAsString(s1);
+		mvc.perform(put(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isNoContent());
+
+		verify(sectionsRepository, times(1)).save(s1);
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(sectionsRepository, times(2)).findById(s1.getId());
+
+		performGetSection(s1);
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(sectionsRepository, times(3)).findById(s1.getId());
 	}
 
 	@Test
@@ -507,5 +557,23 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.comments.href", is(ROOT + resourceProposal.getLink("comments").getHref())))
 				.andReturn();
 	}
+
+	private MvcResult performGetSection(Section section) throws Exception {
+		Resource<Section> resourceSection = sectionAssembler.toResource(section);
+		return mvc.perform(get(resourceSection.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)section.getId())))
+				.andExpect(jsonPath("$.title", is(section.getTitle())))
+				.andExpect(jsonPath("$.discription", is(section.getDescription())))
+				.andExpect(jsonPath("$.material", is(section.getMaterial())))
+				.andExpect(jsonPath("$.workPlan", is(section.getWorkPlan())))
+				.andExpect(jsonPath("$.budget", is(section.getBudget())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceSection.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.sections.href", is(ROOT + resourceSection.getLink("sections").getHref())))
+				.andReturn();
+	}
+
 
 }
