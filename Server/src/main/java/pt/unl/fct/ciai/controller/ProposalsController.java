@@ -75,6 +75,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{id}")
+	// @CanModifyProposal
 	public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal proposal) {
 		if (proposal.getId() != id) {
 			throw new BadRequestException(String.format("Proposal id %d and path id %d don't match.", proposal.getId(), id));
