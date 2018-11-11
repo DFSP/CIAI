@@ -85,6 +85,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{id}")
+	// @CanDeleteProposal
 	public ResponseEntity<?> deleteProposal(@PathVariable("id") long id) {
 		proposalsService.deleteProposal(id);
 		return ResponseEntity.noContent().build();
@@ -101,6 +102,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/sections")
+	// @CanAddSection
 	public ResponseEntity<Resource<Section>> addSection(@PathVariable("id") long id, @RequestBody Section section)
 			throws URISyntaxException {
 		if (section.getId() > 0) {
@@ -122,6 +124,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/sections/{sid}")
+	// @CanModifySection
 	public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section section) {
 		if (section.getId() != sid) {
 			throw new BadRequestException(String.format("Section id %d and path id %d don't match.", section.getId(), sid));
@@ -131,6 +134,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/sections/{sid}")
+	// @CanDeleteSection
 	public ResponseEntity<?> deleteSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		proposalsService.deleteSection(pid, sid);
 		return ResponseEntity.noContent().build();
@@ -147,6 +151,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/reviews")
+	// @CanAddReview
 	public ResponseEntity<?> addReview(@PathVariable("id") long id, @RequestBody Review review) throws URISyntaxException {
 		if (review.getId() > 0) {
 			throw new BadRequestException("A new review has to have a non positive id.");
@@ -168,6 +173,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/reviews/{rid}")
+	// @CanModifyReview
 	public ResponseEntity<?> updateReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review review) {
 		if (review.getId() != rid) {
 			throw new BadRequestException(String.format("Review id %d and path id %d don't match.", review.getId(), rid));
@@ -177,6 +183,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/reviews/{rid}")
+	// @CanDeleteReview
 	public ResponseEntity<?> deleteReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
 		proposalsService.deleteReview(pid, rid);
 		return ResponseEntity.noContent().build();

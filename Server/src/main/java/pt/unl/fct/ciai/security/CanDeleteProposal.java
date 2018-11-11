@@ -8,8 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanModifyProposal.Condition)
-public @interface CanModifyProposal {
+@PreAuthorize(CanDeleteProposal.Condition)
+public @interface CanDeleteProposal {
     String Condition = "@SecurityService.isAuthorOfProposal(principal,#id) or "
-    		+ "@SecurityService.isAdminOfAuthorOfProposal(principal,#id)";
+    		+ "@SecurityService.isAdminOfAuthorOfProposal(principal,#id) or "
+    		+ "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name())";
 }

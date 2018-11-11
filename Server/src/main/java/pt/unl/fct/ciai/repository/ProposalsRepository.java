@@ -223,5 +223,10 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "WHERE p.id = :pid"
     )
     User getProposer(@Param(value = "pid") long pid);
+    
+    @Query("SELECT CASE WHEN r IS NOT NULL THEN TRUE ELSE FALSE END " +
+            "FROM Proposal p JOIN p.reviewers r " +
+            "WHERE p.id = :pid AND r.id = :uid")
+    boolean existsReviewer(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
 
 }

@@ -54,6 +54,9 @@ public class Proposal {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne @JoinColumn(name="proposer_id")
 	private User proposer;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToMany(mappedBy = "proposals")
+	private Set<User> reviewers;
 
 	public Proposal() {
 		this.state = ProposalState.PENDING_APPROVAL;
@@ -381,6 +384,32 @@ public class Proposal {
 
 	public Proposal proposer(User proposer) {
 		setProposer(proposer);
+		return this;
+	}
+	
+	public Optional<Set<User>> getReviewers() {
+		return Optional.ofNullable(this.reviewers);
+	}
+
+	public void setReviewers(Set<User> reviewers) {
+		this.reviewers = reviewers;
+	}
+
+	public Proposal reviewer(Set<User> reviewers) {
+		setReviewers(reviewers);
+		return this;
+	}
+
+	public Proposal addReviewer(User reviewer) {
+		if (this.reviewers == null) {
+			this.reviewers = new HashSet<User>();
+		}
+		this.reviewers.add(reviewer);
+		return this;
+	}
+
+	public Proposal removeReviewer(User reviewer) {
+		this.getReviewers().ifPresent(reviewers -> reviewers.remove(reviewer));
 		return this;
 	}
 
