@@ -139,10 +139,5 @@ public class SecurityService {
     	Optional<Proposal> p = proposals.findById(id);
     	return p.isPresent() && p.get().getState() == Proposal.ProposalState.APPROVED;
     }
-    
-    public boolean isMyBidding(User user, long uid) {
-    	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-    	return u != null && u.getId() == uid;
-    }
 }
 

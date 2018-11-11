@@ -11,6 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @PreAuthorize(CanDeleteBidding.Condition)
 public @interface CanDeleteBidding {
    String Condition = "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name()) or "
-   		+ "@SecurityService.isMyBidding(principal, #uid) or "
+   		+ "@SecurityService.isPrincipal(principal, #uid) or "
    		+ "@SecurityService.isAdminOfUser(principal, #uid)";
 }

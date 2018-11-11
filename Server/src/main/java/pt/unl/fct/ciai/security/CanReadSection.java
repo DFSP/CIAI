@@ -8,8 +8,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanReadComment.Condition)
-public @interface CanReadComment {
+@PreAuthorize(CanReadSection.Condition)
+public @interface CanReadSection {
     String Condition = "@SecurityService.isProposalApproved(#id) or "
     		+ "@SecurityService.isMemberOrStaffOfProposal(principal, #id) or "
     		+ "@SecurityService.isAdminOfAuthorOfProposal(principal, #id) or "

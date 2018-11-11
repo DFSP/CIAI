@@ -8,10 +8,10 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanReadComment.Condition)
-public @interface CanReadComment {
-    String Condition = "@SecurityService.isProposalApproved(#id) or "
-    		+ "@SecurityService.isMemberOrStaffOfProposal(principal, #id) or "
-    		+ "@SecurityService.isAdminOfAuthorOfProposal(principal, #id) or "
+@PreAuthorize(CanReadOneComment.Condition)
+public @interface CanReadOneComment {
+    String Condition = "@SecurityService.isProposalApproved(#pid) or "
+    		+ "@SecurityService.isMemberOrStaffOfProposal(principal, #pid) or "
+    		+ "@SecurityService.isAdminOfAuthorOfProposal(principal, #pid) or "
     		+ "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name())";
 }

@@ -93,6 +93,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{id}/sections")
+	// @CanReadSection
 	public ResponseEntity<Resources<Resource<Section>>> getSections(@PathVariable("id") long id,
 																	@RequestParam (value="search") String search) {
 		Proposal proposal = proposalsService.getProposal(id).orElseThrow(() ->
@@ -117,6 +118,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{pid}/sections/{sid}")
+	// @CanReadOneSection
 	public ResponseEntity<Resource<Section>> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		Section section = proposalsService.getSection(pid, sid).orElseThrow(() ->
 				new BadRequestException(String.format("Section id %d does not belong to proposal with id %d", sid, pid)));
@@ -191,6 +193,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{id}/comments")
+	// @CanReadComment
 	public ResponseEntity<Resources<Resource<Comment>>> getComments(@PathVariable("id") long id,
 																	@RequestParam (value="search") String search) {
 		Proposal proposal = proposalsService.getProposal(id).orElseThrow(() ->
@@ -215,7 +218,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{pid}/comments/{cid}")
-	// @CanReadComment
+	// @CanReadOneComment
 	public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		Comment comment = proposalsService.getComment(pid, cid).orElseThrow(() ->
 				new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid)));
