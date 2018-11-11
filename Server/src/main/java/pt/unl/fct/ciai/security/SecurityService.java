@@ -43,15 +43,6 @@ public class SecurityService {
     	return u.isPresent() && u.get().getUsername().equals(user.getUsername());
     }
 
-    public boolean isUserOfSystem(User user, long id) {
-		Optional<pt.unl.fct.ciai.model.User> u = users.findById(id);
-		return u.isPresent() && u.get().getUsername().equals(user.getUsername());
-	}
-
-    /*public boolean isSystemAdmin(long id) {
-    	return users.hasRole(id, pt.unl.fct.ciai.model.User.Role.SYS_ADMIN);
-	}*/
-
     public boolean isCompanyAdmin(User user, long id) {
 		pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
 		return u != null && u.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN && companies.existsEmployee(id, u.getId());
@@ -97,12 +88,19 @@ public class SecurityService {
 		}
 		return false;
 	}
+	
+	public boolean isAdminOfUser(User user, long id) {
+		pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
+		Optional<pt.unl.fct.ciai.model.User> u = users.findById(id);
+		return myself != null && u.isPresent() && membersOfSameCompany(user, u.get().getId()) && 
+				myself.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN;
+	}
     
-    /*public boolean isMemberOfProposal(User user, long id) {
+    public boolean isMemberOrStaffOfProposal(User user, long id) {
     	pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
-    	Optional<Proposal> p = proposals.findById(id);
-    	return myself != null && p.isPresent() && myself.getProposals().get().contains(p.get()); //TODO
-    }*/
+    	return myself != null && 
+    			(proposals.getMember(id, myself.getId()) != null || proposals.getOneStaff(id, myself.getId()) != null);
+    }
     
     public boolean isAuthorOfProposal(User user, long id) {
     	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
@@ -134,6 +132,16 @@ public class SecurityService {
     public boolean isReviewerOfProposal(User user, long id) {
     	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
     	return u != null && proposals.existsReviewer(id, u.getId());
+    }
+    
+    public boolean isProposalApproved(long id) {
+    	Optional<Proposal> p = proposals.findById(id);
+    	return p.isPresent() && p.get().getState() == Proposal.ProposalState.APPROVED;
+    }
+    
+    public boolean isMyBidding(User user, long uid) {
+    	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
+    	return u != null && u.getId() == uid;
     }
 }
 

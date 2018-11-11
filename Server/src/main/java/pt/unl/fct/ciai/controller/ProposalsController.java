@@ -67,6 +67,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{id}")
+	// @CanReadProposal
 	public ResponseEntity<Resource<Proposal>> getProposal(@PathVariable("id") long id) {
 		Proposal proposal = proposalsService.getProposal(id).orElseThrow(() ->
 				new NotFoundException(String.format("Proposal with id %d not found.", id)));
@@ -200,6 +201,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/comments")
+	// @CanAddComment
 	public ResponseEntity<Resource<Comment>> addComment(@PathVariable("id") long id, @RequestBody Comment comment)
 			throws URISyntaxException {
 		if (comment.getId() > 0) {
@@ -213,6 +215,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{pid}/comments/{cid}")
+	// @CanReadComment
 	public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		Comment comment = proposalsService.getComment(pid, cid).orElseThrow(() ->
 				new BadRequestException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid)));
@@ -221,6 +224,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/comments/{cid}")
+	// @CanModifyComment
 	public ResponseEntity<?> updateComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid,
 										   @RequestBody Comment comment) {
 		if (comment.getId() != cid) {
@@ -231,6 +235,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/comments/{cid}")
+	// @CanDeleteComment
 	public ResponseEntity<?> deleteComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		proposalsService.deleteComment(pid, cid);
 		return ResponseEntity.noContent().build();
@@ -265,6 +270,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/biddings/{uid}")
+	// @CanDeleteBidding
 	public ResponseEntity<?> deleteReviewBidding(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
 		proposalsService.deleteReviewBidding(pid, uid);
 		return ResponseEntity.noContent().build();

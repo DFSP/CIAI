@@ -188,7 +188,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     boolean existsComment(@Param(value = "pid") long pid, @Param(value = "cid") long cid);
 
 
-    // Biddings queries
+    // Biddings queries  
 
     @Query("SELECT u "
             + "FROM Proposal p JOIN p.reviewBiddings u "
