@@ -1,14 +1,14 @@
 package pt.unl.fct.ciai.security;
 
-import java.lang.annotation.*;
-
 import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.lang.annotation.*;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanModifyEmployee.Condition)
-public @interface CanDeleteEmployee {
-
+@PreAuthorize(CanAddReview.Condition)
+public @interface CanAddReview {
+    String Condition = "@SecurityService.isReviewerOfProposal(principal, #id)";
 }

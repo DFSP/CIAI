@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class User {
 
     public enum Gender {
-        MALE, FEMALE;
+        MALE, FEMALE
     }
 
     public enum Role {

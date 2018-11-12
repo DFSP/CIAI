@@ -48,7 +48,7 @@ public class ProposalsService {
 
     public Proposal updateProposal(Proposal newProposal) {
         Proposal proposal = getProposalIfPresent(newProposal.getId());
-        Utils.copyNonNullProperties((Object) newProposal, (Object) proposal);
+        Utils.copyNonNullProperties(newProposal, proposal);
         return proposalsRepository.save(proposal);
     }
 
@@ -80,7 +80,7 @@ public class ProposalsService {
     public Section updateSection(long pid, Section newSection) {
         Proposal proposal = getProposalIfPresent(pid);
         Section section = getSectionIfPresent(pid, newSection.getId());
-        Utils.copyNonNullProperties((Object) newSection, (Object) section);
+        Utils.copyNonNullProperties(newSection, section);
         return sectionsRepository.save(section);
     }
 
@@ -161,7 +161,7 @@ public class ProposalsService {
     public Review updateReview(long pid, Review newReview) {
         Proposal proposal = getProposalIfPresent(pid);
         Review review = getReviewIfPresent(pid, newReview.getId());
-        Utils.copyNonNullProperties((Object) newReview, (Object) review);
+        Utils.copyNonNullProperties(newReview, review);
         return reviewsRepository.save(review);
     }
 
@@ -190,7 +190,7 @@ public class ProposalsService {
     public Comment updateComment(long pid, Comment newComent) {
         Proposal proposal = getProposalIfPresent(pid);
         Comment comment = proposalsRepository.getComment(pid, newComent.getId());
-        Utils.copyNonNullProperties((Object) newComent, (Object) comment);
+        Utils.copyNonNullProperties(newComent, comment);
         return commentsRepository.save(comment);
     }
 

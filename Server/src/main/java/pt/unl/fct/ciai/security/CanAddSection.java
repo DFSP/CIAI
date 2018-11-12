@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanModifyEmployee.Condition)
-public @interface CanDeleteEmployee {
-
+@PreAuthorize(CanAddSection.Condition)
+public @interface CanAddSection {
+    String Condition = "@SecurityService.isAuthorOfProposal(principal,#id)";
 }

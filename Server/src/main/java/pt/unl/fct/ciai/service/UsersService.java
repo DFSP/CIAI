@@ -36,7 +36,7 @@ public class UsersService {
 
     public void updateUser(User newUser) {
         User user = getUserIfPresent(newUser.getId());
-        Utils.copyNonNullProperties((Object) newUser, (Object) user);
+        Utils.copyNonNullProperties(newUser, user);
         usersRepository.save(user);
     }
 

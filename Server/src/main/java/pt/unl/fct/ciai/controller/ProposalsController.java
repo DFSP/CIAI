@@ -62,6 +62,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{id}")
+	// @CanReadProposal
 	public ResponseEntity<Resource<Proposal>> getProposal(@PathVariable("id") long id) {
 		Proposal proposal = getProposalIfPresent(id);
 		Resource<Proposal> resource = proposalAssembler.toResource(proposal);
@@ -69,6 +70,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{id}")
+	// @CanModifyProposal
 	public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal proposal) {
 		proposal.setId(id);
 		proposalsService.updateProposal(proposal);
@@ -76,12 +78,14 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{id}")
+	// @CanDeleteProposal
 	public ResponseEntity<?> deleteProposal(@PathVariable("id") long id) {
 		proposalsService.deleteProposal(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/{id}/sections")
+	// @CanReadSection
 	public ResponseEntity<Resources<Resource<Section>>> getSections(
 			@PathVariable("id") long id, @RequestParam(value="search", required = false) String search) {
 		Proposal proposal = getProposalIfPresent(id);
@@ -91,6 +95,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/sections")
+	// @CanAddSection
 	public ResponseEntity<Resource<Section>> addSection(@PathVariable("id") long id, @Valid @RequestBody Section section)
 			throws URISyntaxException {
 		Section newSection = proposalsService.addSection(id, section);
@@ -101,6 +106,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{pid}/sections/{sid}")
+	// @CanReadOneSection
 	public ResponseEntity<Resource<Section>> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		Section section = proposalsService.getSection(pid, sid).orElseThrow(() ->
 				new NotFoundException(String.format("Section id %d does not belong to proposal with id %d", sid, pid)));
@@ -109,6 +115,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/sections/{sid}")
+	// @CanModifySection
 	public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section section) {
 		section.setId(sid);
 		proposalsService.updateSection(pid, section);
@@ -116,6 +123,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/sections/{sid}")
+	// @CanDeleteSection
 	public ResponseEntity<?> deleteSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
 		proposalsService.deleteSection(pid, sid);
 		return ResponseEntity.noContent().build();
@@ -198,6 +206,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/reviews")
+	// @CanAddReview
 	public ResponseEntity<?> addReview(@PathVariable("id") long id, @Valid @RequestBody Review review)
 			throws URISyntaxException {
 		Review newReview = proposalsService.addReview(id, review);
@@ -216,6 +225,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/reviews/{rid}")
+	// @CanModifyReview
 	public ResponseEntity<?> updateReview(
 			@PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review review) {
 		review.setId(rid);
@@ -224,12 +234,14 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/reviews/{rid}")
+	// @CanDeleteReview
 	public ResponseEntity<?> deleteReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
 		proposalsService.deleteReview(pid, rid);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/{id}/comments")
+	// @CanReadComment
 	public ResponseEntity<Resources<Resource<Comment>>> getComments(
 			@PathVariable("id") long id, @RequestParam (value="search", required = false) String search) {
 		Proposal proposal = getProposalIfPresent(id);
@@ -239,6 +251,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/comments")
+	// @CanAddComment
 	public ResponseEntity<Resource<Comment>> addComment(@PathVariable("id") long id, @Valid @RequestBody Comment comment)
 			throws URISyntaxException {
 		Comment newComment = proposalsService.addComment(id, comment);
@@ -249,6 +262,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{pid}/comments/{cid}")
+	// @CanReadOneComment
 	public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		Comment comment = proposalsService.getComment(pid, cid).orElseThrow(() ->
 				new NotFoundException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid)));
@@ -257,6 +271,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PutMapping("/{pid}/comments/{cid}")
+	// @CanModifyComment
 	public ResponseEntity<?> updateComment(
 			@PathVariable("pid") long pid, @PathVariable("cid") long cid, @RequestBody Comment comment) {
 		comment.setId(cid);
@@ -265,6 +280,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/comments/{cid}")
+	// @CanDeleteComment
 	public ResponseEntity<?> deleteComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
 		proposalsService.deleteComment(pid, cid);
 		return ResponseEntity.noContent().build();
@@ -299,6 +315,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/biddings/{uid}")
+	// @CanDeleteBidding
 	public ResponseEntity<?> deleteReviewBidding(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
 		proposalsService.deleteReviewBidding(pid, uid);
 		return ResponseEntity.noContent().build();

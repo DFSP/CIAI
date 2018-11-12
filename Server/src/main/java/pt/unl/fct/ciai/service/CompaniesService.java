@@ -37,7 +37,7 @@ public class CompaniesService {
 
     public void updateCompany(Company newCompany) {
         Company company = getCompanyIfPresent(newCompany.getId());
-        Utils.copyNonNullProperties((Object) newCompany, (Object) company);
+        Utils.copyNonNullProperties(newCompany, company);
         companiesRepository.save(company);
     }
 
@@ -65,7 +65,7 @@ public class CompaniesService {
     public Employee updateEmployee(long cid, Employee newEmployee) {
         Company company = getCompanyIfPresent(cid);
         Employee employee = getEmployeeIfPresent(cid, newEmployee.getId());
-        Utils.copyNonNullProperties((Object) newEmployee, (Object) employee);
+        Utils.copyNonNullProperties(newEmployee, employee);
         return employeesRepository.save(employee);
     }
 

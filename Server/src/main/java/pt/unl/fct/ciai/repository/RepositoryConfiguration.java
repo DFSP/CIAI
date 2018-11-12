@@ -11,8 +11,11 @@ import javax.persistence.metamodel.Type;
 @Configuration
 public class RepositoryConfiguration extends RepositoryRestConfigurerAdapter {
 
-    @Autowired
     private EntityManager entityManager;
+
+    public RepositoryConfiguration(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
