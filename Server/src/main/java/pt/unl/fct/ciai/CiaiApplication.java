@@ -11,8 +11,6 @@ import org.springframework.hateoas.core.EvoInflectorRelProvider;
 @SpringBootApplication
 public class CiaiApplication {
 
-	//TODO adicionar application.properties ao repositorio bitbucket
-
 	public static void main(String[] args) {
 		SpringApplication.run(CiaiApplication.class, args);
 	}
