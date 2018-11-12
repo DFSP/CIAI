@@ -114,6 +114,11 @@ public class SecurityService {
     	return proposal.map(Proposal::isApproved).orElse(false);
     }
     
+    public boolean isProposalNotRejected(long id) {
+    	Optional<Proposal> proposal = proposals.findById(id);
+    	return proposal.isPresent() && !proposal.get().isRejected();
+    }
+    
     public boolean employeeIsMemberOfCompany(long cid, long eid) {
     	return companies.existsEmployee(cid, eid);
     }

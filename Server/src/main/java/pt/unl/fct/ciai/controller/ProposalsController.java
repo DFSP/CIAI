@@ -329,6 +329,7 @@ public class ProposalsController implements ProposalsApi {
     }
 
     @PostMapping("/{id}/biddings")
+    // @CanAddBidding
     public ResponseEntity<Resource<User>> addReviewBidding(@PathVariable("id") long id, @RequestBody User user)
             throws URISyntaxException {
         User newUser = proposalsService.addReviewBidding(id, user);
