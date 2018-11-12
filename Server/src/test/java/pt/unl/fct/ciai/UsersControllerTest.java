@@ -96,8 +96,8 @@ public class UsersControllerTest {
 				.email("jreis@email.com")
 				.role(User.Role.ROLE_COMPANY_ADMIN)
 				.password("password")
-				.addBidding(p1)
-				.addBidding(p2);
+				.addBid(p1)
+				.addBid(p2);
 	}
 
 	private User createLuisUser() {
@@ -354,7 +354,7 @@ public class UsersControllerTest {
 	public void testGetBiddings() throws Exception {
 		User joao = createJoaoUser();
 		Resource<User> joaoResource = userAssembler.toResource(joao);
-		Iterator<Proposal> it = joao.getBiddings().get().iterator();
+		Iterator<Proposal> it = joao.getBids().get().iterator();
 
 		Proposal bid1 = it.next();
 		Resource<Proposal> bid1Resource = proposalAssembler.toResource(bid1);
