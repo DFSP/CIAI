@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.Resources;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,8 @@ import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 
 @Component
-public class UserResourceAssembler implements ResourcesAssembler<User, Resource<User>>,
+public class UserResourcesAssembler implements ResourceAssembler<User, Resource<User>>,
+		ResourcesAssembler<User, Resource<User>>,
 		SubResourcesAssembler<User, Proposal, Resource<User>> {
 
 	@Override

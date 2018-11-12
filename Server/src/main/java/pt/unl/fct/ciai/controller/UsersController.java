@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.ciai.api.UsersApi;
 import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
-import pt.unl.fct.ciai.assembler.UserResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserResourcesAssembler;
+import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
@@ -23,11 +24,11 @@ public class UsersController implements UsersApi {
 
     private final UsersService usersService;
 
-    private final UserResourceAssembler userAssembler;
+    private final UserResourcesAssembler userAssembler;
     private final ProposalResourceAssembler proposalAssembler;
 
     public UsersController(UsersService usersService,
-                           UserResourceAssembler userAssembler, ProposalResourceAssembler proposalAssembler) {
+                           UserResourcesAssembler userAssembler, ProposalResourceAssembler proposalAssembler) {
         this.usersService = usersService;
         this.userAssembler = userAssembler;
         this.proposalAssembler = proposalAssembler;
@@ -42,6 +43,9 @@ public class UsersController implements UsersApi {
 
     @PostMapping
     public ResponseEntity<Resource<User>> addUser(@Valid @RequestBody User user) throws URISyntaxException {
+        if (user.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative user id, instead got %d", user.getId()));
+        }
         User newUser = usersService.addUser(user);
         Resource<User> resource = userAssembler.toResource(newUser);
         return ResponseEntity
@@ -59,7 +63,9 @@ public class UsersController implements UsersApi {
     @PutMapping("/{id}")
     // @CanModifyUser
     public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
-        user.setId(id);
+        if (id != user.getId()) {
+            throw new BadRequestException(String.format("Path id %d and user id %d don't match.", id, user.getId()));
+        }
         usersService.updateUser(user);
         return ResponseEntity.noContent().build();
     }
@@ -115,45 +121,4 @@ public class UsersController implements UsersApi {
                 new NotFoundException(String.format("User with id %d not found.", id)));
     }
 
-
-
-/*
-	@GetMapping("/{id}/approverInProposals")
-	public ResponseEntity<Resources<Resource<Proposal>>> getApproverInProposals(
-			@PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
-		User user = usersService.getUser(id).orElseThrow(() ->
-				new NotFoundException(String.format("User with id %d not found.", id)));
-		Iterable<Proposal> proposals = usersService.getApproverInProposals(id, search);
-		Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals); //TODO, user?
-		return ResponseEntity.ok(resources);
-	}
-
-	@PostMapping("/{id}/approverInProposals")
-	// @CanAddApprover
-	public ResponseEntity<Resource<Proposal>> addApproverInProposal(@PathVariable("id") long id,
-																	@RequestBody Proposal proposal)
-			throws URISyntaxException {
-		//TODO proposal must exist
-		Proposal updatedProposal = usersService.addApproverInProposal(id, proposal);
-		Resource<Proposal> resource = proposalAssembler.toResource(updatedProposal);
-		return ResponseEntity
-				.created(new URI(resource.getId().expand().getHref()))
-				.body(resource);
-	}
-
-	@GetMapping("/{uid}/approverInProposals/{pid}")
-	public ResponseEntity<Resource<Proposal>> getApproverInProposal(@PathVariable("uid") long uid,
-																	@PathVariable("pid") long pid) {
-		Proposal proposal = usersService.getApproverInProposal(uid, pid).orElseThrow(() ->
-				new BadRequestException(String.format("Proposal id %d is not being approved by user id %d", pid, uid)));
-		Resource<Proposal> resource = proposalAssembler.toResource(proposal);
-		return ResponseEntity.ok(resource);
-	}
-
-	@DeleteMapping("/{uid}/approverInProposals/{pid}")
-	// @CanDeleteApprover
-	public ResponseEntity<?> deleteApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
-		usersService.deleteApproverInProposal(uid, pid);
-		return ResponseEntity.noContent().build();
-	}*/
 }

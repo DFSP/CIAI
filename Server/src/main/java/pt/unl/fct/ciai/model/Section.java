@@ -20,9 +20,9 @@ public class Section {
     @NotEmpty
     private String description;
     @NotEmpty
-    private String goals; //TODO String[] se nao complicar muito as queries
+    private String goals;
     @NotEmpty
-    private String material; //TODO String[] se nao complicar muito as queries
+    private String material;
     @NotEmpty
     private String workPlan;
     @Min(0)

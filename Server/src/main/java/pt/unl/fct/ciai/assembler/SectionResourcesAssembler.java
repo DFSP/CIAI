@@ -3,7 +3,6 @@ package pt.unl.fct.ciai.assembler;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -19,7 +18,8 @@ import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.Section;
 
 @Component
-public class SectionResourceAssembler implements SubResourcesAssembler<Section, Proposal, Resource<Section>> {
+public class SectionResourcesAssembler implements ResourceAssembler<Section, Resource<Section>>,
+		SubResourcesAssembler<Section, Proposal, Resource<Section>> {
 
 	@Override
 	public Resource<Section> toResource(Section section) {

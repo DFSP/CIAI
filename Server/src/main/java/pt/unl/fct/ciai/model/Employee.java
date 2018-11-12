@@ -16,7 +16,6 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee extends User {
 
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Id @GeneratedValue
 	private long id;
 	@NotEmpty

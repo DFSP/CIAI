@@ -28,7 +28,6 @@ public class User {
         ROLE_SYS_ADMIN, ROLE_COMPANY_ADMIN, ROLE_PROPOSAL_APPROVER
     }
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id @GeneratedValue
     private long id;
     @NotEmpty

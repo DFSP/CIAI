@@ -15,33 +15,34 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.controller.UsersController;
-import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.model.Proposal;
+import pt.unl.fct.ciai.model.Review;
 
 @Component
-public class CommentResourceAssembler implements SubResourcesAssembler<Comment, Proposal, Resource<Comment>> {
+public class ReviewResourcesAssembler implements ResourceAssembler<Review, Resource<Review>>,
+		SubResourcesAssembler<Review, Proposal, Resource<Review>> {
 
 	@Override
-	public Resource<Comment> toResource(Comment comment) {
-		long cid = comment.getId();
-		long pid = comment.getProposal().getId();
-		long aid = comment.getAuthor().getId();
-		return new Resource<>(comment,
-				linkTo(methodOn(ProposalsController.class).getComment(pid, cid)).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getComments(pid, "")).withRel("comments"),
+	public Resource<Review> toResource(Review review) {
+		long rid = review.getId();
+		long pid = review.getProposal().getId();
+		long aid = review.getAuthor().getId();
+		return new Resource<>(review,
+				linkTo(methodOn(ProposalsController.class).getReview(pid, rid)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getReviews(pid, "")).withRel("reviews"),
 				linkTo(methodOn(UsersController.class).getUser(aid)).withRel("author"),
 				linkTo(methodOn(ProposalsController.class).getProposal(pid)).withRel("proposal"));
 	}
 
 	@Override
-	public Resources<Resource<Comment>> toResources(Iterable<? extends Comment> entities, Proposal proposal) {
+	public Resources<Resource<Review>> toResources(Iterable<? extends Review> entities, Proposal proposal) {
 		long cid = proposal.getId();
-		List<Resource<Comment>> comments = 
+		List<Resource<Review>> reviews = 
 				StreamSupport.stream(entities.spliterator(), false)
 				.map(this::toResource)
 				.collect(Collectors.toList());
-		return new Resources<>(comments,
-				linkTo(methodOn(ProposalsController.class).getComments(cid, "")).withSelfRel(),
+		return new Resources<>(reviews,
+				linkTo(methodOn(ProposalsController.class).getReviews(cid, "")).withSelfRel(),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

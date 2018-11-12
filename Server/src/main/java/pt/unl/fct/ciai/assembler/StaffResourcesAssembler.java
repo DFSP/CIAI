@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.controller.UsersController;
-import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 
@@ -18,15 +17,17 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
-public class StaffResourceAssembler implements SubResourcesAssembler<User, Proposal, Resource<User>> {
+public class StaffResourcesAssembler implements SubResourceAssembler<User, Proposal, Resource<User>>,
+        SubResourcesAssembler<User, Proposal, Resource<User>> {
 
     @Override
-    public Resource<User> toResource(User user) {
-        long id = user.getId();
+    public Resource<User> toResource(User user, Proposal proposal) {
+        long pid = proposal.getId();
+        long uid = user.getId();
         return new Resource<>(user,
-                linkTo(methodOn(UsersController.class).getUser(id)).withSelfRel(),
-                linkTo(methodOn(UsersController.class).getProposals(id, "")).withRel("proposals"),
-                linkTo(methodOn(UsersController.class).getBiddings(id, "")).withRel("biddings"));
+                linkTo(methodOn(ProposalsController.class).getStaff(pid, uid)).withSelfRel(),
+                linkTo(methodOn(UsersController.class).getProposals(uid, "")).withRel("proposals"),
+                linkTo(methodOn(UsersController.class).getBiddings(uid, "")).withRel("biddings"));
     }
 
     @Override
@@ -34,11 +35,10 @@ public class StaffResourceAssembler implements SubResourcesAssembler<User, Propo
         long pid = proposal.getId();
         List<Resource<User>> users =
                 StreamSupport.stream(entities.spliterator(), false)
-                        .map(this::toResource)
+                        .map(s -> this.toResource(s, proposal))
                         .collect(Collectors.toList());
         return new Resources<>(users,
                 linkTo(methodOn(ProposalsController.class).getStaff(pid, "")).withSelfRel(),
-                linkTo(methodOn(ProposalsController.class).getReviewBiddings(pid, "")).withRel("biddings"),
                 linkTo(methodOn(RootController.class).root()).withRel("root"));
     }
 

@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
-import pt.unl.fct.ciai.assembler.EmployeeResourceAssembler;
+import pt.unl.fct.ciai.assembler.EmployeeResourcesAssembler;
 import pt.unl.fct.ciai.controller.CompaniesController;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
@@ -38,7 +38,7 @@ import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = CompaniesController.class, secure = false)
-@Import({CompanyResourceAssembler.class, EmployeeResourceAssembler.class})
+@Import({CompanyResourceAssembler.class, EmployeeResourcesAssembler.class})
 public class CompaniesControllerTest {
 
 	@Autowired
@@ -52,7 +52,7 @@ public class CompaniesControllerTest {
 	@Autowired
 	private CompanyResourceAssembler companyAssembler;
 	@Autowired
-	private EmployeeResourceAssembler employeeAssembler;
+	private EmployeeResourcesAssembler employeeAssembler;
 	private final ObjectMapper objectMapper;
 
 	private static final String ROOT = "http://localhost";
@@ -528,7 +528,6 @@ public class CompaniesControllerTest {
 
 	@Test
 	public void testUpdateEmployee() throws Exception {
-		//TODO gerar company a partir do json para nao perder os jsonproperties write only
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		Employee firstEmployee = fct.getEmployees().get().iterator().next();

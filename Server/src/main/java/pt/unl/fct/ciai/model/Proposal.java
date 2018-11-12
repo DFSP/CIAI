@@ -195,7 +195,7 @@ public class Proposal {
 			throw new IllegalArgumentException(
 					String.format("Proposal %d doesn't have a section %d", getId(), section.getId()));
 		}
-		sections.add(section); //TODO global vs local
+		sections.add(section);
 		return this;
 	}
 
@@ -284,7 +284,7 @@ public class Proposal {
 			throw new IllegalArgumentException(
 					String.format("Proposal %d doesn't have a review %d", getId(), review.getId()));
 		}
-		reviews.add(review); //TODO verificar se mudança local tambem afeta o global
+		reviews.add(review);
 		return this;
 	}
 
@@ -321,7 +321,7 @@ public class Proposal {
 			throw new IllegalArgumentException(
 					String.format("Proposal %d doesn't have a comment %d", getId(), comment.getId()));
 		}
-		comments.add(comment); //TODO verificar se mudança local tambem afeta o global
+		comments.add(comment);
 		return this;
 	}
 
@@ -358,7 +358,7 @@ public class Proposal {
 			throw new IllegalArgumentException(
 					String.format("Proposal %d doesn't have a bidding of user %d", getId(), bidding.getUsername()));
 		}
-		biddings.add(bidding); //TODO verificar se mudança local tambem afeta o global
+		biddings.add(bidding);
 		return this;
 	}
 

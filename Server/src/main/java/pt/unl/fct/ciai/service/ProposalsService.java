@@ -12,18 +12,18 @@ import java.util.Optional;
 public class ProposalsService {
 
     private final ProposalsRepository proposalsRepository;
-    private final UsersRepository staffRepository;
-    private final EmployeesRepository membersRepository;
+    private final UsersRepository usersRepository;
+    private final EmployeesRepository employeesRepository;
     private final SectionsRepository sectionsRepository;
     private final ReviewsRepository reviewsRepository;
     private final CommentsRepository commentsRepository;
 
-    public ProposalsService(ProposalsRepository proposalsRepository, UsersRepository staffRepository,
-                            EmployeesRepository membersRepository, SectionsRepository sectionsRepository,
+    public ProposalsService(ProposalsRepository proposalsRepository, UsersRepository usersRepository,
+                            EmployeesRepository employeesRepository, SectionsRepository sectionsRepository,
                             ReviewsRepository reviewsRepository, CommentsRepository commentsRepository) {
         this.proposalsRepository = proposalsRepository;
-        this.staffRepository = staffRepository;
-        this.membersRepository = membersRepository;
+        this.usersRepository = usersRepository;
+        this.employeesRepository = employeesRepository;
         this.sectionsRepository = sectionsRepository;
         this.reviewsRepository = reviewsRepository;
         this.commentsRepository = commentsRepository;
@@ -90,12 +90,13 @@ public class ProposalsService {
                 proposalsRepository.searchStaff(id, search);
     }
 
-    public User addStaff(long pid, User user) {
+    public User addStaff(long pid, User staff) {
         Proposal proposal = getProposalIfPresent(pid);
+        User user = getUserIfPresent(staff.getId());
         proposal.addStaff(user);
-        proposalsRepository.save(proposal); //TODO verificar se é preciso tambem guardar a proposal
+        proposalsRepository.save(proposal);
         user.addProposal(proposal);
-        return staffRepository.save(user);
+        return usersRepository.save(user);
     }
 
     public Optional<User> getStaff(long pid, long uid) {
@@ -107,9 +108,9 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         User staff = getStaffIfPresent(pid, uid);
         proposal.removeStaff(staff);
-        proposalsRepository.save(proposal); //TODO ver se algum dos saves não é necessário
+        proposalsRepository.save(proposal);
         staff.removeProposal(proposal);
-        staffRepository.save(staff);
+        usersRepository.save(staff);
     }
 
     public Iterable<Employee> getMembers(long id, String search) {
@@ -120,10 +121,11 @@ public class ProposalsService {
 
     public Employee addMember(long pid, Employee member) {
         Proposal proposal = getProposalIfPresent(pid);
-        proposal.addMember(member);
-        proposalsRepository.save(proposal); //TODO verificar se é preciso tambem guardar a proposal
-        member.addProposal(proposal);
-        return membersRepository.save(member);
+        Employee employee = getEmployeeIfPresent(member.getId());
+        proposal.addMember(employee);
+        proposalsRepository.save(proposal);
+        employee.addProposal(proposal);
+        return employeesRepository.save(employee);
     }
 
     public Optional<Employee> getMember(long pid, long mid) {
@@ -135,9 +137,9 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         Employee member = getMemberIfPresent(pid, mid);
         proposal.removeMember(member);
-        proposalsRepository.save(proposal); //TODO ver se algum dos saves não é necessário
+        proposalsRepository.save(proposal);
         member.removeProposal(proposal);
-        membersRepository.save(member);
+        employeesRepository.save(member);
     }
 
     public Iterable<Review> getReviews(long id, String search) {
@@ -204,11 +206,13 @@ public class ProposalsService {
                 proposalsRepository.searchReviewBiddings(pid, search);
     }
 
-    public User addReviewBidding(long pid, User user) {
+    public User addReviewBidding(long pid, User bidding) {
         Proposal proposal = getProposalIfPresent(pid);
-        //TODO user tem que existir no sistema
+        User user = getUserIfPresent(bidding.getId());
+        proposal.addReviewBidding(user);
+        proposalsRepository.save(proposal);
         user.addBidding(proposal);
-        return staffRepository.save(user);
+        return usersRepository.save(user);
     }
 
     public Optional<User> getReviewBidding(long pid, long uid) {
@@ -219,9 +223,9 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         User user = getBiddingIfPresent(pid, uid);
         proposal.removeReviewBidding(user);
-        proposalsRepository.save(proposal); //TODO ver qual destes não é necessário
+        proposalsRepository.save(proposal);
         user.removeBidding(proposal);
-        staffRepository.save(user);
+        usersRepository.save(user);
     }
 
     private Proposal getProposalIfPresent(long id) {
@@ -243,6 +247,20 @@ public class ProposalsService {
                 .orElseThrow(() ->
                         new NotFoundException(
                                 String.format("Member with id %d is not part of proposal with id %d.", mid, pid)));
+    }
+
+    private User getUserIfPresent(long uid) {
+        return usersRepository.findById(uid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("User with id %d not found.", uid)));
+    }
+
+    private Employee getEmployeeIfPresent(long eid) {
+        return employeesRepository.findById(eid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Employee with id %d not found.", eid)));
     }
 
     private Section getSectionIfPresent(long pid, long sid) {
@@ -272,4 +290,5 @@ public class ProposalsService {
                         new NotFoundException(
                                 String.format("Bidding with id %d doesn't belong to proposal with id %d.", uid, pid)));
     }
+
 }

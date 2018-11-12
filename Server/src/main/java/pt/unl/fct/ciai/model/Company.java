@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Company {
 
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Id @GeneratedValue
 	private long id;
 	@NotEmpty
@@ -177,7 +176,7 @@ public class Company {
 			throw new IllegalArgumentException(
 					String.format("Company %d doesn't have an employee %d", getId(), employee.getId()));
 		}
-		employees.add(employee); //TODO verificar se mudança local tambem afeta o global
+		employees.add(employee);
 		return this;
 	}
 

@@ -13,7 +13,7 @@ import pt.unl.fct.ciai.api.CompaniesApi;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
-import pt.unl.fct.ciai.assembler.EmployeeResourceAssembler;
+import pt.unl.fct.ciai.assembler.EmployeeResourcesAssembler;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.security.CanAddCompany;
 import pt.unl.fct.ciai.security.CanDeleteCompany;
@@ -28,10 +28,10 @@ public class CompaniesController implements CompaniesApi {
 	private final CompaniesService companiesService;
 
 	private final CompanyResourceAssembler companyAssembler;
-	private final EmployeeResourceAssembler employeeAssembler;
+	private final EmployeeResourcesAssembler employeeAssembler;
 
 	public CompaniesController(CompaniesService companiesService,
-							   CompanyResourceAssembler companyAssembler, EmployeeResourceAssembler employeeAssembler) {
+                               CompanyResourceAssembler companyAssembler, EmployeeResourcesAssembler employeeAssembler) {
 		this.companiesService = companiesService;
 		this.companyAssembler = companyAssembler;
 		this.employeeAssembler = employeeAssembler;

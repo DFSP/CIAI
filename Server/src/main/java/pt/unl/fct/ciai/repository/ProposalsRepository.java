@@ -102,7 +102,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.staff u "
             + "WHERE p.id = :pid AND u.id = :uid"
     )
-    User getStaff(@Param(value = "pid") long pid, @Param(value = "uid") long uid); //TODO mudar para getStaff
+    User getStaff(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
 
 
     @Query("SELECT CASE WHEN s IS NOT NULL THEN TRUE ELSE FALSE END " +

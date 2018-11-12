@@ -19,7 +19,6 @@ public class Utils {
                 field.setAccessible(true);
                 try {
                     Object attribute = field.get(source);
-                    System.out.println(attribute);
                     if (attribute == null) {
                         ignoreProperties.add(field.getName());
                     }

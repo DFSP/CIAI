@@ -5,8 +5,8 @@ import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 
-public interface ResourcesAssembler<T, D extends ResourceSupport> {
+public interface SubResourceAssembler<T, E, D extends ResourceSupport> {
 
-		Resources<D> toResources(Iterable<? extends T> entities);
+    D toResource(T subEntity, E entity);
 
 }

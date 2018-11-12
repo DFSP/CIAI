@@ -35,9 +35,9 @@ import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ProposalsController.class, secure = false)
-@Import({ProposalResourceAssembler.class, SectionResourceAssembler.class,
-	ReviewResourceAssembler.class, CommentResourceAssembler.class,
-	UserResourceAssembler.class})
+@Import({ProposalResourceAssembler.class, SectionResourcesAssembler.class,
+	ReviewResourcesAssembler.class, CommentResourcesAssembler.class,
+	UserResourcesAssembler.class})
 public class ProposalsControllerTest {
 
 	@Autowired
@@ -55,13 +55,13 @@ public class ProposalsControllerTest {
 	@Autowired
 	private ProposalResourceAssembler proposalAssembler;
 	@Autowired
-	private SectionResourceAssembler sectionAssembler;
+	private SectionResourcesAssembler sectionAssembler;
 	@Autowired
-	private ReviewResourceAssembler reviewAssembler;
+	private ReviewResourcesAssembler reviewAssembler;
 	@Autowired
-	private CommentResourceAssembler commentAssembler;
+	private CommentResourcesAssembler commentAssembler;
 	@Autowired
-	private UserResourceAssembler userAssembler;
+	private UserResourcesAssembler userAssembler;
 	private final ObjectMapper objectMapper;
 
 	private static final String ROOT = "http://localhost";

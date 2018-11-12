@@ -17,7 +17,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MyUserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
-    
+
     public WebSecurityConfig(MyUserDetailsService userDetailsService, PasswordEncoder encoder) {
         this.userDetailsService = userDetailsService;
         this.encoder = encoder;
@@ -25,10 +25,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http    //TODO
+        http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/hello/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().permitAll()

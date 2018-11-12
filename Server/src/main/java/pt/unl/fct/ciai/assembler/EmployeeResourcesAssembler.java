@@ -13,14 +13,13 @@ import org.springframework.hateoas.Resources;
 import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.CompaniesController;
-import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
-import pt.unl.fct.ciai.model.Proposal;
 
 @Component
-public class EmployeeResourceAssembler implements SubResourcesAssembler<Employee, Company, Resource<Employee>> {
+public class EmployeeResourcesAssembler implements ResourceAssembler<Employee, Resource<Employee>>,
+		SubResourcesAssembler<Employee, Company, Resource<Employee>> {
 
 	@Override
 	public Resource<Employee> toResource(Employee employee) {

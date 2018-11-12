@@ -35,7 +35,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
-import pt.unl.fct.ciai.assembler.UserResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserResourcesAssembler;
 import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
@@ -45,10 +45,10 @@ import pt.unl.fct.ciai.service.UsersService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = UsersController.class, secure = false)
-@Import({UserResourceAssembler.class, ProposalResourceAssembler.class})
+@Import({UserResourcesAssembler.class, ProposalResourceAssembler.class})
 public class UsersControllerTest {
 
-	//TODO segurança
+	//TODO testes segurança
 
 	@Autowired
 	private MockMvc mvc;
@@ -57,7 +57,7 @@ public class UsersControllerTest {
 	@MockBean
 	private ProposalsService proposalsService;
 	@Autowired
-	private UserResourceAssembler userAssembler;
+	private UserResourcesAssembler userAssembler;
 	@Autowired
 	private ProposalResourceAssembler proposalAssembler;
 	private final ObjectMapper objectMapper;

@@ -12,6 +12,7 @@ import org.springframework.hateoas.core.EvoInflectorRelProvider;
 public class CiaiApplication {
 
 	//TODO adicionar application.properties ao repositorio bitbucket
+//TODO adicionar badrequests aos puts (path != id) e posts (id > 0)
 
 	public static void main(String[] args) {
 		SpringApplication.run(CiaiApplication.class, args);
