@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 
-//@RestController
+@RestController
 @RequestMapping(value = "/", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class RootController {
 

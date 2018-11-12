@@ -35,10 +35,10 @@ public class CompaniesService {
         return companiesRepository.findById(id);
     }
 
-    public void updateCompany(Company newCompany) {
+    public Company updateCompany(Company newCompany) {
         Company company = getCompanyIfPresent(newCompany.getId());
         Utils.copyNonNullProperties(newCompany, company);
-        companiesRepository.save(company);
+        return companiesRepository.save(company);
     }
 
     public void deleteCompany(long id) {

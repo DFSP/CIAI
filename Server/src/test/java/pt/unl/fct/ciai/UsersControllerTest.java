@@ -50,15 +50,11 @@ import pt.unl.fct.ciai.service.UsersService;
 @WebMvcTest(controllers = UsersController.class, secure = false)
 @Import({UserResourcesAssembler.class, UserProposalResourceAssembler.class, BidProposalResourceAssembler.class})
 public class UsersControllerTest {
-
-	//TODO testes segurança
-
+	
 	@Autowired
 	private MockMvc mvc;
 	@MockBean
 	private UsersService usersService;
-	@MockBean
-	private ProposalsService proposalsService;
 	@Autowired
 	private UserResourcesAssembler userAssembler;
 	@Autowired

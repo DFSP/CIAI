@@ -27,6 +27,7 @@ public class SectionResourcesAssembler implements ResourceAssembler<Section, Res
 		long pid = section.getProposal().getId();
 		return new Resource<>(section,
 				linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getProposal(pid)).withRel("proposal"),
 				linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));
 	}
 

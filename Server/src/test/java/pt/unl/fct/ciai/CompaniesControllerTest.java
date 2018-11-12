@@ -24,6 +24,7 @@ import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.repository.CompaniesRepository;
 import pt.unl.fct.ciai.repository.EmployeesRepository;
+import pt.unl.fct.ciai.service.CompaniesService;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.*;
@@ -43,12 +44,9 @@ public class CompaniesControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
-//	@Autowired
-//	private CompaniesController companiesController;
+
 	@MockBean
-	private CompaniesRepository companiesRepository;
-	@MockBean
-	private EmployeesRepository employeesRepository;
+	private CompaniesService companiesService;
 	@Autowired
 	private CompanyResourceAssembler companyAssembler;
 	@Autowired
@@ -186,7 +184,7 @@ public class CompaniesControllerTest {
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		Resource<Company> istResource = companyAssembler.toResource(ist);
 		
-		given(companiesRepository.findAll()).willReturn(Arrays.asList(fct, ist));
+		given(companiesService.getCompanies("")).willReturn(Arrays.asList(fct, ist));
 
 		String href = fctResource.getLink("companies").getHref();
 		mvc.perform(get(href))
@@ -219,18 +217,22 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 		.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(companiesRepository, times(1)).findAll();
+		verify(companiesService, times(1)).getCompanies("");
 	}
 
 	@Test
 	public void testAddCompany() throws Exception {
 		Company iscte = createISCTECompany();
+		iscte.setId(0);
 		Resource<Company> iscteResource = companyAssembler.toResource(iscte);
 
-		given(companiesRepository.save(iscte)).willReturn(iscte);
-		given(companiesRepository.findById(iscte.getId())).willReturn(Optional.of(iscte));
+		given(companiesService.getCompany(iscte.getId())).willReturn(Optional.of(iscte));
+		given(companiesService.addCompany(iscte)).willReturn(iscte);
 
-		String json = objectMapper.writeValueAsString(iscte);
+		String json = "{\"name\":\"ISCTE\",\"city\":\"Lisboa\",\"zipCode\":\"1649-026\"," +
+				"\"address\":\"Av. das Forças Armadas\",\"phone\":\"+351 210464014\"," +
+				"\"email\":\"iscte@email.pt\",\"fax\":\"+351 217964710\"}";
+		System.out.println(json);
 		mvc.perform(post(iscteResource.getLink("companies").getHref())
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -250,11 +252,11 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._links.companies.href", is(ROOT + iscteResource.getLink("companies").getHref())))
 		.andExpect(jsonPath("$._links.employees.href", is(ROOT + iscteResource.getLink("employees").getHref())));
 
-		verify(companiesRepository, times(1)).save(iscte);
+		verify(companiesService, times(1)).addCompany(iscte);
 
 		performGet(iscte);
 
-		verify(companiesRepository, times(1)).findById(iscte.getId());
+		verify(companiesService, times(1)).getCompany(iscte.getId());
 	}
 
 	@Test
@@ -262,11 +264,11 @@ public class CompaniesControllerTest {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
 		performGet(fct);
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getCompany(fct.getId());
 	}
 
 	@Test
@@ -274,14 +276,13 @@ public class CompaniesControllerTest {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
 		performGet(fct);
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getCompany(fct.getId());
 
-		given(companiesRepository.save(fct)).willReturn(fct);
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 		
 		fct.setEmail("fct.unl@email.pt");
 		String json = objectMapper.writeValueAsString(fct);
@@ -291,12 +292,11 @@ public class CompaniesControllerTest {
 				.content(json))
 		.andExpect(status().isNoContent());
 
-		verify(companiesRepository, times(1)).save(fct);
-		verify(companiesRepository, times(2)).findById(fct.getId());
+		verify(companiesService, times(1)).updateCompany(fct);
 
 		performGet(fct);
 
-		verify(companiesRepository, times(3)).findById(fct.getId());
+		verify(companiesService, times(2)).getCompany(fct.getId());
 	}
 
 	@Test
@@ -304,14 +304,13 @@ public class CompaniesControllerTest {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
 		performGet(fct);
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getCompany(fct.getId());
 
-		given(companiesRepository.save(fct)).willReturn(fct);
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
 		fct.setEmail("fct.unl@email.pt");
 		fct.setId(2);
@@ -328,9 +327,9 @@ public class CompaniesControllerTest {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 
-		when(companiesRepository.findById(fct.getId()))
+		when(companiesService.getCompany(fct.getId()))
 		.thenReturn(Optional.of(fct))
-		.thenReturn(Optional.ofNullable(null));
+		.thenReturn(Optional.empty());
 
 		String href = fctResource.getLink("self").getHref();
 		
@@ -338,18 +337,17 @@ public class CompaniesControllerTest {
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.name", is(fct.getName())));
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getCompany(fct.getId());
 
 		mvc.perform(delete(href))
 		.andExpect(status().isNoContent());
 
-		verify(companiesRepository, times(2)).findById(fct.getId());
-		verify(companiesRepository, times(1)).delete(fct);
+		verify(companiesService, times(1)).deleteCompany(fct.getId());
 
 		mvc.perform(get(href))
 		.andExpect(status().isNotFound());
 
-		verify(companiesRepository, times(3)).findById(fct.getId());
+		verify(companiesService, times(2)).getCompany(fct.getId());
 	}
 
 	@Test
@@ -368,8 +366,8 @@ public class CompaniesControllerTest {
 		Employee daniel = it.next();
 		Resource<Employee> danielResource = employeeAssembler.toResource(daniel);
 		
-		given(companiesRepository.findById(fct.getId()))
-		.willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getEmployees(fct.getId(), "")).willReturn(fct.getEmployees().get());
 
 		String href = fctResource.getLink("employees").getHref();
 		mvc.perform(get(href))
@@ -383,15 +381,14 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.employees[0].lastName", is(joao.getLastName())))
 		.andExpect(jsonPath("$._embedded.employees[0].username", is(joao.getUsername())))
 		.andExpect(jsonPath("$._embedded.employees[0].email", is(joao.getEmail())))
-		.andExpect(jsonPath("$._embedded.employees[0].role", is(joao.getRole())))
+		.andExpect(jsonPath("$._embedded.employees[0].role", is(joao.getRole().name())))
 		.andExpect(jsonPath("$._embedded.employees[0].city", is(joao.getCity())))
 		.andExpect(jsonPath("$._embedded.employees[0].address", is(joao.getAddress())))
 		.andExpect(jsonPath("$._embedded.employees[0].zipCode", is(joao.getZipCode())))
 		.andExpect(jsonPath("$._embedded.employees[0].cellPhone", is(joao.getCellPhone())))
 		.andExpect(jsonPath("$._embedded.employees[0].homePhone", is(joao.getHomePhone())))
-		.andExpect(jsonPath("$._embedded.employees[0].gender", is(joao.getGender())))
+		.andExpect(jsonPath("$._embedded.employees[0].gender", is(joao.getGender().name())))
 		.andExpect(jsonPath("$._embedded.employees[0].salary", is(joao.getSalary())))
-		.andExpect(jsonPath("$._embedded.employees[0].birthday", is(joao.getBirthday())))
 		.andExpect(jsonPath("$._embedded.employees[0]._links.self.href", is(ROOT + joaoResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.employees[0]._links.employees.href", is(ROOT + joaoResource.getLink("employees").getHref())))
 
@@ -400,15 +397,14 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.employees[1].lastName", is(luis.getLastName())))
 		.andExpect(jsonPath("$._embedded.employees[1].username", is(luis.getUsername())))
 		.andExpect(jsonPath("$._embedded.employees[1].email", is(luis.getEmail())))
-		.andExpect(jsonPath("$._embedded.employees[1].role", is(luis.getRole())))
+		.andExpect(jsonPath("$._embedded.employees[1].role", is(luis.getRole().name())))
 		.andExpect(jsonPath("$._embedded.employees[1].city", is(luis.getCity())))
 		.andExpect(jsonPath("$._embedded.employees[1].address", is(luis.getAddress())))
 		.andExpect(jsonPath("$._embedded.employees[1].zipCode", is(luis.getZipCode())))
 		.andExpect(jsonPath("$._embedded.employees[1].cellPhone", is(luis.getCellPhone())))
 		.andExpect(jsonPath("$._embedded.employees[1].homePhone", is(luis.getHomePhone())))
-		.andExpect(jsonPath("$._embedded.employees[1].gender", is(luis.getGender())))
+		.andExpect(jsonPath("$._embedded.employees[1].gender", is(luis.getGender().name())))
 		.andExpect(jsonPath("$._embedded.employees[1].salary", is(luis.getSalary())))
-		.andExpect(jsonPath("$._embedded.employees[1].birthday", is(luis.getBirthday())))
 		.andExpect(jsonPath("$._embedded.employees[1]._links.self.href", is(ROOT + luisResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.employees[1]._links.employees.href", is(ROOT + luisResource.getLink("employees").getHref())))
 
@@ -417,29 +413,29 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$._embedded.employees[2].lastName", is(daniel.getLastName())))
 		.andExpect(jsonPath("$._embedded.employees[2].username", is(daniel.getUsername())))
 		.andExpect(jsonPath("$._embedded.employees[2].email", is(daniel.getEmail())))
-		.andExpect(jsonPath("$._embedded.employees[2].role", is(daniel.getRole())))
+		.andExpect(jsonPath("$._embedded.employees[2].role", is(daniel.getRole().name())))
 		.andExpect(jsonPath("$._embedded.employees[2].city", is(daniel.getCity())))
 		.andExpect(jsonPath("$._embedded.employees[2].address", is(daniel.getAddress())))
 		.andExpect(jsonPath("$._embedded.employees[2].zipCode", is(daniel.getZipCode())))
 		.andExpect(jsonPath("$._embedded.employees[2].cellPhone", is(daniel.getCellPhone())))
 		.andExpect(jsonPath("$._embedded.employees[2].homePhone", is(daniel.getHomePhone())))
-		.andExpect(jsonPath("$._embedded.employees[2].gender", is(daniel.getGender())))
+		.andExpect(jsonPath("$._embedded.employees[2].gender", is(daniel.getGender().name())))
 		.andExpect(jsonPath("$._embedded.employees[2].salary", is(daniel.getSalary())))
-		.andExpect(jsonPath("$._embedded.employees[2].birthday", is(daniel.getBirthday())))
 		.andExpect(jsonPath("$._embedded.employees[2]._links.self.href", is(ROOT + danielResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.employees[2]._links.employees.href", is(ROOT + danielResource.getLink("employees").getHref())))
 
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + href)));
 
-		verify(companiesRepository, times(1)).findById(fct.getId());	
+		verify(companiesService, times(1)).getEmployees(fct.getId(), "");
 	}
 
 	@Test
 	public void testAddEmployee() throws Exception {	
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
-		
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getEmployees(fct.getId(), "")).willReturn(fct.getEmployees().get());
 
 		String href = fctResource.getLink("employees").getHref();
 		mvc.perform(get(href))
@@ -448,10 +444,9 @@ public class CompaniesControllerTest {
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$._embedded.employees", hasSize(3)));
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getEmployees(fct.getId(), "");
 		
-		Employee andre = new Employee();	
-		andre.setId(4L);
+		Employee andre = new Employee();
 		andre.setFirstName("Andre");
 		andre.setLastName("Oliveira");
 		andre.setUsername("aoliveira");
@@ -468,11 +463,16 @@ public class CompaniesControllerTest {
 		andre.setCompany(fct);
 		Resource<Employee> andreResource = employeeAssembler.toResource(andre);
 		
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
-		when(companiesRepository.save(fct)).thenReturn(fct);
-		when(employeesRepository.save(andre)).thenReturn(andre);
-		
-		String json = objectMapper.writeValueAsString(andre);
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
+		when(companiesService.addEmployee(fct.getId(), andre)).thenReturn(andre);
+
+		String json = "{\"firstName\":\"Andre\",\"lastName\":\"Oliveira\",\"username\":\"aoliveira\"," +
+				"\"password\":\"password\",\"email\":\"aoliveira@email.com\",\"role\":null,\"city\":\"Lisboa\"," +
+				"\"address\":\"Lisboa\",\"zipCode\":\"4322-939\",\"cellPhone\":\"+351 916785678\"," +
+				"\"homePhone\":\"+351 212117922\",\"gender\":\"MALE\",\"salary\":1250.0,\"birthday\":1542060894866}," +
+				"\"company\":{\"id\":1,\"name\":\"FCT\",\"city\":\"Almada\",\"zipCode\":\"2825-149\"," +
+				"\"address\":\"Calçada de Alfazina 2\",\"phone\":\"+351 212948300\",\"email\":\"fct@email.pt\"," +
+				"\"fax\":\"+351 212954461\"}}";
 		mvc.perform(post(href)
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -491,23 +491,23 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$.zipCode", is(andre.getZipCode())))
 		.andExpect(jsonPath("$.cellPhone", is(andre.getCellPhone())))
 		.andExpect(jsonPath("$.homePhone", is(andre.getHomePhone())))
-		.andExpect(jsonPath("$.gender", is(andre.getGender())))
+		.andExpect(jsonPath("$.gender", is(andre.getGender().name())))
 		.andExpect(jsonPath("$.salary", is(andre.getSalary())))
-		.andExpect(jsonPath("$.birthday", is(andre.getBirthday())))
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + andreResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._links.employees.href", is(ROOT + href)));
-		
-		verify(companiesRepository, times(2)).findById(fct.getId());
-		verify(companiesRepository, times(1)).save(fct);
-		verify(employeesRepository, times(1)).save(andre);
-		
+
+		verify(companiesService, times(1)).addEmployee(fct.getId(), andre);
+
+
+		given(companiesService.getEmployees(fct.getId(), "")).willReturn(fct.addEmployee(andre).getEmployees().get());
+
 		mvc.perform(get(href))
 		.andExpect(status().isOk())
 		.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 		.andExpect(jsonPath("$._embedded.employees", hasSize(4)));
 		
-		verify(companiesRepository, times(3)).findById(fct.getId());
+		verify(companiesService, times(2)).getEmployees(fct.getId(), "");
 	}
 
 	@Test
@@ -516,14 +516,12 @@ public class CompaniesControllerTest {
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		Employee firstEmployee = fct.getEmployees().get().iterator().next();
 		Resource<Employee> firstEmployeeResource = employeeAssembler.toResource(firstEmployee);
-		
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
-		given(employeesRepository.findById(firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
+
+		given(companiesService.getEmployee(fct.getId(), firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
 		
 		performGet(firstEmployee);
-		
-		verify(companiesRepository, times(1)).findById(fct.getId());	
-		verify(employeesRepository, times(1)).findById(firstEmployee.getId());
+
+		verify(companiesService, times(1)).getEmployee(fct.getId(), firstEmployee.getId());
 	}
 
 	@Test
@@ -534,17 +532,15 @@ public class CompaniesControllerTest {
 		Resource<Employee> firstEmployeeResource = employeeAssembler.toResource(firstEmployee);
 		String href = firstEmployeeResource.getLink("self").getHref();
 
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
-		given(employeesRepository.findById(firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
+		given(companiesService.getEmployee(fct.getId(), firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
 
 		performGet(firstEmployee);
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
-		verify(employeesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getEmployee(fct.getId(), firstEmployee.getId());
 
-		given(employeesRepository.save(firstEmployee)).willReturn(firstEmployee);
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
-		given(employeesRepository.findById(firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
+		given(companiesService.updateEmployee(fct.getId(), firstEmployee)).willReturn(firstEmployee);
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getEmployee(fct.getId(), firstEmployee.getId())).willReturn(Optional.of(firstEmployee));
 		
 		firstEmployee.setEmail("outroemail.pt");
 		String json = objectMapper.writeValueAsString(firstEmployee);
@@ -554,14 +550,11 @@ public class CompaniesControllerTest {
 				.content(json))
 		.andExpect(status().isNoContent());
 
-		verify(employeesRepository, times(1)).save(firstEmployee);
-		verify(companiesRepository, times(2)).findById(fct.getId());
-		verify(employeesRepository, times(2)).findById(firstEmployee.getId());
+		verify(companiesService, times(1)).updateEmployee(fct.getId(), firstEmployee);
 
 		performGet(firstEmployee);
 
-		verify(companiesRepository, times(3)).findById(fct.getId());
-		verify(employeesRepository, times(3)).findById(firstEmployee.getId());
+		verify(companiesService, times(2)).getEmployee(fct.getId(), firstEmployee.getId());
 	}
 
 	@Test
@@ -570,31 +563,25 @@ public class CompaniesControllerTest {
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		Employee firstEmployee = fct.getEmployees().get().iterator().next();
 		String href = employeeAssembler.toResource(firstEmployee).getLink("self").getHref();
-		
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
-		
-		when(employeesRepository.findById(firstEmployee.getId()))
-		.thenReturn(Optional.of(firstEmployee))
-		.thenReturn(Optional.of(firstEmployee))
-		.thenReturn(Optional.ofNullable(null));
-		
+
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
+		when(companiesService.getEmployee(fct.getId(), firstEmployee.getId()))
+				.thenReturn(Optional.of(firstEmployee))
+				.thenReturn(Optional.empty());
+
 		performGet(firstEmployee);
-		
-		verify(companiesRepository, times(1)).findById(fct.getId());
-		verify(employeesRepository, times(1)).findById(firstEmployee.getId());
+
+		verify(companiesService, times(1)).getEmployee(fct.getId(), firstEmployee.getId());
 
 		mvc.perform(delete(href))
 		.andExpect(status().isNoContent());
 
-		verify(companiesRepository, times(2)).findById(fct.getId());
-		verify(employeesRepository, times(2)).findById(firstEmployee.getId());
-		verify(employeesRepository, times(1)).delete(firstEmployee);
+		verify(companiesService, times(1)).deleteEmployee(fct.getId(), firstEmployee.getId());
 
 		mvc.perform(get(href))
 		.andExpect(status().isNotFound());
 
-		verify(companiesRepository, times(3)).findById(fct.getId());
-		verify(employeesRepository, times(3)).findById(firstEmployee.getId());
+		verify(companiesService, times(2)).getEmployee(fct.getId(), firstEmployee.getId());
 	}
 
 	@Test
@@ -602,12 +589,12 @@ public class CompaniesControllerTest {
 		Company fct = createFCTCompany();
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
-		mvc.perform(get("http://localhost/partners/2"))
+		mvc.perform(get("http://localhost/companies/999"))
 		.andExpect(status().isNotFound());
 
-		verify(companiesRepository, times(1)).findById(2L);
+		verify(companiesService, times(1)).getCompany(999);
 	}
 	
 	@Test
@@ -616,14 +603,14 @@ public class CompaniesControllerTest {
 		Resource<Company> fctResource = companyAssembler.toResource(fct);
 		String href = fctResource.getLink("self").getHref();
 
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
 		performGet(fct);
 
-		verify(companiesRepository, times(1)).findById(fct.getId());
+		verify(companiesService, times(1)).getCompany(fct.getId());
 
-		given(companiesRepository.save(fct)).willReturn(fct);
-		given(companiesRepository.findById(fct.getId())).willReturn(Optional.of(fct));
+		given(companiesService.updateCompany(fct)).willReturn(fct);
+		given(companiesService.getCompany(fct.getId())).willReturn(Optional.of(fct));
 
 		fct.setId(2);
 		String json = objectMapper.writeValueAsString(fct);
@@ -662,15 +649,14 @@ public class CompaniesControllerTest {
 		.andExpect(jsonPath("$.lastName", is(employee.getLastName())))
 		.andExpect(jsonPath("$.username", is(employee.getUsername())))
 		.andExpect(jsonPath("$.email", is(employee.getEmail())))
-		.andExpect(jsonPath("$.role", is(employee.getRole())))
+		.andExpect(jsonPath("$.role", is(employee.getRole().name())))
 		.andExpect(jsonPath("$.city", is(employee.getCity())))
 		.andExpect(jsonPath("$.address", is(employee.getAddress())))
 		.andExpect(jsonPath("$.zipCode", is(employee.getZipCode())))
 		.andExpect(jsonPath("$.cellPhone", is(employee.getCellPhone())))
 		.andExpect(jsonPath("$.homePhone", is(employee.getHomePhone())))
-		.andExpect(jsonPath("$.gender", is(employee.getGender())))
+		.andExpect(jsonPath("$.gender", is(employee.getGender().name())))
 		.andExpect(jsonPath("$.salary", is(employee.getSalary())))
-		.andExpect(jsonPath("$.birthday", is(employee.getBirthday())))
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + employeeResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._links.employees.href", is(ROOT + employeeResource.getLink("employees").getHref())))
 		.andReturn();
