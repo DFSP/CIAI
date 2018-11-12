@@ -8,8 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanAddSection.Condition)
-public @interface CanAddSection {
-    String Condition = "@SecurityService.isProposalNotRejected(#id) and "
-    		+ "@SecurityService.isAuthorOfProposal(principal,#id)";
+@PreAuthorize(CanAddBidding.Condition)
+public @interface CanAddBidding {
+   String Condition = "#user.username == principal.username";
 }

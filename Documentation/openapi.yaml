@@ -115,8 +115,8 @@ paths:
       responses:
         '200':
           description: Utilizador atualizado
-        '400':
-          description: Id especificado inválido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Utilizador não encontrado
         default:
@@ -141,6 +141,8 @@ paths:
       responses:
         '204':
           description: Utilizador removido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Utilizador não encontrado
         default:
@@ -206,6 +208,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Proposal'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Utilizador ou proposta não encontrados
         default:
@@ -328,6 +332,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '403':
+          description: Não tem permissão para executar esta ação
   '/companies/{id}':
     get:
       tags:
@@ -379,8 +385,8 @@ paths:
       responses:
         '200':
           description: Empresa atualizada
-        '400':
-          description: Id especificado inválido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Empresa não encontrada
         default:
@@ -405,6 +411,8 @@ paths:
       responses:
         '204':
           description: Empresa removida
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Empresa não encontrada
         default:
@@ -478,8 +486,8 @@ paths:
       responses:
         '200':
           description: Informações do empregado atualizadas
-        '400':
-          description: Id especificado da empresa ou empregado inválidos
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Empregado ou empresa não encontrados no sistema
         default:
@@ -511,6 +519,8 @@ paths:
       responses:
         '204':
           description: Empregado removido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Empresa ou empregado não encontrados
         default:
@@ -581,6 +591,8 @@ paths:
       responses:
         '200':
           description: Empregado adicionado com sucesso
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Empresa não encontrada
         default:
@@ -659,6 +671,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Proposal'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -689,8 +703,8 @@ paths:
       responses:
         '200':
           description: Proposta de evento atualizada
-        '400':
-          description: Id especificado inválido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -715,6 +729,8 @@ paths:
       responses:
         '204':
           description: Proposta de evento removida
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -746,6 +762,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Section'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -777,6 +795,8 @@ paths:
       responses:
         '200':
           description: Secção adicionada com sucesso
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -815,6 +835,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Section'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento ou secção não encontradas
         default:
@@ -852,8 +874,8 @@ paths:
       responses:
         '200':
           description: Secção atualizada
-        '400':
-          description: Id especificado da proposta ou secção inválido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou secção não encontrados
         default:
@@ -885,6 +907,8 @@ paths:
       responses:
         '204':
           description: Secção removida
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou secção não encontrada
         default:
@@ -922,6 +946,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Review'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -953,6 +979,8 @@ paths:
       responses:
         '200':
           description: Revisão adicionada com sucesso
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -989,6 +1017,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou revisão não encontradas
         default:
@@ -1026,8 +1056,8 @@ paths:
       responses:
         '200':
           description: Revisão atualizada
-        '400':
-          description: Id especificado da proposta ou revisão inválidos
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou revisão não encontradas
         default:
@@ -1059,6 +1089,8 @@ paths:
       responses:
         '204':
           description: Revisão removida
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Porposta ou revisão não encontradas
         default:
@@ -1127,6 +1159,8 @@ paths:
       responses:
         '200':
           description: Utilizador adicionado com sucesso
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -1194,6 +1228,8 @@ paths:
       responses:
         '204':
           description: Utilizador removido do staff da proposta
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou utilizador não encontrados
         default:
@@ -1262,6 +1298,8 @@ paths:
       responses:
         '200':
           description: Utilizador adicionado com sucesso
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -1329,6 +1367,8 @@ paths:
       responses:
         '204':
           description: Utilizador removido dos membros da proposta
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou utilizador não encontrados
         default:
@@ -1366,6 +1406,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Comment'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -1397,6 +1439,8 @@ paths:
       responses:
         '200':
           description: Comentário adicionado com sucesso
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -1433,6 +1477,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou comentário não encontrados
         default:
@@ -1470,8 +1516,8 @@ paths:
       responses:
         '200':
           description: Comentário atualizado
-        '400':
-          description: Id especificado da proposta ou comentário inválido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou comentário não encontrados
         default:
@@ -1503,6 +1549,8 @@ paths:
       responses:
         '204':
           description: Comentário removido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou comentário não encontrados
         default:
@@ -1633,6 +1681,8 @@ paths:
       responses:
         '204':
           description: Utilizador removido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta ou utilizador não encontrados
         default:
