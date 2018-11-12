@@ -396,7 +396,7 @@ public class UsersControllerTest {
 	}
 
 	@Test
-	public void testNotFoundEmployee() throws Exception {
+	public void testNotFound_Employee() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
@@ -408,43 +408,38 @@ public class UsersControllerTest {
 		verify(usersService, times(1)).getUser(2L);
 	}
 
-	public void testNotFoundProposal() throws Exception{
-		User manuel = createManuelUser();
-		Resource<User> manuelResource = userAssembler.toResource(manuel);
-		Proposal prop1 = createProposal_1();
-		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
+	@Test
+	public void testNotFound_Proposal() throws Exception{
+		User luis = createLuisUser();
+		Resource<User> luisResource = userAssembler.toResource(luis);
 
-		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
+		given(usersService.getUser(luis.getId())).willReturn(Optional.of(luis));
 
-		mvc.perform(get("http://localhost/users/4/proposals/2"))
+		mvc.perform(get("http://localhost/users/2/proposals/3"))
 				.andExpect(status().isNotFound());
-
-		verify(usersService, times(1)).getUser(manuel.getId());
+		verify(usersService, times(1)).getUser(luis.getId());
+		verify(proposalsService, times(1)).getProposal(1L);
 		verify(proposalsService, times(1)).getProposal(2L);
+
 	}
 
-	public void testNotFoundBidding() throws Exception{
+	@Test
+	public void testNotFound_Bidding() throws Exception{
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
-		Proposal bid1 = createProposal_1();
-		Resource<Proposal> bid1Resource = proposalAssembler.toResource(bid1);
 
 		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
 		mvc.perform(get("http://localhost/users/4/biddings/2"))
 				.andExpect(status().isNotFound());
-
-		verify(usersService, times(1)).getUser(manuel.getId());
-		verify(proposalsService, times(1)).getProposal(2L);
 	}
 
 	@Test
-	public void testBadRequestUpdateUser() throws Exception {
+	public void testBadRequest_UpdateUser() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 		String href = manuelResource.getLink("self").getHref();
 		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
-
 		performGet(manuel);
 
 		verify(usersService, times(1)).getUser(manuel.getId());
@@ -460,6 +455,7 @@ public class UsersControllerTest {
 				.content(json))
 		.andExpect(status().isBadRequest());
 	}
+
 
 
 
