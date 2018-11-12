@@ -29,7 +29,7 @@ public class MemberResourceAssembler implements SubResourceAssembler<Employee, P
         return new Resource<Employee>(member,
                 linkTo(methodOn(ProposalsController.class).getMember(pid, mid)).withSelfRel(),
                 linkTo(methodOn(UsersController.class).getProposals(mid, "")).withRel("proposals"),
-                linkTo(methodOn(UsersController.class).getBiddings(mid, "")).withRel("biddings"),
+                linkTo(methodOn(UsersController.class).getBids(mid, "")).withRel("bids"),
                 linkTo(methodOn(CompaniesController.class).getCompany(cid)).withRel("company"));
     }
 

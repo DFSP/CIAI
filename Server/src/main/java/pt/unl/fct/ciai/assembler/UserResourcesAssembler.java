@@ -21,6 +21,7 @@ import pt.unl.fct.ciai.model.User;
 @Component
 public class UserResourcesAssembler implements ResourceAssembler<User, Resource<User>>,
 		ResourcesAssembler<User, Resource<User>>,
+		SubResourceAssembler<User, Proposal, Resource<User>>,
 		SubResourcesAssembler<User, Proposal, Resource<User>> {
 
 	@Override
@@ -30,7 +31,7 @@ public class UserResourcesAssembler implements ResourceAssembler<User, Resource<
 				linkTo(methodOn(UsersController.class).getUser(id)).withSelfRel(),
 				linkTo(methodOn(UsersController.class).getUsers("")).withRel("users"),
 				linkTo(methodOn(UsersController.class).getProposals(id, "")).withRel("proposals"),
-				linkTo(methodOn(UsersController.class).getBiddings(id, "")).withRel("biddings"));
+				linkTo(methodOn(UsersController.class).getBids(id, "")).withRel("bids"));
 	}
 
 	@Override
@@ -45,14 +46,25 @@ public class UserResourcesAssembler implements ResourceAssembler<User, Resource<
 	}
 
 	@Override
+	public Resource<User> toResource(User user, Proposal proposal) {
+		long pid = proposal.getId();
+		long uid = user.getId();
+		return new Resource<>(user,
+				linkTo(methodOn(ProposalsController.class).getStaff(pid, uid)).withSelfRel(),
+				linkTo(methodOn(UsersController.class).getProposals(uid, "")).withRel("proposals"),
+				linkTo(methodOn(UsersController.class).getBids(uid, "")).withRel("bids"));
+	}
+
+	@Override
 	public Resources<Resource<User>> toResources(Iterable<? extends User> entities, Proposal proposal) {
 		long pid = proposal.getId();
 		List<Resource<User>> users =
 				StreamSupport.stream(entities.spliterator(), false)
-				.map(this::toResource)
+				.map(user -> this.toResource(user, proposal))
 				.collect(Collectors.toList());
 		return new Resources<>(users,
-				linkTo(methodOn(ProposalsController.class).getReviewBiddings(pid, "")).withRel("biddings"),
+				linkTo(methodOn(ProposalsController.class).getReviewBids(pid, "")).withRel("bids"),
+				linkTo(methodOn(ProposalsController.class).getReviewers(pid, "")).withRel("reviewers"),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

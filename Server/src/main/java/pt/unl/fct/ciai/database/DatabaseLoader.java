@@ -155,10 +155,10 @@ public class DatabaseLoader {
                     .description("Fazer um churrasco só com carne de porco.")
                     .staff(Collections.singleton(manuel))
                     .members(Collections.singleton(joao))
-                    .reviewBiddings(Collections.singleton(luis))
+                    .reviewBid(Collections.singleton(luis))
                     .proposer(joao);
             manuel.addProposal(proposal1);
-            luis.addBidding(proposal1);
+            luis.addBid(proposal1);
             joao.addProposal(proposal1);
             proposal1 = proposals.save(proposal1);
             manuel = users.save(manuel);
@@ -170,12 +170,12 @@ public class DatabaseLoader {
                     .description("Fazer um evento com comida vegan.")
                     .staff(Collections.singleton(andre))
                     .members(new HashSet<Employee>(Collections.singleton(joao)))
-                    .reviewBiddings(new HashSet<User>(Arrays.asList(joao, daniel)))
+                    .reviewBid(new HashSet<User>(Arrays.asList(joao, daniel)))
                     .proposer(luis);
             andre.addProposal(proposal2);
             joao.addProposal(proposal2);
-            joao.addBidding(proposal2);
-            daniel.addBidding(proposal2);
+            joao.addBid(proposal2);
+            daniel.addBid(proposal2);
             luis.addProposal(proposal2);
             proposal2 = proposals.save(proposal2);
             andre = users.save(andre);
@@ -188,7 +188,7 @@ public class DatabaseLoader {
                     .description("Evento de pesca no lago do departamental.")
                     .staff(new HashSet<User>(Arrays.asList(manuel, andre)))
                     .members(new HashSet<Employee>(Arrays.asList(daniel, joao)))
-                    .reviewBiddings(Collections.singleton(luis))
+                    .reviewBid(Collections.singleton(luis))
                     .proposer(daniel);
             manuel.addProposal(proposal3);
             andre.addProposal(proposal3);

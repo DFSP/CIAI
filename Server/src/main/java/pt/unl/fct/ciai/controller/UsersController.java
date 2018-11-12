@@ -79,7 +79,7 @@ public class UsersController implements UsersApi {
 
     @GetMapping("/{id}/proposals")
     public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
-            @PathVariable("id") long id, @RequestParam(value = "searchProposals", required = false) String search) {
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         getUserIfPresent(id);
         Iterable<Proposal> proposals = usersService.getProposals(id, search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
@@ -97,20 +97,20 @@ public class UsersController implements UsersApi {
         return ResponseEntity.ok(resource);
     }
 
-    @GetMapping("/{id}/biddings")
-    public ResponseEntity<Resources<Resource<Proposal>>> getBiddings(
-            @PathVariable("id") long id, @RequestParam(value = "searchProposals", required = false) String search) {
+    @GetMapping("/{id}/bids")
+    public ResponseEntity<Resources<Resource<Proposal>>> getBids(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         getUserIfPresent(id);
-        Iterable<Proposal> proposals = usersService.getBiddings(id, search);
+        Iterable<Proposal> proposals = usersService.getBids(id, search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
         return ResponseEntity.ok(resources);
     }
 
-    @GetMapping("/{uid}/biddings/{pid}")
-    public ResponseEntity<Resource<Proposal>> getBidding(
+    @GetMapping("/{uid}/bids/{pid}")
+    public ResponseEntity<Resource<Proposal>> getBid(
             @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
         getUserIfPresent(uid);
-        Proposal proposal = usersService.getBidding(uid, pid).orElseThrow(() ->
+        Proposal proposal = usersService.getBid(uid, pid).orElseThrow(() ->
                 new NotFoundException(String.format("Proposal with id %d is not bid by a member/staff with id %d", pid, uid)));
         Resource<Proposal> resource = proposalAssembler.toResource(proposal);
         return ResponseEntity.ok(resource);

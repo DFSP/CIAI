@@ -49,7 +49,7 @@ public class ProposalsController implements ProposalsApi {
 
     @GetMapping
     public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
-            @RequestParam(value = "searchProposals", required = false) String search) {
+            @RequestParam(value = "search", required = false) String search) {
         Iterable<Proposal> proposals = proposalsService.getProposals(search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
         return ResponseEntity.ok(resources);
@@ -319,38 +319,55 @@ public class ProposalsController implements ProposalsApi {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/biddings")
-    public ResponseEntity<Resources<Resource<User>>> getReviewBiddings(
+    @GetMapping("/{id}/bids")
+    public ResponseEntity<Resources<Resource<User>>> getReviewBids(
             @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         Proposal proposal = getProposalIfPresent(id);
-        Iterable<User> biddings = proposalsService.getReviewBiddings(id, search);
-        Resources<Resource<User>> resources = userAssembler.toResources(biddings, proposal);
+        Iterable<User> bids = proposalsService.getReviewBids(id, search);
+        Resources<Resource<User>> resources = userAssembler.toResources(bids, proposal);
         return ResponseEntity.ok(resources);
     }
 
-    @PostMapping("/{id}/biddings")
-    public ResponseEntity<Resource<User>> addReviewBidding(@PathVariable("id") long id, @RequestBody User user)
+    @PostMapping("/{id}/bids")
+    public ResponseEntity<Resource<User>> addReviewBid(@PathVariable("id") long id, @RequestBody User user)
             throws URISyntaxException {
-        User newUser = proposalsService.addReviewBidding(id, user);
+        User newUser = proposalsService.addReviewBid(id, user);
         Resource<User> resource = userAssembler.toResource(newUser);
         return ResponseEntity
                 .created(new URI(resource.getId().expand().getHref()))
                 .body(resource);
     }
 
-    @GetMapping("/{pid}/biddings/{uid}")
-    public ResponseEntity<Resource<User>> getReviewBidding(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
-        User bidding = proposalsService.getReviewBidding(pid, uid).orElseThrow(() ->
-                new NotFoundException(String.format("Bidding id %d does not belong to proposal with id %d", uid, pid)));
-        Resource<User> resource = userAssembler.toResource(bidding);
+    @GetMapping("/{pid}/bids/{uid}")
+    public ResponseEntity<Resource<User>> getReviewBid(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+        User bid = proposalsService.getReviewBid(pid, uid).orElseThrow(() ->
+                new NotFoundException(String.format("Bid id %d does not belong to proposal with id %d", uid, pid)));
+        Resource<User> resource = userAssembler.toResource(bid);
         return ResponseEntity.ok(resource);
     }
 
-    @DeleteMapping("/{pid}/biddings/{uid}")
-    // @CanDeleteBidding
-    public ResponseEntity<?> deleteReviewBidding(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
-        proposalsService.deleteReviewBidding(pid, uid);
+    @DeleteMapping("/{pid}/bids/{uid}")
+    // @CanDeleteBid
+    public ResponseEntity<?> deleteReviewBid(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+        proposalsService.deleteReviewBid(pid, uid);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/reviewers")
+    public ResponseEntity<Resources<Resource<User>>> getReviewers(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<User> reviewers = proposalsService.getReviewers(id, search);
+        Resources<Resource<User>> resources = userAssembler.toResources(reviewers, proposal);
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping("/{pid}/reviewers/{rid}")
+    public ResponseEntity<Resource<User>> getReviewer(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
+        User bid = proposalsService.getReviewer(pid, rid).orElseThrow(() ->
+                new NotFoundException(String.format("Reviewer id %d does not belong to proposal with id %d", rid, pid)));
+        Resource<User> resource = userAssembler.toResource(bid);
+        return ResponseEntity.ok(resource);
     }
 
     private Proposal getProposalIfPresent(long id) {

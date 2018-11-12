@@ -33,8 +33,8 @@ public class ProposalResourceAssembler implements ResourceAssembler<Proposal, Re
 				linkTo(methodOn(ProposalsController.class).getSections(id, "")).withRel("sections"),
 				linkTo(methodOn(ProposalsController.class).getReviews(id, "")).withRel("reviews"),
 				linkTo(methodOn(ProposalsController.class).getComments(id, "")).withRel("comments"),
-				linkTo(methodOn(ProposalsController.class).getReviewBiddings(id, "")).withRel("reviewBiddings"),
-				//linkTo(methodOn(ProposalsController.class).getReviewers(id, "")).withRel("reviewers"), //TODO reviewers
+				linkTo(methodOn(ProposalsController.class).getReviewBids(id, "")).withRel("reviewBid"),
+				linkTo(methodOn(ProposalsController.class).getReviewers(id, "")).withRel("reviewers"),
 				linkTo(methodOn(UsersController.class).getUser(uid)).withRel("proposer"));
 	}
 

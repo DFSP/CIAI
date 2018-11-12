@@ -214,12 +214,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/users/{id}/biddings':
+  '/users/{id}/bids':
     get:
       tags:
         - Users
       description: 'Obter as propostas nas quais o utilizador identificado pelo {id} tem interesse em ser reviewer.'
-      operationId: getBiddings
+      operationId: getBids
       parameters:
         - name: id
           in: path
@@ -243,12 +243,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/users/{uid}/biddings/{pid}':
+  '/users/{uid}/bids/{pid}':
     get:
       tags:
         - Users
       description: 'Obter a propostas {pid}, na qual o utilizador identificado pelo {id} tem interesse em ser reviewer.'
-      operationId: getBidding
+      operationId: getBid
       parameters:
         - name: uid
           in: path
@@ -1511,14 +1511,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/proposals/{id}/biddings':
+  '/proposals/{id}/bids':
     get:
       tags:
         - Event Proposal
       description: >-
         Obter os Ids dos utilizadores interessados em fazer review à proposta
         {id}.
-      operationId: getReviewBiddings
+      operationId: getReviewBids
       parameters:
         - name: id
           in: path
@@ -1548,7 +1548,7 @@ paths:
       description: >-
         Adiciona um utilizador à lista de utilizadores interessados
         em fazer review à proposta {id}.
-      operationId: addReviewBidding
+      operationId: addReviewBid
       parameters:
         - name: id
           in: path
@@ -1570,14 +1570,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/proposals/{pid}/biddings/{uid}':
+  '/proposals/{pid}/bids/{uid}':
     get:
       tags:
         - Event Proposal
       description: >-
         Obter o utilizadores {uid} interessado em fazer review à proposta
         {pid}.
-      operationId: getReviewBidding
+      operationId: getReviewBid
       parameters:
         - name: pid
           in: path
@@ -1614,7 +1614,7 @@ paths:
       description: >-
         Remover o utilizador {uid} da lista de utilizadores interessados
         em fazer review à proposta {pid}
-      operationId: deleteReviewBidding
+      operationId: deleteReviewBid
       parameters:
         - name: pid
           in: path
@@ -1683,7 +1683,7 @@ components:
           items:
             $ref: '#/components/schemas/Proposal'
           writeOnly: true
-        biddings:
+        bids:
           type: array
           items:
             $ref: '#/components/schemas/Proposal'
@@ -1835,7 +1835,7 @@ components:
           items:
             $ref: '#/components/schemas/Comment'
           writeOnly: true
-        reviewBiddings:
+        reviewBids:
           type: array
           items:
             $ref: '#/components/schemas/User'

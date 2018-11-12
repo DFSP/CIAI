@@ -53,14 +53,14 @@ public class UsersService {
         return Optional.ofNullable(usersRepository.getProposal(uid, pid));
     }
 
-    public Iterable<Proposal> getBiddings(long id, String search) {
+    public Iterable<Proposal> getBids(long id, String search) {
         return search ==  null ?
-                usersRepository.getBiddings(id) :
-                usersRepository.searchBiddings(id, search);
+                usersRepository.getBids(id) :
+                usersRepository.searchBids(id, search);
     }
 
-    public Optional<Proposal> getBidding(long uid, long pid) {
-        return Optional.ofNullable(usersRepository.getBidding(uid, pid));
+    public Optional<Proposal> getBid(long uid, long pid) {
+        return Optional.ofNullable(usersRepository.getBid(uid, pid));
     }
 
     private User getUserIfPresent(long id) {
