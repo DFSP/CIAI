@@ -19,7 +19,7 @@ public interface EmployeesRepository extends CrudRepository<Employee, Long> {
             + "OR e.salary LIKE CONCAT('%',:search,'%')"
             + "OR e.birthday LIKE CONCAT('%',:search,'%')"
     )
-    Iterable<Employee> search(@Param(value = "search") String search);
+    Iterable<Employee> searchEmployees(@Param(value = "search") String search);
 
 
 

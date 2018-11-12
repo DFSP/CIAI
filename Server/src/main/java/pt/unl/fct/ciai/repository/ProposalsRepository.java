@@ -12,15 +12,33 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     // Own queries
 
     @Query("SELECT p "
-            + "FROM Proposal p "
-            + "WHERE p.id LIKE CONCAT('%',:search,'%') "
+            + "FROM Proposal p JOIN p.staff s JOIN p.members m "
+            + "WHERE p.state = 'APPROVED' "
+            + "OR s.username = ?#{principal.username} "
+            + "OR m.username = ?#{principal.username} "
+            + "OR p.proposer.username = ?#{principal.username} "
+            + "OR 1=?#{hasRole('ROLE_SYS_ADMIN') ? 1 : 0}")
+    Iterable<Proposal> getPublicProposals();
+
+    @Query("SELECT p "
+            + "FROM Proposal p JOIN p.staff s JOIN p.members m "
+            + "WHERE (p.state = 'APPROVED' "
+            + "OR s.username = ?#{principal.username} "
+            + "OR m.username = ?#{principal.username} "
+            + "OR p.proposer.username = ?#{principal.username} "
+            + "OR 1=?#{hasRole('ROLE_SYS_ADMIN') ? 1 : 0})"
+            + "AND "
+            + "(p.id LIKE CONCAT('%',:search,'%') "
             + "OR p.title LIKE CONCAT('%',:search,'%') "
             + "OR p.description LIKE CONCAT('%',:search,'%') "
             + "OR p.state LIKE CONCAT('%',:search,'%') "
-            + "OR p.creationDate LIKE CONCAT('%',:search,'%')"
-    )
-    Iterable<Proposal> search(@Param(value = "search") String search);
+            + "OR p.creationDate LIKE CONCAT('%',:search,'%'))")
+    Iterable<Proposal> searchPublicProposals(@Param(value = "search") String search);
 
+    @Query("SELECT p "
+            + "FROM Proposal p "
+            + "WHERE p.id = :id AND p.state = APPROVED")
+    Proposal getPublicProposal(@Param(value = "id") long id);
 
     // Section queries
 

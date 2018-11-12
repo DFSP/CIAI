@@ -24,7 +24,7 @@ public class CompaniesService {
     public Iterable<Company> getCompanies(String search) {
         return search == null ?
                 companiesRepository.findAll() :
-                companiesRepository.search(search);
+                companiesRepository.searchCompanies(search);
     }
 
     public Company addCompany(Company company) {

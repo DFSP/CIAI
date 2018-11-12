@@ -18,7 +18,7 @@ public interface UsersRepository extends CrudRepository<User, Long> {
             + "OR u.username LIKE CONCAT('%',:search,'%')"
             + "OR u.email LIKE CONCAT('%',:search,'%')"
             + "OR u.role LIKE CONCAT('%',:search,'%')")
-    Iterable<User> search(@Param(value = "search") String search);
+    Iterable<User> searchUsers(@Param(value = "search") String search);
 
     // Proposals
 

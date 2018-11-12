@@ -73,7 +73,7 @@ public class UsersController implements UsersApi {
 
     @GetMapping("/{id}/proposals")
     public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
-            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+            @PathVariable("id") long id, @RequestParam(value = "searchProposals", required = false) String search) {
         User user = getUserIfPresent(id);
         Iterable<Proposal> proposals = usersService.getProposals(id, search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
@@ -91,8 +91,9 @@ public class UsersController implements UsersApi {
     }
 
     @GetMapping("/{id}/biddings")
+    // @CanGetUserBiddings //TODO
     public ResponseEntity<Resources<Resource<Proposal>>> getBiddings(
-            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+            @PathVariable("id") long id, @RequestParam(value = "searchProposals", required = false) String search) {
         User user = getUserIfPresent(id);
         Iterable<Proposal> proposals = usersService.getBiddings(id, search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
@@ -100,6 +101,7 @@ public class UsersController implements UsersApi {
     }
 
     @GetMapping("/{uid}/biddings/{pid}")
+    // @CanGetUserBidding //TODO
     public ResponseEntity<Resource<Proposal>> getBidding(
             @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
         User user = getUserIfPresent(uid);

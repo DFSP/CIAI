@@ -2,6 +2,8 @@ package pt.unl.fct.ciai.security;
 
 import java.util.Optional;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.repository.query.spi.EvaluationContextExtension;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
@@ -139,5 +141,10 @@ public class SecurityService {
     	Optional<Proposal> p = proposals.findById(id);
     	return p.isPresent() && p.get().getState() == Proposal.ProposalState.APPROVED;
     }
+
+	@Bean
+	EvaluationContextExtension securityExtension() {
+		return new SecurityEvaluationContextExtension();
+	}
 }
 

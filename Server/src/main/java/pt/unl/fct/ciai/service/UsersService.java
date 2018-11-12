@@ -24,7 +24,7 @@ public class UsersService {
     public Iterable<User> getUsers(String search) {
         return search == null ?
                 usersRepository.findAll() :
-                usersRepository.search(search);
+                usersRepository.searchUsers(search);
     }
 
     public User addUser(User user) {

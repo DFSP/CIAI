@@ -15,6 +15,6 @@ public interface SectionsRepository extends CrudRepository<Section, Long> {
             + "OR s.workPlan LIKE CONCAT('%',:search,'%') "
             + "OR s.budget LIKE CONCAT('%',:search,'%') "
     )
-    Iterable<Section> search(@Param(value = "search") String search);
+    Iterable<Section> searchSections(@Param(value = "search") String search);
 
 }

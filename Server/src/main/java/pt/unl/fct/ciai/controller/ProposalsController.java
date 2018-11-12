@@ -45,7 +45,7 @@ public class ProposalsController implements ProposalsApi {
 
 	@GetMapping
 	public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
-			@RequestParam(value="search", required = false) String search) {
+			@RequestParam(value="searchProposals", required = false) String search) {
 		Iterable<Proposal> proposals = proposalsService.getProposals(search);
 		Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
 		return ResponseEntity.ok(resources);

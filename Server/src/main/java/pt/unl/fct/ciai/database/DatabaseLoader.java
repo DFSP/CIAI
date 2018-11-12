@@ -154,17 +154,16 @@ public class DatabaseLoader {
                     .title("Churrasco")
                     .description("Fazer um churrasco só com carne de porco.")
                     .staff(Collections.singleton(manuel))
-                    .members(new HashSet<Employee>(Arrays.asList(joao, daniel)))
+                    .members(new HashSet<Employee>(Arrays.asList(joao)))
                     .reviewBiddings(Collections.singleton(luis))
-                    .proposer(joao);
+                    .proposer(joao)
+                    .approved();
             manuel.addProposal(proposal1);
             joao.addProposal(proposal1);
-            daniel.addProposal(proposal1);
             luis.addBidding(proposal1);
             proposal1 = proposals.save(proposal1);
             manuel = users.save(manuel);
             joao = employees.save(joao);
-            daniel = employees.save(daniel);
             luis = employees.save(luis);
 
             //TODO mudar tambem proposal2 e proposal3 para como está a proposal1

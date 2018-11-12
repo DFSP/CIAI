@@ -15,7 +15,7 @@ public interface CompaniesRepository extends CrudRepository<Company, Long> {
 			+ "OR c.name LIKE CONCAT('%',:search,'%') "
 			+ "OR c.address LIKE CONCAT('%',:search,'%') "
 			+ "OR c.email LIKE CONCAT('%',:search,'%')")
-	Iterable<Company> search(@Param(value = "search") String search);
+	Iterable<Company> searchCompanies(@Param(value = "search") String search);
 
 
 	// Employees queries
