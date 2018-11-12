@@ -5,7 +5,6 @@ import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.utils.Utils;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.repository.ProposalsRepository;
 import pt.unl.fct.ciai.repository.UsersRepository;
 
 import java.util.Optional;
@@ -14,11 +13,9 @@ import java.util.Optional;
 public class UsersService {
 
     private final UsersRepository usersRepository;
-    private final ProposalsRepository proposalsRepository;
 
-    public UsersService(UsersRepository usersRepository, ProposalsRepository proposalsRepository) {
+    public UsersService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
-        this.proposalsRepository = proposalsRepository;
     }
 
     public Iterable<User> getUsers(String search) {

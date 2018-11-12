@@ -135,13 +135,14 @@ public class ProposalsController implements ProposalsApi {
 	@GetMapping("/{id}/staff")
 	public ResponseEntity<Resources<Resource<User>>> getStaff(
 			@PathVariable("id") long id, @RequestParam(value="search", required = false) String search) {
-		Proposal proposal = getProposalIfPresent(id);
+		getProposalIfPresent(id);
 		Iterable<User> staff = proposalsService.getStaff(id, search);
 		Resources<Resource<User>> resources = staffAssembler.toResources(staff, proposal);
 		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping("/{id}/staff")
+	// @CanAddStaff
 	public ResponseEntity<Resource<User>> addStaff(@PathVariable("id") long id, @Valid @RequestBody User staff)
 			throws URISyntaxException {
 		User newStaff = proposalsService.addStaff(id, staff);
@@ -160,6 +161,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/staff/{uid}")
+	/// @CanDeleteStaff
 	public ResponseEntity<?> removeStaff(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
 		proposalsService.removeStaff(pid, uid);
 		return ResponseEntity.noContent().build();
@@ -175,6 +177,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@PostMapping("/{id}/members")
+	// @CanAddMember
 	public ResponseEntity<Resource<Employee>> addMember(@PathVariable("id") long id, @Valid @RequestBody Employee member)
 			throws URISyntaxException {// TODO recebe objeto employee ou apenas o id?
 		Employee newMember = proposalsService.addMember(id, member);
@@ -193,12 +196,14 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@DeleteMapping("/{pid}/members/{mid}")
+	// @CanDeleteMember
 	public ResponseEntity<?> removeMember(@PathVariable("pid") long pid, @PathVariable("mid") long mid) {
 		proposalsService.removeMember(pid, mid);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/{id}/reviews")
+	// @CanReadReview
 	public ResponseEntity<Resources<Resource<Review>>> getReviews(
 			@PathVariable("id") long id, @RequestParam (value="search", required = false) String search) {
 		Proposal proposal = getProposalIfPresent(id);
@@ -219,6 +224,7 @@ public class ProposalsController implements ProposalsApi {
 	}
 
 	@GetMapping("/{pid}/reviews/{rid}")
+	// @CanReadOneReview
 	public ResponseEntity<Resource<Review>> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
 		Review review = proposalsService.getReview(pid, rid).orElseThrow(() ->
 				new NotFoundException(String.format("Review id %d does not belong to proposal with id %d", rid, pid)));

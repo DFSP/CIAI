@@ -72,14 +72,14 @@ public class ProposalsService {
     }
 
     public Section updateSection(long pid, Section newSection) {
-        Proposal proposal = getProposalIfPresent(pid);
+        getProposalIfPresent(pid);
         Section section = getSectionIfPresent(pid, newSection.getId());
         Utils.copyNonNullProperties(newSection, section);
         return sectionsRepository.save(section);
     }
 
     public void deleteSection(long pid, long sid) {
-        Proposal proposal = getProposalIfPresent(pid);
+        getProposalIfPresent(pid);
         Section section = getSectionIfPresent(pid, sid);
         sectionsRepository.delete(section);
     }
@@ -157,14 +157,14 @@ public class ProposalsService {
     }
 
     public Review updateReview(long pid, Review newReview) {
-        Proposal proposal = getProposalIfPresent(pid);
+        getProposalIfPresent(pid);
         Review review = getReviewIfPresent(pid, newReview.getId());
         Utils.copyNonNullProperties(newReview, review);
         return reviewsRepository.save(review);
     }
 
     public void deleteReview(long pid, long rid) {
-        Proposal proposal = getProposalIfPresent(pid);
+        getProposalIfPresent(pid);
         Review review = getReviewIfPresent(pid, rid);
         reviewsRepository.delete(review);
     }
@@ -186,14 +186,14 @@ public class ProposalsService {
     }
 
     public Comment updateComment(long pid, Comment newComent) {
-        Proposal proposal = getProposalIfPresent(pid);
+        getProposalIfPresent(pid);
         Comment comment = proposalsRepository.getComment(pid, newComent.getId());
         Utils.copyNonNullProperties(newComent, comment);
         return commentsRepository.save(comment);
     }
 
     public void deleteComment(long pid, long cid) {
-        Proposal proposal = getProposalIfPresent(pid);
+        getProposalIfPresent(pid);
         Comment comment = getCommentIfPresent(pid, cid);
         commentsRepository.delete(comment);
     }

@@ -5,8 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import pt.unl.fct.ciai.model.*;
 
-import java.util.Optional;
-
 public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
 
     // Own queries
