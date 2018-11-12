@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(value = "/proposals", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
+
 public class ProposalsController{
 
     private final ProposalsService proposalsService;

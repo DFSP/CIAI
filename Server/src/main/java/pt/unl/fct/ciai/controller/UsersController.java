@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 @RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class UsersController{
 
+
     private final UsersService usersService;
 
     private final UserResourcesAssembler userAssembler;
@@ -87,6 +88,7 @@ public class UsersController{
     }
 
     @GetMapping("/{id}/proposals")
+    @CanReadUserProposal
     public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
             @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         User user = getUserIfPresent(id);

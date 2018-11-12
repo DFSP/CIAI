@@ -30,10 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ProposalsController.class, secure = false)
@@ -59,6 +56,8 @@ public class ProposalsControllerTest {
 	@Autowired
 	private CommentResourcesAssembler commentAssembler;
 	@Autowired
+	private StaffResourcesAssembler staffAssembler;
+	@Autowired
 	private UserResourcesAssembler userAssembler;
 	private final ObjectMapper objectMapper;
 
@@ -76,7 +75,6 @@ public class ProposalsControllerTest {
 		p1.setDescription("Proposal 1 - Description");
 		p1.setCreationDate(new Date());
 
-
 		Review r1 = create_Review_1();
 		r1.setProposal(p1);
 
@@ -88,12 +86,14 @@ public class ProposalsControllerTest {
 
 		User u1 = create_User_1();
 		p1.setProposer(u1);
+		p1.addStaff(u1);
 		u1.addProposal(p1);
+		p1.addReviewBid(u1);
+		u1.addBid(p1);
 
 		p1.addReview(r1);
 		p1.addSection(s1);
 		p1.addComment(c1);
-
 
 		return p1;
 	}
@@ -1023,17 +1023,15 @@ public class ProposalsControllerTest {
 		User bid1 = p1.getReviewBids().get().iterator().next();
 		String href = userAssembler.toResource(bid1).getLink("self").getHref();
 
-		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getReviewBid(p1.getId(), bid1.getId())).willReturn(Optional.of(bid1));
 
-		when(usersService.getUser(bid1.getId()))
-				.thenReturn(Optional.of(bid1))
-				.thenReturn(Optional.of(bid1))
-				.thenReturn(Optional.ofNullable(null));
+		/*when(proposalsService.getReviewBids(bid1.getId(), ""))
+				.thenReturn(Collections.singleton(bid1))
+				.thenReturn(Collections.emptyList());*/
 
-		performGetBidUser(bid1);
+		performGetBidUser(bid1, p1);
 
-		verify(proposalsService, times(1)).getProposal(p1.getId());
-		verify(usersService, times(1)).getUser(bid1.getId());
+		verify(proposalsService, times(1)).getReviewBid(p1.getId(), bid1.getId());
 
 		mvc.perform(delete(href))
 				.andExpect(status().isNotFound());
@@ -1050,16 +1048,16 @@ public class ProposalsControllerTest {
 	}
 
 	@Test
-	public void testNotFound_Proposal() throws Exception {
+	public void testNotFoundProposal() throws Exception {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		mvc.perform(get("http://localhost/proposals/2"))
+		mvc.perform(get("http://localhost/proposals/100"))
 				.andExpect(status().isNotFound());
 
-		verify(usersService, times(1)).getUser(2L);
+		verify(proposalsService, times(1)).getProposal(100);
 	}
 
 
@@ -1129,8 +1127,8 @@ public class ProposalsControllerTest {
 				.andReturn();
 	}
 
-	private MvcResult performGetBidUser(User bidUser) throws Exception {
-		Resource<User> resourceBid = userAssembler.toResource(bidUser);
+	private MvcResult performGetBidUser(User bidUser, Proposal proposal) throws Exception {
+		Resource<User> resourceBid = staffAssembler.toResource(bidUser, proposal);
 		return mvc.perform(get(resourceBid.getLink("self").getHref()))
 				.andExpect(status().isOk())
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
