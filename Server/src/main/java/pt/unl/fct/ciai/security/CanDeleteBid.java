@@ -8,8 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@PreAuthorize(CanDeleteBidding.Condition)
-public @interface CanDeleteBidding {
+@PreAuthorize(CanDeleteBid.Condition)
+public @interface CanDeleteBid {
    String Condition = "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name()) or "
    		+ "@SecurityService.isPrincipal(principal, #uid) or "
    		+ "@SecurityService.isAdminOfUser(principal, #uid)";

@@ -200,32 +200,42 @@ public class ProposalsService {
         commentsRepository.delete(comment);
     }
 
-    public Iterable<User> getReviewBiddings(long pid, String search) {
+    public Iterable<User> getReviewBids(long pid, String search) {
         return search == null ?
-                proposalsRepository.getReviewBiddings(pid) :
-                proposalsRepository.searchReviewBiddings(pid, search);
+                proposalsRepository.getReviewBids(pid) :
+                proposalsRepository.searchReviewBids(pid, search);
     }
 
-    public User addReviewBidding(long pid, User bidding) {
+    public User addReviewBid(long pid, User bid) {
         Proposal proposal = getProposalIfPresent(pid);
-        User user = getUserIfPresent(bidding.getId());
-        proposal.addReviewBidding(user);
+        User user = getUserIfPresent(bid.getId());
+        proposal.addReviewBid(user);
         proposalsRepository.save(proposal);
-        user.addBidding(proposal);
+        user.addBid(proposal);
         return usersRepository.save(user);
     }
 
-    public Optional<User> getReviewBidding(long pid, long uid) {
-        return Optional.ofNullable(proposalsRepository.getReviewBidding(pid, uid));
+    public Optional<User> getReviewBid(long pid, long uid) {
+        return Optional.ofNullable(proposalsRepository.getReviewBid(pid, uid));
     }
 
-    public void deleteReviewBidding(long pid, long uid) {
+    public void deleteReviewBid(long pid, long uid) {
         Proposal proposal = getProposalIfPresent(pid);
-        User user = getBiddingIfPresent(pid, uid);
-        proposal.removeReviewBidding(user);
+        User user = getBidIfPresent(pid, uid);
+        proposal.removeReviewBid(user);
         proposalsRepository.save(proposal);
-        user.removeBidding(proposal);
+        user.removeBid(proposal);
         usersRepository.save(user);
+    }
+
+    public Iterable<User> getReviewers(long pid, String search) {
+        return search == null ?
+                proposalsRepository.getReviewers(pid) :
+                proposalsRepository.searchReviewers(pid, search);
+    }
+
+    public Optional<User> getReviewer(long pid, long rid) {
+        return Optional.ofNullable(proposalsRepository.getReviewer(pid, rid));
     }
 
     private Proposal getProposalIfPresent(long id) {
@@ -284,11 +294,11 @@ public class ProposalsService {
                                 String.format("Comment with id %d doesn't belong to proposal with id %d.", cid, pid)));
     }
 
-    private User getBiddingIfPresent(long pid, long uid) {
-        return this.getReviewBidding(pid, uid)
+    private User getBidIfPresent(long pid, long uid) {
+        return this.getReviewBid(pid, uid)
                 .orElseThrow(() ->
                         new NotFoundException(
-                                String.format("Bidding with id %d doesn't belong to proposal with id %d.", uid, pid)));
+                                String.format("Bid with id %d doesn't belong to proposal with id %d.", uid, pid)));
     }
 
 }

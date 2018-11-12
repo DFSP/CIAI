@@ -50,7 +50,7 @@ public class User {
     private Set<Proposal> proposals;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(cascade = CascadeType.REFRESH)
-    private Set<Proposal> biddings;
+    private Set<Proposal> bids;
 
     public User() {
     }
@@ -184,30 +184,30 @@ public class User {
         return this;
     }
 
-    public Optional<Set<Proposal>> getBiddings() {
-        return Optional.ofNullable(this.biddings);
+    public Optional<Set<Proposal>> getBids() {
+        return Optional.ofNullable(this.bids);
     }
 
-    public void setBiddings(Set<Proposal> proposals) {
-        this.biddings = proposals;
+    public void setBids(Set<Proposal> proposals) {
+        this.bids = proposals;
     }
 
-    public User biddings(Set<Proposal> proposals) {
-        setBiddings(proposals);
+    public User bids(Set<Proposal> proposals) {
+        setBids(proposals);
         return this;
     }
 
-    public User addBidding(Proposal proposal) {
-        if (this.biddings == null) {
-            this.biddings = new HashSet<Proposal>();
+    public User addBid(Proposal proposal) {
+        if (this.bids == null) {
+            this.bids = new HashSet<Proposal>();
         }
-        this.biddings.add(proposal);
+        this.bids.add(proposal);
         return this;
     }
 
-    public User removeBidding(Proposal proposal) {
-        if (this.biddings != null) {
-            this.biddings.remove(proposal);
+    public User removeBid(Proposal proposal) {
+        if (this.bids != null) {
+            this.bids.remove(proposal);
         }
         return this;
     }
@@ -245,7 +245,7 @@ public class User {
                 ", proposals=" + getProposals()
                 .map(p -> p.stream().map(Proposal::getId).collect(Collectors.toList()))
                 .orElse(Collections.emptyList()) +
-                ", biddings=" + getBiddings()
+                ", bids=" + getBids()
                 .map(p -> p.stream().map(Proposal::getId).collect(Collectors.toList()))
                 .orElse(Collections.emptyList()) +
                 '}';

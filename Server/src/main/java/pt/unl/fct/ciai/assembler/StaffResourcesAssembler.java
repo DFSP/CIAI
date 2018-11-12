@@ -27,7 +27,7 @@ public class StaffResourcesAssembler implements SubResourceAssembler<User, Propo
         return new Resource<>(user,
                 linkTo(methodOn(ProposalsController.class).getStaff(pid, uid)).withSelfRel(),
                 linkTo(methodOn(UsersController.class).getProposals(uid, "")).withRel("proposals"),
-                linkTo(methodOn(UsersController.class).getBiddings(uid, "")).withRel("biddings"));
+                linkTo(methodOn(UsersController.class).getBids(uid, "")).withRel("bids"));
     }
 
     @Override

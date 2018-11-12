@@ -46,16 +46,16 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     )
     Proposal getProposal(@Param(value = "uid") long uid, @Param(value = "pid") long pid);
 
-    // Biddings
+    // Bids
 
     @Query("SELECT b "
-            + "FROM User u JOIN u.biddings b "
+            + "FROM User u JOIN u.bids b "
             + "WHERE u.id = :uid"
     )
-    Iterable<Proposal> getBiddings(@Param(value = "uid") long uid);
+    Iterable<Proposal> getBids(@Param(value = "uid") long uid);
 
     @Query("SELECT p "
-            + "FROM User u JOIN u.proposals p "
+            + "FROM User u JOIN u.bids p "
             + "WHERE u.id = :uid "
             + "AND "
             + "(p.id LIKE CONCAT('%',:search,'%') "
@@ -64,12 +64,12 @@ public interface UsersRepository extends CrudRepository<User, Long> {
             + "OR p.state LIKE CONCAT('%',:search,'%') "
             + "OR p.creationDate LIKE CONCAT('%',:search,'%'))"
     )
-    Iterable<Proposal> searchBiddings(@Param(value = "uid") long uid, @Param(value = "search") String search);
+    Iterable<Proposal> searchBids(@Param(value = "uid") long uid, @Param(value = "search") String search);
 
     @Query("SELECT b "
-            + "FROM User u JOIN u.biddings b "
+            + "FROM User u JOIN u.bids b "
             + "WHERE u.id = :uid AND b.id = :pid"
     )
-    Proposal getBidding(@Param(value = "uid") long uid, @Param(value = "pid") long pid);
+    Proposal getBid(@Param(value = "uid") long uid, @Param(value = "pid") long pid);
 
 }

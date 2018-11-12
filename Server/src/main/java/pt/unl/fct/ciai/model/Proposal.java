@@ -50,7 +50,7 @@ public class Proposal {
 	private Set<Comment> comments;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToMany(cascade = CascadeType.REFRESH)
-	private Set<User> reviewBiddings; //TODO ver se é possivel ter Map<User, Boolean> para saber se o bid foi ganho
+	private Set<User> reviewBids;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToMany(mappedBy = "proposals")
 	private Set<User> reviewers;
@@ -325,40 +325,40 @@ public class Proposal {
 		return this;
 	}
 
-	public Optional<Set<User>> getReviewBiddings() {
-		return Optional.ofNullable(this.reviewBiddings);
+	public Optional<Set<User>> getReviewBids() {
+		return Optional.ofNullable(this.reviewBids);
 	}
 
-	public void setReviewBiddings(Set<User> reviewBiddings) {
-		this.reviewBiddings = reviewBiddings;
+	public void setReviewBids(Set<User> reviewBids) {
+		this.reviewBids = reviewBids;
 	}
 
-	public Proposal reviewBiddings(Set<User> biddings) {
-		setReviewBiddings(biddings);
+	public Proposal reviewBid(Set<User> bids) {
+		setReviewBids(bids);
 		return this;
 	}
 
-	public Proposal addReviewBidding(User user) {
-		if (this.reviewBiddings == null) {
-			this.reviewBiddings = new HashSet<User>();
+	public Proposal addReviewBid(User user) {
+		if (this.reviewBids == null) {
+			this.reviewBids = new HashSet<User>();
 		}
-		this.reviewBiddings.add(user);
+		this.reviewBids.add(user);
 		return this;
 	}
 
-	public Proposal removeReviewBidding(User bidding) {
-		this.getReviewBiddings().ifPresent(reviewBiddings -> reviewBiddings.remove(bidding));
+	public Proposal removeReviewBid(User bid) {
+		this.getReviewBids().ifPresent(reviewBids -> reviewBids.remove(bid));
 		return this;
 	}
 
-	public Proposal updateReviewBidding(User bidding) {
-		Set<User> biddings = this.getReviewBiddings().orElseThrow(() ->
-				new IllegalStateException(String.format("Proposal %d has no review biddings", getId())));
-		if (!biddings.remove(bidding)) {
+	public Proposal updateReviewBid(User bid) {
+		Set<User> bids = this.getReviewBids().orElseThrow(() ->
+				new IllegalStateException(String.format("Proposal %d has no review bids", getId())));
+		if (!bids.remove(bid)) {
 			throw new IllegalArgumentException(
-					String.format("Proposal %d doesn't have a bidding of user %d", getId(), bidding.getUsername()));
+					String.format("Proposal %d doesn't have a bid of user %d", getId(), bid.getUsername()));
 		}
-		biddings.add(bidding);
+		bids.add(bid);
 		return this;
 	}
 
@@ -441,7 +441,7 @@ public class Proposal {
 				", comments=" + getComments()
 				.map(p -> p.stream().map(Comment::getTitle).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
-				", reviewBiddings=" + getReviewBiddings()
+				", reviewBids=" + getReviewBids()
 				.map(p -> p.stream().map(User::getUsername).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
 				", proposer=" + Optional.ofNullable(getProposer()).map(User::getUsername)

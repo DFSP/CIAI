@@ -96,10 +96,10 @@ public class UsersControllerTest {
 				.email("jreis@email.com")
 				.role(User.Role.ROLE_COMPANY_ADMIN)
 				.password("password")
-				.addBidding(p1)
-				.addBidding(p2);
-		p1.addReviewBidding(u);
-		p2.addReviewBidding(u);
+				.addBid(p1)
+				.addBid(p2);
+		p1.addReviewBid(u);
+		p2.addReviewBid(u);
 		return u;
 	}
 
@@ -344,7 +344,7 @@ public class UsersControllerTest {
 	public void testGetBidding() throws Exception {
 		User joao = createJoaoUser();
 		Resource<User> joaoResource = userAssembler.toResource(joao);
-		Proposal prop1 = joao.getBiddings().get().iterator().next();
+		Proposal prop1 = joao.getBids().get().iterator().next();
 		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
 
 		given(usersService.getUser(joao.getId())).willReturn(Optional.of(joao));
@@ -360,7 +360,7 @@ public class UsersControllerTest {
 	public void testGetBiddings() throws Exception {
 		User joao = createJoaoUser();
 		Resource<User> joaoResource = userAssembler.toResource(joao);
-		Iterator<Proposal> it = joao.getBiddings().get().iterator();
+		Iterator<Proposal> it = joao.getBids().get().iterator();
 
 		Proposal bid1 = it.next();
 		Resource<Proposal> bid1Resource = proposalAssembler.toResource(bid1);

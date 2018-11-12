@@ -210,16 +210,16 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     boolean existsComment(@Param(value = "pid") long pid, @Param(value = "cid") long cid);
 
 
-    // Biddings queries  
+    // Reviewers queries
 
     @Query("SELECT u "
-            + "FROM Proposal p JOIN p.reviewBiddings u "
+            + "FROM Proposal p JOIN p.reviewBids u "
             + "WHERE p.id = :pid"
     )
-    Iterable<User> getReviewBiddings(@Param(value = "pid") long pid);
+    Iterable<User> getReviewBids(@Param(value = "pid") long pid);
 
     @Query("SELECT u "
-            + "FROM Proposal p JOIN p.reviewBiddings u "
+            + "FROM Proposal p JOIN p.reviewBids u "
             + "WHERE p.id = :pid "
             + "AND "
             + "(u.id LIKE CONCAT('%',:search,'%') "
@@ -229,13 +229,41 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "OR u.email LIKE CONCAT('%',:search,'%') "
             + "OR u.role LIKE CONCAT('%',:search,'%'))"
     )
-    Iterable<User> searchReviewBiddings(@Param(value = "pid") long pid, @Param(value = "search") String search);
+    Iterable<User> searchReviewBids(@Param(value = "pid") long pid, @Param(value = "search") String search);
 
     @Query("SELECT u "
-            + "FROM Proposal p JOIN p.reviewBiddings u "
+            + "FROM Proposal p JOIN p.reviewBids u "
             + "WHERE p.id = :pid AND u.id = :uid"
     )
-    User getReviewBidding(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
+    User getReviewBid(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
+
+
+    // Bids queries
+
+    @Query("SELECT r "
+            + "FROM Proposal p JOIN p.reviewers r "
+            + "WHERE p.id = :pid"
+    )
+    Iterable<User> getReviewers(@Param(value = "pid") long pid);
+
+    @Query("SELECT r "
+            + "FROM Proposal p JOIN p.reviewers r "
+            + "WHERE p.id = :pid "
+            + "AND "
+            + "(r.id LIKE CONCAT('%',:search,'%') "
+            + "OR r.firstName LIKE CONCAT('%',:search,'%') "
+            + "OR r.lastName LIKE CONCAT('%',:search,'%') "
+            + "OR r.username LIKE CONCAT('%',:search,'%') "
+            + "OR r.email LIKE CONCAT('%',:search,'%') "
+            + "OR r.role LIKE CONCAT('%',:search,'%'))"
+    )
+    Iterable<User> searchReviewers(@Param(value = "pid") long pid, @Param(value = "search") String search);
+
+    @Query("SELECT r "
+            + "FROM Proposal p JOIN p.reviewers r "
+            + "WHERE p.id = :pid AND r.id = :rid"
+    )
+    User getReviewer(@Param(value = "pid") long pid, @Param(value = "rid") long rid);
 
 
     // Proposer queries
