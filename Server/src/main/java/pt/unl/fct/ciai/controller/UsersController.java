@@ -17,6 +17,7 @@ import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.security.CanDeleteUser;
 import pt.unl.fct.ciai.security.CanModifyUser;
 import pt.unl.fct.ciai.security.CanReadOneProposal;
+import pt.unl.fct.ciai.security.CanReadUserProposal;
 import pt.unl.fct.ciai.service.UsersService;
 
 import javax.validation.Valid;
@@ -43,6 +44,7 @@ public class UsersController implements UsersApi {
     }
 
     @GetMapping
+    @CanReadUserProposal
     public ResponseEntity<Resources<Resource<User>>> getUsers(@RequestParam(required = false) String search) {
         Iterable<User> users = usersService.getUsers(search);
         Resources<Resource<User>> resources = userAssembler.toResources(users);
