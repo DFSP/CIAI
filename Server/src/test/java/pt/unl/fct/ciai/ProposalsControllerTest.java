@@ -78,16 +78,16 @@ public class ProposalsControllerTest {
 		p1.setDescription("Proposal 1 - Description");
 		p1.setCreationDate(new Date());
 
-		Review r = create_Review_1();
-		r.setProposal(p1);
-		Section s=create_Section_1();
-		s.setProposal(p1);
-		Comment c=create_Comment_1();
-		c.setProposal(p1);
+		Review r1 = create_Review_1();
+		r1.setProposal(p1);
+		Section s1=create_Section_1();
+		s1.setProposal(p1);
+		Comment c1=create_Comment_1();
+		c1.setProposal(p1);
 
-		p1.addReview(r);
-		p1.addSection(s);
-		p1.addComment(c);
+		p1.addReview(r1);
+		p1.addSection(s1);
+		p1.addComment(c1);
 
 		return p1;
 	}
@@ -98,16 +98,31 @@ public class ProposalsControllerTest {
 		p2.setDescription("Proposal 2 - Description");
 		p2.setCreationDate(new Date());
 
-		Review r = create_Review_2();
-		r.setProposal(p2);
-		Section s= create_Section_2();
-		s.setProposal(p2);
-		Comment c=create_Comment_2();
-		c.setProposal(p2);
+		Review r1 = create_Review_1();
+		r1.setProposal(p2);
+		Review r2 = create_Review_2();
+		r2.setProposal(p2);
+		Section s1=create_Section_1();
+		s1.setProposal(p2);
+		Section s2=create_Section_2();
+		s2.setProposal(p2);
+		Comment c1=create_Comment_1();
+		c1.setProposal(p2);
+		Comment c2=create_Comment_1();
+		c2.setProposal(p2);
+		User bidder1 = create_User_1();
+		bidder1.addBid(p2);
+		User bidder2 = create_User_2();
+		bidder2.addBid(p2);
 
-		p2.addReview(r);
-		p2.addSection(s);
-		p2.addComment(c);
+		p2.addReview(r1);
+		p2.addReview(r2);
+		p2.addSection(s1);
+		p2.addSection(s2);
+		p2.addComment(c1);
+		p2.addComment(c2);
+		p2.addReviewBid(bidder1);
+		p2.addReviewBid(bidder2);
 
 		return p2;
 	}
@@ -327,7 +342,7 @@ public class ProposalsControllerTest {
 
 	@Test
 	public void testGetSections() throws Exception {
-		Proposal p1 = createProposal_1();
+		Proposal p1 = createProposal_2();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 		Iterator<Section> it = p1.getSections().get().iterator();
 
@@ -523,7 +538,7 @@ public class ProposalsControllerTest {
 
 	@Test
 	public void testGetReviews() throws Exception {
-		Proposal p1 = createProposal_1();
+		Proposal p1 = createProposal_2();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 		Iterator<Review> it = p1.getReviews().get().iterator();
 
@@ -722,7 +737,7 @@ public class ProposalsControllerTest {
 
 	@Test
 	public void testGetComments() throws Exception {
-		Proposal p1 = createProposal_1();
+		Proposal p1 = createProposal_2();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 		Iterator<Comment> it = p1.getComments().get().iterator();
 

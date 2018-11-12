@@ -10,7 +10,8 @@ import java.lang.annotation.*;
 @Documented
 @PreAuthorize(CanAddStaff.Condition)
 public @interface CanAddStaff {
-    String Condition = "@SecurityService.isAuthorOfProposal(#id) or "
+    String Condition = "@SecurityService.isProposalNotRejected(#id) and "
+    		+ "( @SecurityService.isAuthorOfProposal(#id) or "
     		+ "@SecurityService.isAdminOfAuthorOfProposal(principal, #id) or "
-    		+ "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name())";
+    		+ "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name()) )";
 }
