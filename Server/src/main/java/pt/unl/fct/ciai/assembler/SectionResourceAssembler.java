@@ -23,19 +23,11 @@ public class SectionResourceAssembler implements SubResourcesAssembler<Section, 
 
 	@Override
 	public Resource<Section> toResource(Section section) {
-<<<<<<< HEAD
 		long sid = section.getId();
 		long pid = section.getProposal().getId();
 		return new Resource<>(section,
 				linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
 				linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));
-=======
-		//long sid = section.getId();
-		//long pid = section.getProposal().getId();
-		return new Resource<>(section, Collections.emptyList());
-			//	linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
-			//	linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));
->>>>>>> 94ed255f0d232941c3664d260bd9acc1ea411a08
 	}
 
 	@Override

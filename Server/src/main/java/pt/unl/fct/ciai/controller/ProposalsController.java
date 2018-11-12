@@ -135,7 +135,7 @@ public class ProposalsController implements ProposalsApi {
 	@GetMapping("/{id}/staff")
 	public ResponseEntity<Resources<Resource<User>>> getStaff(
 			@PathVariable("id") long id, @RequestParam(value="search", required = false) String search) {
-		getProposalIfPresent(id);
+		Proposal proposal = getProposalIfPresent(id);
 		Iterable<User> staff = proposalsService.getStaff(id, search);
 		Resources<Resource<User>> resources = staffAssembler.toResources(staff, proposal);
 		return ResponseEntity.ok(resources);
@@ -179,12 +179,9 @@ public class ProposalsController implements ProposalsApi {
 	@PostMapping("/{id}/members")
 	// @CanAddMember
 	public ResponseEntity<Resource<Employee>> addMember(@PathVariable("id") long id, @Valid @RequestBody Employee member)
-			throws URISyntaxException {// TODO recebe objeto employee ou apenas o id?
-		Employee newMember = proposalsService.addMember(id, member);
-		Resource<Employee> resource = memberAssembler.toResource(newMember);
-		return ResponseEntity
-				.created(new URI(resource.getId().expand().getHref()))
-				.body(resource);
+			throws URISyntaxException {
+		proposalsService.addMember(id, member); //TODO ver qual é o id do member
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/{pid}/members/{mid}")
