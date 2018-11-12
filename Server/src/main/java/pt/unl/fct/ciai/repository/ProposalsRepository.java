@@ -11,7 +11,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
 
     // Own queries
 
-    @Query("SELECT p "
+    @Query("SELECT DISTINCT p "
             + "FROM Proposal p JOIN p.staff s JOIN p.members m "
             + "WHERE p.state = 'APPROVED' "
             + "OR s.username = ?#{principal.username} "
@@ -20,7 +20,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "OR 1=?#{hasRole('ROLE_SYS_ADMIN') ? 1 : 0}")
     Iterable<Proposal> getPublicProposals();
 
-    @Query("SELECT p "
+    @Query("SELECT DISTINCT p "
             + "FROM Proposal p JOIN p.staff s JOIN p.members m "
             + "WHERE (p.state = 'APPROVED' "
             + "OR s.username = ?#{principal.username} "

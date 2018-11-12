@@ -156,8 +156,7 @@ public class DatabaseLoader {
                     .staff(Collections.singleton(manuel))
                     .members(new HashSet<Employee>(Arrays.asList(joao)))
                     .reviewBiddings(Collections.singleton(luis))
-                    .proposer(joao)
-                    .approved();
+                    .proposer(joao);
             manuel.addProposal(proposal1);
             joao.addProposal(proposal1);
             luis.addBidding(proposal1);
