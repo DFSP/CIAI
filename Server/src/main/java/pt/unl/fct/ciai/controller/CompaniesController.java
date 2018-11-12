@@ -2,162 +2,136 @@ package pt.unl.fct.ciai.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.hateoas.MediaTypes;
 
+import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
-import pt.unl.fct.ciai.assemblers.CompanyResourceAssembler;
-import pt.unl.fct.ciai.assemblers.EmployeeResourceAssembler;
-import pt.unl.fct.ciai.exceptions.BadRequestException;
-import pt.unl.fct.ciai.exceptions.NotFoundException;
-import pt.unl.fct.ciai.repository.CompaniesRepository;
-import pt.unl.fct.ciai.repository.EmployeesRepository;
+import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
+import pt.unl.fct.ciai.assembler.EmployeeResourcesAssembler;
+import pt.unl.fct.ciai.exception.NotFoundException;
+import pt.unl.fct.ciai.security.*;
+import pt.unl.fct.ciai.service.CompaniesService;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/partners", produces = MediaType.APPLICATION_JSON_VALUE)
-public class CompaniesController { //implements CompaniesApi {
+@RequestMapping(value = "/companies", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
+public class CompaniesController {
 
-	private final CompaniesRepository companiesRepository;
-	private final EmployeesRepository employeesRepository;
+	private final CompaniesService companiesService;
 
 	private final CompanyResourceAssembler companyAssembler;
-	private final EmployeeResourceAssembler employeeAssembler;
+	private final EmployeeResourcesAssembler employeeAssembler;
 
-	public CompaniesController(CompaniesRepository companiesRepository, EmployeesRepository employeesRepository,
-			CompanyResourceAssembler companyResourceAssembler, EmployeeResourceAssembler employeeResourceAssembler) {
-		this.companiesRepository = companiesRepository;
-		this.employeesRepository = employeesRepository;
-		this.companyAssembler = companyResourceAssembler;
-		this.employeeAssembler = employeeResourceAssembler;
+	public CompaniesController(CompaniesService companiesService,
+                               CompanyResourceAssembler companyAssembler, EmployeeResourcesAssembler employeeAssembler) {
+		this.companiesService = companiesService;
+		this.companyAssembler = companyAssembler;
+		this.employeeAssembler = employeeAssembler;
 	}
 
 	@GetMapping
-	public Resources<Resource<Company>> getCompanies() { //TODO search necessario? que campos?
-		// @RequestParam(value = "search", required = false) String search)
-		List<Resource<Company>> companies = 
-				companiesRepository.findAll()
-				.stream()
-				.map(companyAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(companies,
-				linkTo(methodOn(CompaniesController.class).getCompanies()).withSelfRel());
+	public ResponseEntity<Resources<Resource<Company>>> getCompanies(@RequestParam(required = false) String search) {
+		Iterable<Company> companies = companiesService.getCompanies(search);
+		Resources<Resource<Company>> resources = companyAssembler.toResources(companies);
+		return ResponseEntity.ok(resources);
 	}
 
 	@PostMapping
-	public ResponseEntity<Resource<Company>> addCompany(@RequestBody Company company) throws URISyntaxException {
-		Company newCompany = companiesRepository.save(company);
+	@CanAddCompany
+	public ResponseEntity<Resource<Company>> addCompany(@Valid @RequestBody Company company) throws URISyntaxException {
+		if (company.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative company id, instead got %d", company.getId()));
+        }
+		Company newCompany = companiesService.addCompany(company);
 		Resource<Company> resource = companyAssembler.toResource(newCompany);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
-				.body(resource);	
+				.body(resource);
 	}
 
 	@GetMapping(value = "/{id}")
-	public Resource<Company> getCompany(@PathVariable("id") long id) {
-		Company company = findCompany(id);
-		return companyAssembler.toResource(company);
+	public ResponseEntity<Resource<Company>> getCompany(@PathVariable("id") long id) {
+		Company company = getCompanyIfPresent(id);
+		Resource<Company> resource = companyAssembler.toResource(company);
+		return ResponseEntity.ok(resource);
 	}
 
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<?> updateCompany(@PathVariable("id") long id, @RequestBody Company newCompany) {
-		if (id != newCompany.getId()) {
-			throw new BadRequestException(String.format("Path id %d does not match company id %d", id, newCompany.getId()));
+	@CanModifyCompany
+	public ResponseEntity<?> updateCompany(@PathVariable("id") long id, @RequestBody Company company) {
+		if (id != company.getId()) {
+			throw new BadRequestException(String.format("Path id %d and company id %d don't match.", id, company.getId()));
 		}
-		Company oldCompany = findCompany(id);
-		companiesRepository.save(newCompany);
+		companiesService.updateCompany(company);
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping(value = "/{id}")
+	@CanDeleteCompany
 	public ResponseEntity<?> deleteCompany(@PathVariable("id") long id) {
-		Company deletedCompany = findCompany(id);
-		companiesRepository.deleteById(id);
+		companiesService.deleteCompany(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping(value = "/{id}/employees")
-	public Resources<Resource<Employee>> getEmployees(@PathVariable("id") long id) { // TODO search mesmo necessário? que campos?	
-		// @RequestParam(value = "search", required = false) String search)
-		List<Resource<Employee>> employees = 
-				findCompany(id).getEmployees()
-				.stream()
-				.map(employeeAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(employees,
-				linkTo(methodOn(CompaniesController.class).getEmployees(id)).withSelfRel());	
+	public ResponseEntity<Resources<Resource<Employee>>> getEmployees(
+			@PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+		Company company = getCompanyIfPresent(id);
+		Iterable<Employee> employees = companiesService.getEmployees(id, search);
+		Resources<Resource<Employee>> resources = employeeAssembler.toResources(employees, company);
+		return ResponseEntity.ok(resources);
 	}
-
-	@GetMapping(value = "/{cid}/employees/{eid}")
-	public Resource<Employee> getEmployee(@PathVariable("id") long cid, @PathVariable long eid) {
-		Company company = findCompany(cid);
-		Employee employee = findEmployee(eid);
-		if (!employee.getCompany().equals(company)) {
-			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
-		}
-		return employeeAssembler.toResource(employee);
-	}
-
+	
 	@PostMapping(value = "/{id}/employees")
-	public ResponseEntity<Resource<Employee>> addEmployee(@PathVariable("id") long id, @RequestBody Employee employee) throws URISyntaxException {	
-		Company company = findCompany(id);
-		employee.setCompany(company);
-		company.addEmployee(employee);
-		companiesRepository.save(company); //TODO verificar se é necessário
-		Employee newEmployee = employeesRepository.save(employee);
+	@CanAddEmployee
+	public ResponseEntity<Resource<Employee>> addEmployee(
+			@PathVariable("id") long id, @Valid @RequestBody Employee employee) throws URISyntaxException {
+		if (employee.getId() > 0) {
+			throw new BadRequestException(String.format("Expected non negative employee id, instead got %d", employee.getId()));
+		}
+		Employee newEmployee = companiesService.addEmployee(id, employee);
 		Resource<Employee> resource = employeeAssembler.toResource(newEmployee);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);
 	}
 
-	@PutMapping(value = "/{pid}/employees/{eid}")
-	public ResponseEntity<?> updateEmployee(@PathVariable("id") long cid, @PathVariable long eid, @RequestBody Employee newEmployee) {
-		Company company = findCompany(cid);
-		Employee oldEmployee = findEmployee(eid);
-		if (newEmployee.getId() != eid) {
-			throw new BadRequestException(String.format("Request body employee id %d and path paramenter eid %d don't match.", newEmployee.getId(), eid));
+	@GetMapping(value = "/{cid}/employees/{eid}")
+	public ResponseEntity<Resource<Employee>> getEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {
+		Employee employee = companiesService.getEmployee(cid, eid).orElseThrow(() ->
+				new NotFoundException(String.format("Employee with id %d is not part of company with id %d", eid, cid)));
+		Resource<Employee> resource = employeeAssembler.toResource(employee);
+		return ResponseEntity.ok(resource);
+	}
+
+	@PutMapping(value = "/{cid}/employees/{eid}")
+	@CanModifyEmployee
+	public ResponseEntity<?> updateEmployee(
+			@PathVariable("cid") long cid, @PathVariable("eid") long eid, @RequestBody Employee employee) {
+		if (eid != employee.getId()) {
+			throw new BadRequestException(String.format("Path id %d and employee id %d don't match.", eid, employee.getId()));
 		}
-		if (oldEmployee.getCompany().getId() != company.getId()) {
-			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));	
-		}
-		employeesRepository.save(newEmployee);
+		companiesService.updateEmployee(cid, employee);
 		return ResponseEntity.noContent().build();
 	}
 
-	@DeleteMapping(value = "/{pid}/employees/{eid}")
-	public ResponseEntity<?> deleteEmployee(@PathVariable("id") long cid, @PathVariable long eid) {		
-		Company company = findCompany(cid);
-		Employee employee = findEmployee(eid);
-		if (employee.getCompany().getId() != company.getId()) {
-			throw new BadRequestException(String.format("Employee id %d does not belong to company with id %d", eid, cid));
-		}
-		employeesRepository.deleteById(eid);
+	@DeleteMapping(value = "/{cid}/employees/{eid}")
+	@CanDeleteEmployee
+	public ResponseEntity<?> deleteEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {
+		companiesService.deleteEmployee(cid, eid);
 		return ResponseEntity.noContent().build();
-	}	
-
-	private Company findCompany(long id) {
-		return companiesRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Company with id %d not found", id)));
 	}
 
-	private Employee findEmployee(long id) {
-		return employeesRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Employee with id %d not found", id)));
+	private Company getCompanyIfPresent(long id) {
+		return companiesService.getCompany(id).orElseThrow(() ->
+				new NotFoundException(String.format("Company with id %d not found.", id)));
 	}
 
 }

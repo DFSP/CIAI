@@ -1,27 +1,34 @@
 package pt.unl.fct.ciai.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name = "companies")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Company {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue
 	private long id;
+	@NotEmpty
 	private String name;
+	@NotEmpty
 	private String city;
+	@NotEmpty
 	private String zipCode;
+	@NotEmpty
 	private String address;
+	@NotEmpty
 	private String phone;
+	@NotEmpty
 	private String email;
 	private String fax;
-
-	@JsonIgnore
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private Set<Employee> employees;
 
@@ -37,133 +44,170 @@ public class Company {
 		this.fax = fax;
 	}
 
-	public Company addEmployee(Employee employee) {
-		if (this.employees == null) {
-			this.employees = new HashSet<Employee>();
-		}
-		this.employees.add(employee);
-		return this;
-	}
-
 	public long getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
+	public Company id(long id) {
+		setId(id);
+		return this;
+	}
+
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	public Company name(String name) {
+		setName(name);
+		return this;
+	}
+
 	public String getCity() {
-		return city;
+		return this.city;
 	}
 
 	public void setCity(String city) {
 		this.city = city;
 	}
 
+	public Company city(String city) {
+		setCity(city);
+		return this;
+	}
+
 	public String getZipCode() {
-		return zipCode;
+		return this.zipCode;
 	}
 
 	public void setZipCode(String zipCode) {
 		this.zipCode = zipCode;
 	}
 
+	public Company zipCode(String zipCode) {
+		setZipCode(zipCode);
+		return this;
+	}
+
 	public String getAddress() {
-		return address;
+		return this.address;
 	}
 
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
+	public Company address(String address) {
+		setAddress(address);
+		return this;
+	}
+
 	public String getPhone() {
-		return phone;
+		return this.phone;
 	}
 
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
+	public Company phone(String phone) {
+		setPhone(phone);
+		return this;
+	}
+
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
+	public Company email(String email) {
+		setEmail(email);
+		return this;
+	}
+
 	public String getFax() {
-		return fax;
+		return this.fax;
 	}
 
 	public void setFax(String fax) {
 		this.fax = fax;
 	}
 
-	public Set<Employee> getEmployees() {
-		return employees;
+	public Company fax(String fax) {
+		setFax(fax);
+		return this;
+	}
+
+	public Optional<Set<Employee>> getEmployees() {
+		return Optional.ofNullable(employees);
 	}
 
 	public void setEmployees(Set<Employee> employees) {
 		this.employees = employees;
 	}
 
+	public Company addEmployee(Employee employee) {
+		if (this.employees == null) {
+			this.employees = new LinkedHashSet<>();
+		}
+		this.employees.add(employee);
+		return this;
+	}
+
+	public Company removeEmployee(Employee employee) {
+		getEmployees().ifPresent(employees -> employees.remove(employee));
+		return this;
+	}
+
+	public Company updateEmployee(Employee employee) {
+		Set<Employee> employees = this.getEmployees().orElseThrow(() ->
+				new IllegalStateException(String.format("Company %d has no employees", getId())));
+		if (!employees.remove(employee)) {
+			throw new IllegalArgumentException(
+					String.format("Company %d doesn't have an employee %d", getId(), employee.getId()));
+		}
+		employees.add(employee);
+		return this;
+	}
+
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 		Company company = (Company) o;
-		return Objects.equals(this.id, company.id) &&
-				Objects.equals(this.name, company.name) &&
-				Objects.equals(this.address, company.address) &&
-				Objects.equals(this.email, company.email) &&
-				Objects.equals(this.fax, company.fax) &&
-				Objects.equals(this.zipCode, company.zipCode) &&
-				Objects.equals(this.phone, company.phone) &&
-				Objects.equals(this.employees, company.employees);
+		return id == company.id;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, address, phone, zipCode, fax, email, employees);
+		return Objects.hash(id);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Company {\n");
-
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("    address: ").append(toIndentedString(address)).append("\n");
-		sb.append("    email: ").append(toIndentedString(email)).append("\n");
-		sb.append("    employees: ").append(toIndentedString(employees)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
+		return "Company{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", city='" + city + '\'' +
+				", zipCode='" + zipCode + '\'' +
+				", address='" + address + '\'' +
+				", phone='" + phone + '\'' +
+				", email='" + email + '\'' +
+				", fax='" + fax + '\'' +
+				", employees=" + getEmployees()
+				.map(p -> p.stream().map(Employee::getId).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()) +
+				'}';
 	}
 }
 

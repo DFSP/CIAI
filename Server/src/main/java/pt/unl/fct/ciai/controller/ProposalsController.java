@@ -1,276 +1,380 @@
 package pt.unl.fct.ciai.controller;
 
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.exceptions.ConflictException;
-import pt.unl.fct.ciai.model.Comment;
-import pt.unl.fct.ciai.repository.CommentsRepository;
-import pt.unl.fct.ciai.exceptions.BadRequestException;
-import pt.unl.fct.ciai.exceptions.NotFoundException;
-import pt.unl.fct.ciai.model.Proposal;
-import pt.unl.fct.ciai.model.Review;
-import pt.unl.fct.ciai.repository.ProposalsRepository;
-import pt.unl.fct.ciai.repository.ReviewsRepository;
-import pt.unl.fct.ciai.model.Section;
-import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.repository.SectionsRepository;
+import pt.unl.fct.ciai.assembler.*;
+import pt.unl.fct.ciai.exception.BadRequestException;
+import pt.unl.fct.ciai.exception.NotFoundException;
+import pt.unl.fct.ciai.model.*;
+import pt.unl.fct.ciai.security.*;
+import pt.unl.fct.ciai.service.ProposalsService;
 
-import java.util.Optional;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/proposals")
-public class ProposalsController {
+@RequestMapping(value = "/proposals", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 
-    private ProposalsRepository proposals;
-    private ReviewsRepository reviews;
-    private CommentsRepository comments;
-    private SectionsRepository sections;
+public class ProposalsController{
 
-    public ProposalsController(ProposalsRepository proposals, ReviewsRepository reviews,
-                               CommentsRepository comments, SectionsRepository sections) {
-        this.proposals = proposals;
-        this.reviews = reviews;
-        this.comments = comments;
-        this.sections = sections;
+    private final ProposalsService proposalsService;
+
+    private final ProposalResourceAssembler proposalAssembler;
+    private final StaffResourcesAssembler staffAssembler;
+    private final MemberResourceAssembler memberAssembler;
+    private final SectionResourcesAssembler sectionAssembler;
+    private final ReviewResourcesAssembler reviewAssembler;
+    private final CommentResourcesAssembler commentAssembler;
+    private final UserResourcesAssembler userAssembler;
+
+    public ProposalsController(ProposalsService proposalsService,
+                               ProposalResourceAssembler proposalAssembler,
+                               StaffResourcesAssembler staffAssembler,
+                               MemberResourceAssembler memberAssembler,
+                               SectionResourcesAssembler sectionAssembler,
+                               ReviewResourcesAssembler reviewAssembler, CommentResourcesAssembler commentAssembler,
+                               UserResourcesAssembler userAssembler) {
+        this.proposalsService = proposalsService;
+        this.proposalAssembler = proposalAssembler;
+        this.staffAssembler = staffAssembler;
+        this.memberAssembler = memberAssembler;
+        this.sectionAssembler = sectionAssembler;
+        this.reviewAssembler = reviewAssembler;
+        this.commentAssembler = commentAssembler;
+        this.userAssembler = userAssembler;
     }
 
-    @GetMapping("")
-    Iterable<Proposal> getAllProposals(@RequestParam(required = false) String search){
-        if(search == null)
-            return proposals.findAll();
-        else
-            return proposals.searchProposals(search);
+    @GetMapping
+    public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
+            @RequestParam(value = "search", required = false) String search) {
+        Iterable<Proposal> proposals = proposalsService.getProposals(search);
+        Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
+        return ResponseEntity.ok(resources);
+    }
+
+    @PostMapping
+    public ResponseEntity<Resource<Proposal>> addProposal(@Valid @RequestBody Proposal proposal)
+            throws URISyntaxException {
+        if (proposal.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative proposal id, instead got %d", proposal.getId()));
+        }
+        Proposal newProposal = proposalsService.addProposal(proposal);
+        Resource<Proposal> resource = proposalAssembler.toResource(newProposal);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
 
     @GetMapping("/{id}")
-    Proposal getProposalById(@PathVariable long id){
-        Optional<Proposal> p1 = proposals.findById(id);
-        if(p1.isPresent())
-            return p1.get();
-        else{
-            throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
-        }
-    }
-
-    @PostMapping("")
-    void addProposal(@RequestBody Proposal proposal){
-        proposals.save(proposal);
+    @CanReadProposal
+    public ResponseEntity<Resource<Proposal>> getProposal(@PathVariable("id") long id) {
+        Proposal proposal = getProposalIfPresent(id);
+        Resource<Proposal> resource = proposalAssembler.toResource(proposal);
+        return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{id}")
-    void updateProposal(@PathVariable long id, @RequestBody Proposal proposal){
-        if(proposal.getId() == id) {
-            Optional<Proposal> p1 = proposals.findById(id);
-            if (p1.isPresent())
-                proposals.save(proposal);
-            else
-                throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+    @CanModifyProposal
+    public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal proposal) {
+        if (id != proposal.getId()) {
+            throw new BadRequestException(String.format("Path id %d and proposal id %d don't match.", id, proposal.getId()));
         }
-        else
-            throw new BadRequestException("Invalid request: Body request proposal id and path id don't match.");
+        proposalsService.updateProposal(proposal);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    void deleteProposal(@PathVariable long id) {
-        Optional<Proposal> p1 = proposals.findById(id);
-        if( p1.isPresent() ) {
-            proposals.delete(p1.get());
-        } else
-            throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+    @CanDeleteProposal
+    public ResponseEntity<?> deleteProposal(@PathVariable("id") long id) {
+        proposalsService.deleteProposal(id);
+        return ResponseEntity.noContent().build();
     }
 
-    // TODO
     @GetMapping("/{id}/sections")
-    Iterable<Section> getAllSectionsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if (search == null)
-                return p.get().getSections();
-            else
-                return sections.searchSections(search); // ----> ver isto
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+    @CanReadSection
+    public ResponseEntity<Resources<Resource<Section>>> getSections(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<Section> sections = proposalsService.getSections(id, search);
+        Resources<Resource<Section>> resources = sectionAssembler.toResources(sections, proposal);
+        return ResponseEntity.ok(resources);
     }
 
     @PostMapping("/{id}/sections")
-    void addSectionOfProposal(@PathVariable long id, @RequestBody Section section){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if(!p.get().getSections().contains(section))
-                sections.save(section);
-            else throw new ConflictException(String.format("Section already associated with proposal id %d.", id));
+    @CanAddSection
+    public ResponseEntity<Resource<Section>> addSection(@PathVariable("id") long id, @Valid @RequestBody Section section)
+            throws URISyntaxException {
+        if (section.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative section id, instead got %d", section.getId()));
         }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+        Section newSection = proposalsService.addSection(id, section);
+        Resource<Section> resource = sectionAssembler.toResource(newSection);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
+    }
+
+    @GetMapping("/{pid}/sections/{sid}")
+    @CanReadOneSection
+    public ResponseEntity<Resource<Section>> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
+        Section section = proposalsService.getSection(pid, sid).orElseThrow(() ->
+                new NotFoundException(String.format("Section id %d does not belong to proposal with id %d", sid, pid)));
+        Resource<Section> resource = sectionAssembler.toResource(section);
+        return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{pid}/sections/{sid}")
-    void updateSectionOfProposal(@PathVariable long pid, @PathVariable long sid, @RequestBody Section section){
-        if(section.getId() == sid) {
-            Optional<Proposal> p = proposals.findById(pid);
-            if (p.isPresent()){
-                if(p.get().getSections().contains(section))
-                    sections.save(section);
-                else throw new BadRequestException(String.format("Proposal id %d does not have Section id %id associated", pid, sid));
-            }
-            else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanModifySection
+    public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section section) {
+        if (sid != section.getId()) {
+            throw new BadRequestException(String.format("Path id %d and section id %d don't match.", sid, section.getId()));
         }
-        else throw new BadRequestException("Invalid request: sectionID on request does not match the Section.id attribute");
+        proposalsService.updateSection(pid, section);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{pid}/sections/{sid}")
-    void deleteSectionOfProposal(@PathVariable long pid, @PathVariable long sid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent()) {
-            Optional<Section> s = sections.findById(sid);
-            if(s.isPresent() && p.get().getSections().contains(s.get())){
-                sections.deleteById(sid);
-            }
-            else throw new BadRequestException(String.format("Proposal id %d does not have Section id %id associated", pid, sid));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanDeleteSection
+    public ResponseEntity<?> deleteSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
+        proposalsService.deleteSection(pid, sid);
+        return ResponseEntity.noContent().build();
     }
 
-    // TODO
+    @GetMapping("/{id}/staff")
+    public ResponseEntity<Resources<Resource<User>>> getStaff(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<User> staff = proposalsService.getStaff(id, search);
+        Resources<Resource<User>> resources = staffAssembler.toResources(staff, proposal);
+        return ResponseEntity.ok(resources);
+    }
+
+    @PostMapping("/{id}/staff")
+    @CanAddStaff
+    public ResponseEntity<Resource<User>> addStaff(@PathVariable("id") long id, @RequestBody User staff)
+            throws URISyntaxException {
+        Proposal proposal = getProposalIfPresent(id);
+        User newStaff = proposalsService.addStaff(id, staff);
+        Resource<User> resource = staffAssembler.toResource(newStaff, proposal);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
+    }
+
+    @GetMapping("/{pid}/staff/{uid}")
+    public ResponseEntity<Resource<User>> getStaff(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+        Proposal proposal = getProposalIfPresent(pid);
+        User staff = proposalsService.getStaff(pid, uid).orElseThrow(() ->
+                new NotFoundException(String.format("Staff id %d does not belong to proposal with id %d", uid, pid)));
+        Resource<User> resource = staffAssembler.toResource(staff, proposal);
+        return ResponseEntity.ok(resource);
+    }
+
+    @DeleteMapping("/{pid}/staff/{uid}")
+    @CanDeleteStaff
+    public ResponseEntity<?> removeStaff(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+        proposalsService.removeStaff(pid, uid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/members")
+    public ResponseEntity<Resources<Resource<Employee>>> getMembers(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<Employee> members = proposalsService.getMembers(id, search);
+        Resources<Resource<Employee>> resources = memberAssembler.toResources(members, proposal);
+        return ResponseEntity.ok(resources);
+    }
+
+    @PostMapping("/{id}/members")
+    @CanAddMember
+    public ResponseEntity<Resource<Employee>> addMember(@PathVariable("id") long id, @RequestBody Employee member)
+            throws URISyntaxException {
+        Proposal proposal = getProposalIfPresent(id);
+        Employee newMember = proposalsService.addMember(id, member);
+        Resource<Employee> resource = memberAssembler.toResource(newMember, proposal);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
+    }
+
+    @GetMapping("/{pid}/members/{mid}")
+    public ResponseEntity<Resource<Employee>> getMember(@PathVariable("pid") long pid, @PathVariable("mid") long mid) {
+        Proposal proposal = getProposalIfPresent(pid);
+        Employee member = proposalsService.getMember(pid, mid).orElseThrow(() ->
+                new NotFoundException(String.format("Member id %d does not belong to proposal with id %d", mid, pid)));
+        Resource<Employee> resource = memberAssembler.toResource(member, proposal);
+        return ResponseEntity.ok(resource);
+    }
+
+    @DeleteMapping("/{pid}/members/{mid}")
+    @CanDeleteMember
+    public ResponseEntity<?> removeMember(@PathVariable("pid") long pid, @PathVariable("mid") long mid) {
+        proposalsService.removeMember(pid, mid);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/reviews")
-    Iterable<Review> getAllReviewsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()) {
-            if (search == null)
-                return p.get().getReviews();
-            else
-                return reviews.searchReviews(search); // ----> ver isto TODO
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+    @CanReadReview
+    public ResponseEntity<Resources<Resource<Review>>> getReviews(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<Review> reviews = proposalsService.getReviews(id, search);
+        Resources<Resource<Review>> resources = reviewAssembler.toResources(reviews, proposal);
+        return ResponseEntity.ok(resources);
     }
 
     @PostMapping("/{id}/reviews")
-    void addReview(@PathVariable long id, @RequestBody Review review){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if(!p.get().getReviews().contains(review))
-                reviews.save(review);
-            else throw new ConflictException(String.format("Review already associated with proposal id %d", id));
+    @CanAddReview
+    public ResponseEntity<?> addReview(@PathVariable("id") long id, @Valid @RequestBody Review review)
+            throws URISyntaxException {
+        if (review.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative review id, instead got %d", review.getId()));
         }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+        Review newReview = proposalsService.addReview(id, review);
+        Resource<Review> resource = reviewAssembler.toResource(newReview);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
 
-    //TODO
     @GetMapping("/{pid}/reviews/{rid}")
-    Review getOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent())
-            return reviews.findById(rid).get(); // -----> não está a apanhar da lista da Proposal p, mas sim do repositorio TODO
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanReadOneReview
+    public ResponseEntity<Resource<Review>> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
+        Review review = proposalsService.getReview(pid, rid).orElseThrow(() ->
+                new NotFoundException(String.format("Review id %d does not belong to proposal with id %d", rid, pid)));
+        Resource<Review> resource = reviewAssembler.toResource(review);
+        return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{pid}/reviews/{rid}")
-    void updateOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid, @RequestBody Review review){
-        if(review.getId() == rid) {
-            Optional<Proposal> p = proposals.findById(pid);
-            if (p.isPresent()){
-                if(p.get().getReviews().contains(review))
-                    reviews.save(review);
-                else throw new NotFoundException(String.format("Proposal id %d does not have Review id %id associated", pid, rid));
-            }
-            else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanModifyReview
+    public ResponseEntity<?> updateReview(
+            @PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review review) {
+        if (rid != review.getId()) {
+            throw new BadRequestException(String.format("Path id %d and review id %d don't match.", rid, review.getId()));
         }
-        else throw new BadRequestException("Invalid request: reviewID on request does not match the Review.id attribute");
+        proposalsService.updateReview(pid, review);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{pid}/reviews/{rid}")
-    void deleteOneReviewOfProposal(@PathVariable long pid, @PathVariable long rid){
-        Optional<Proposal> p = proposals.findById(pid);
-        if(p.isPresent()) {
-            Optional<Review> r = reviews.findById(rid);
-            if(r.isPresent() && p.get().getReviews().contains(r.get())){
-                reviews.deleteById(rid);
-            }
-            else throw new NotFoundException(String.format("Proposal id %d does not have Review id %id associated", pid, rid));
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanDeleteReview
+    public ResponseEntity<?> deleteReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
+        proposalsService.deleteReview(pid, rid);
+        return ResponseEntity.noContent().build();
     }
 
-    //TODO
     @GetMapping("/{id}/comments")
-    Iterable<Comment> getAllCommentsOfProposal(@PathVariable long id, @RequestParam(required = false) String search){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()) {
-            if (search == null)
-                return p.get().getComments();
-            else
-                return comments.searchComments(search); // ----> ver isto TODO
-        }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+    @CanReadComment
+    public ResponseEntity<Resources<Resource<Comment>>> getComments(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<Comment> comments = proposalsService.getComments(id, search);
+        Resources<Resource<Comment>> resources = commentAssembler.toResources(comments, proposal);
+        return ResponseEntity.ok(resources);
     }
 
     @PostMapping("/{id}/comments")
-    void addComment(@PathVariable long id, @RequestBody Comment comment){
-        Optional<Proposal> p = proposals.findById(id);
-        if(p.isPresent()){
-            if(!p.get().getComments().contains(comment))
-                comments.save(comment);
-            else throw new ConflictException(String.format("Comment already associated with proposal id %d", id));
+    @CanAddComment
+    public ResponseEntity<Resource<Comment>> addComment(@PathVariable("id") long id, @Valid @RequestBody Comment comment)
+            throws URISyntaxException {
+        if (comment.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative comment id, instead got %d", comment.getId()));
         }
-        else throw new NotFoundException(String.format("Proposal with id %d does not exist.", id));
+        Comment newComment = proposalsService.addComment(id, comment);
+        Resource<Comment> resource = commentAssembler.toResource(newComment);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
-    
+
     @GetMapping("/{pid}/comments/{cid}")
-    Comment getOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-        Optional<Proposal> p = proposals.findById(pid);
-        Optional<Comment> c = comments.findById(cid);
-        if(p.isPresent()) {
-            if (c.isPresent()) {
-            	Comment comment = c.get();
-            	if (comment.getProposal().equals(p.get()))
-            		return comment;
-            	else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
-            } else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
-        } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanReadOneComment
+    public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
+        Comment comment = proposalsService.getComment(pid, cid).orElseThrow(() ->
+                new NotFoundException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid)));
+        Resource<Comment> resource = commentAssembler.toResource(comment);
+        return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{pid}/comments/{cid}")
-    void updateOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid, @RequestBody Comment comment){
-        if(comment.getId() == cid) {
-            Optional<Proposal> p = proposals.findById(pid);
-            if (p.isPresent()){
-            	Optional<Comment> c = comments.findById(cid);
-            	if (c.isPresent()) {
-            		if (c.get().getProposal().equals(p.get()))
-            			comments.save(comment);
-            		else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
-            	} else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
-            } else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
-        } else throw new BadRequestException("Invalid request: commentID on request does not match the Comment.id attribute");
+    @CanModifyComment
+    public ResponseEntity<?> updateComment(
+            @PathVariable("pid") long pid, @PathVariable("cid") long cid, @RequestBody Comment comment) {
+        if (cid != comment.getId()) {
+            throw new BadRequestException(String.format("Path id %d and comment id %d don't match.", cid, comment.getId()));
+        }
+        proposalsService.updateComment(pid, comment);
+        return ResponseEntity.noContent().build();
     }
-    
+
     @DeleteMapping("/{pid}/comments/{cid}")
-    void deleteOneCommentOfProposal(@PathVariable long pid, @PathVariable long cid){
-    	Optional<Proposal> p = proposals.findById(pid);
-    	if (p.isPresent()){
-    		Optional<Comment> c = comments.findById(cid);
-    		if (c.isPresent()) {
-    			if (c.get().getProposal().equals(p.get()))
-    				comments.deleteById(cid);
-    			else throw new BadRequestException(String.format("Comment with id %d does not belong to proposal id %d.", cid, pid));
-    		} else throw new NotFoundException(String.format("Comment with id %d does not exist.", cid));
-    	} else throw new NotFoundException(String.format("Proposal with id %d does not exist.", pid));
+    @CanDeleteComment
+    public ResponseEntity<?> deleteComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
+        proposalsService.deleteComment(pid, cid);
+        return ResponseEntity.noContent().build();
     }
-    
-    // TODO
-    @GetMapping("/{pid}/usersForBiding")
-    Iterable<User> getUsersForBidingOfProposal(@PathVariable long pid){
-        return null;
+
+    @GetMapping("/{id}/bids")
+    public ResponseEntity<Resources<Resource<User>>> getReviewBids(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<User> bids = proposalsService.getReviewBids(id, search);
+        Resources<Resource<User>> resources = userAssembler.toResources(bids, proposal);
+        return ResponseEntity.ok(resources);
     }
-    
-    // TODO
-    @PostMapping("/{pid}/usersForBiding/{uid}")
-    void addUserForBiding(@PathVariable long pid, @PathVariable long uid, @RequestBody User user){
-        
+
+    @PostMapping("/{id}/bids")
+    public ResponseEntity<Resource<User>> addReviewBid(@PathVariable("id") long id, @RequestBody User user)
+            throws URISyntaxException {
+        User newUser = proposalsService.addReviewBid(id, user);
+        Resource<User> resource = userAssembler.toResource(newUser);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
-    
-    // TODO
-    @DeleteMapping("/{pid}/usersForBiding/{uid}")
-    void deleteUserForBiding(@PathVariable long pid, @PathVariable long uid){
-        
-    }    
+
+    @GetMapping("/{pid}/bids/{uid}")
+    public ResponseEntity<Resource<User>> getReviewBid(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+        User bid = proposalsService.getReviewBid(pid, uid).orElseThrow(() ->
+                new NotFoundException(String.format("Bid id %d does not belong to proposal with id %d", uid, pid)));
+        Resource<User> resource = userAssembler.toResource(bid);
+        return ResponseEntity.ok(resource);
+    }
+
+    @DeleteMapping("/{pid}/bids/{uid}")
+    @CanDeleteBid
+    public ResponseEntity<?> deleteReviewBid(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
+        proposalsService.deleteReviewBid(pid, uid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/reviewers")
+    public ResponseEntity<Resources<Resource<User>>> getReviewers(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        Proposal proposal = getProposalIfPresent(id);
+        Iterable<User> reviewers = proposalsService.getReviewers(id, search);
+        Resources<Resource<User>> resources = userAssembler.toResources(reviewers, proposal);
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping("/{pid}/reviewers/{rid}")
+    public ResponseEntity<Resource<User>> getReviewer(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
+        User bid = proposalsService.getReviewer(pid, rid).orElseThrow(() ->
+                new NotFoundException(String.format("Reviewer id %d does not belong to proposal with id %d", rid, pid)));
+        Resource<User> resource = userAssembler.toResource(bid);
+        return ResponseEntity.ok(resource);
+    }
+
+    private Proposal getProposalIfPresent(long id) {
+        return proposalsService.getProposal(id).orElseThrow(() ->
+                new NotFoundException(String.format("Proposal with id %d not found.", id)));
+    }
 
 }

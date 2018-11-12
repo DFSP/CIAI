@@ -1,105 +1,135 @@
 package pt.unl.fct.ciai.controller;
 
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.exceptions.BadRequestException;
-import pt.unl.fct.ciai.exceptions.ConflictException;
-import pt.unl.fct.ciai.exceptions.NotFoundException;
+import pt.unl.fct.ciai.assembler.BidProposalResourceAssembler;
+import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserProposalResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserResourcesAssembler;
+import pt.unl.fct.ciai.exception.BadRequestException;
+import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.repository.ProposalsRepository;
-import pt.unl.fct.ciai.repository.UsersRepository;
+import pt.unl.fct.ciai.security.CanDeleteUser;
+import pt.unl.fct.ciai.security.CanModifyUser;
+import pt.unl.fct.ciai.security.CanReadOneProposal;
+import pt.unl.fct.ciai.security.CanReadUserProposal;
+import pt.unl.fct.ciai.service.UsersService;
 
-import java.util.Optional;
+import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/users")
-public class UsersController {
+@RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
+public class UsersController{
 
-    private final UsersRepository users;
-    private final ProposalsRepository toApprove;
 
-    public UsersController(UsersRepository users, ProposalsRepository toApprove) {
-        this.users = users;
-        this.toApprove = toApprove;
+    private final UsersService usersService;
+
+    private final UserResourcesAssembler userAssembler;
+    private final BidProposalResourceAssembler bidProposalAssembler;
+    private final UserProposalResourceAssembler userProposalAssembler;
+
+    public UsersController(UsersService usersService,
+                           UserResourcesAssembler userAssembler, BidProposalResourceAssembler bidProposalAssembler,
+                           UserProposalResourceAssembler userProposalAssembler) {
+        this.usersService = usersService;
+        this.userAssembler = userAssembler;
+        this.bidProposalAssembler = bidProposalAssembler;
+        this.userProposalAssembler = userProposalAssembler;
     }
 
-    @GetMapping("")
-    Iterable<User> getAllUsers(@RequestParam(required = false) String search){
-        if(search == null)
-            return users.findAll();
-        else
-            return users.searchUsers(search);
+    @GetMapping
+    @CanReadUserProposal
+    public ResponseEntity<Resources<Resource<User>>> getUsers(@RequestParam(required = false) String search) {
+        Iterable<User> users = usersService.getUsers(search);
+        Resources<Resource<User>> resources = userAssembler.toResources(users);
+        return ResponseEntity.ok(resources);
+    }
+
+    @PostMapping
+    public ResponseEntity<Resource<User>> addUser(@Valid @RequestBody User user) throws URISyntaxException {
+        if (user.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative user id, instead got %d", user.getId()));
+        }
+        User newUser = usersService.addUser(user);
+        Resource<User> resource = userAssembler.toResource(newUser);
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
 
     @GetMapping("/{id}")
-    User getUserById(@PathVariable long id){
-        Optional<User> u1 = users.findById(id);
-        if(u1.isPresent())
-            return u1.get();
-        else{
-            throw new NotFoundException("User with id "+id+" does not exist.");
-        }
-    }
-
-    @PostMapping("")
-    void addUser(@RequestBody User user){
-        users.save(user);
+    public ResponseEntity<Resource<User>> getUser(@PathVariable("id") long id) {
+        User user = getUserIfPresent(id);
+        Resource<User> resource = userAssembler.toResource(user);
+        return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{id}")
-    void updateUser(@PathVariable long id, @RequestBody User user){
-        if(user.getId() == id) {
-            Optional<User> u1 = users.findById(id);
-            if (u1.isPresent())
-                users.save(user);
-            else
-                throw new NotFoundException("User with id "+id+" does not exist.");
+    @CanModifyUser
+    public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+        if (id != user.getId()) {
+            throw new BadRequestException(String.format("Path id %d and user id %d don't match.", id, user.getId()));
         }
-        else
-            throw new BadRequestException("Invalid request: userID on request does not match the UserClass id attribute");
+        usersService.updateUser(user);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    void deleteUser(@PathVariable long id) {
-        Optional<User> u1 = users.findById(id);
-        if( u1.isPresent() ) {
-            users.delete(u1.get());
-        } else
-            throw new NotFoundException("User with id "+id+" does not exist.");
+    @CanDeleteUser
+    public ResponseEntity<?> deleteUser(@PathVariable("id") long id) {
+        usersService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
-    // Obter a lista de propostas que o User {id} pode aprovar
-    @GetMapping("/{id}/approverInProposals")
-    Iterable<Proposal> getUserApproverProposals(@PathVariable long id){
-        Optional<User> u = users.findById(id);
-        if(u.isPresent()){
-            return u.get().getProposalsToApprove();
-        }
-        else throw new NotFoundException("User with id" +id+" not found.");
+    @GetMapping("/{id}/proposals")
+    @CanReadUserProposal
+    public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        User user = getUserIfPresent(id);
+        Iterable<Proposal> proposals = usersService.getProposals(id, search);
+        Resources<Resource<Proposal>> resources = userProposalAssembler.toResources(proposals, user);
+        return ResponseEntity.ok(resources);
     }
 
-    // Add proposta à lista de propostas para o User {id} aprovar
-    @PostMapping("/{id}/approverInProposals")
-    void addUserApproverProposal(@PathVariable long id, @RequestBody Proposal proposal){
-        Optional<User> u = users.findById(id);
-        if(u.isPresent()){
-            if(!u.get().getProposalsToApprove().contains(proposal))
-                toApprove.save(proposal);
-            else throw new ConflictException("Proposal already to be approved by the user " + id);
-        }
-        else throw new NotFoundException("User "+id+" not found.");
+    @GetMapping("/{uid}/proposals/{pid}")
+    @CanReadOneProposal
+    public ResponseEntity<Resource<Proposal>> getProposal(
+            @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
+        User user = getUserIfPresent(uid);
+        Proposal proposal = usersService.getProposal(uid, pid).orElseThrow(() ->
+                new NotFoundException(String.format("Proposal with id %d doesn't have a member/staff with id %d", pid, uid)));
+        Resource<Proposal> resource = userProposalAssembler.toResource(proposal, user);
+        return ResponseEntity.ok(resource);
     }
 
-    // Apaga proposta {pid} à lista de propostas que o User {uid} tem de aprovar
-    @DeleteMapping("/{uid}/approverInProposals/{pid}")
-    void deleteUserApproverInProposal(@PathVariable long uid, @PathVariable long pid) {
-        Optional<User> u = users.findById(uid);
-        if(u.isPresent()){
-            Optional<Proposal> p = toApprove.findById(pid);
-            if(p.isPresent() && u.get().getProposalsToApprove().contains(p.get()))
-                toApprove.deleteById(pid);
-            else throw new NotFoundException("User "+uid+" does not have proposal "+pid+" to approve.");
-        }
-        else throw new NotFoundException("User "+uid+" not found.");
+    @GetMapping("/{id}/bids")
+    public ResponseEntity<Resources<Resource<Proposal>>> getBids(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        User user = getUserIfPresent(id);
+        Iterable<Proposal> proposals = usersService.getBids(id, search);
+        Resources<Resource<Proposal>> resources = bidProposalAssembler.toResources(proposals, user);
+        return ResponseEntity.ok(resources);
     }
+
+    @GetMapping("/{uid}/bids/{pid}")
+    public ResponseEntity<Resource<Proposal>> getBid(
+            @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
+        User user = getUserIfPresent(uid);
+        Proposal proposal = usersService.getBid(uid, pid).orElseThrow(() ->
+                new NotFoundException(String.format("Proposal with id %d is not bid by a member/staff with id %d", pid, uid)));
+        Resource<Proposal> resource = bidProposalAssembler.toResource(proposal, user);
+        return ResponseEntity.ok(resource);
+    }
+
+    private User getUserIfPresent(long id) {
+        return usersService.getUser(id).orElseThrow(() ->
+                new NotFoundException(String.format("User with id %d not found.", id)));
+    }
+
 }
