@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.controller.UsersController;
+import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 
@@ -49,10 +50,10 @@ public class UserResourcesAssembler implements ResourceAssembler<User, Resource<
 	public Resource<User> toResource(User user, Proposal proposal) {
 		long pid = proposal.getId();
 		long uid = user.getId();
-		return new Resource<>(user,
-				linkTo(methodOn(ProposalsController.class).getStaff(pid, uid)).withSelfRel(),
+		Resource<User> resource = new Resource<>(user,
 				linkTo(methodOn(UsersController.class).getProposals(uid, "")).withRel("proposals"),
 				linkTo(methodOn(UsersController.class).getBids(uid, "")).withRel("bids"));
+		return resource;
 	}
 
 	@Override
