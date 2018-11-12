@@ -88,7 +88,7 @@ public class UsersControllerTest {
 	private User createJoaoUser() {
 		Proposal p1 = createProposal_1();
 		Proposal p2 = createProposal_2();
-		return new User()
+		User u = new User()
 				.id(1L)
 				.firstName("João")
 				.lastName("Reis")
@@ -98,12 +98,15 @@ public class UsersControllerTest {
 				.password("password")
 				.addBidding(p1)
 				.addBidding(p2);
+		p1.addReviewBidding(u);
+		p2.addReviewBidding(u);
+		return u;
 	}
 
 	private User createLuisUser() {
 		Proposal p1 = createProposal_1();
 		Proposal p2 = createProposal_2();
-		return new User()
+		User u = new User()
 		.id(2L)
 		.firstName("Luis")
 		.lastName("Martins")
@@ -113,6 +116,9 @@ public class UsersControllerTest {
 		.password("password")
 				.addProposal(p1)
 				.addProposal(p2);
+		p1.setProposer(u);
+		p2.setProposer(u);
+		return u;
 	}
 
 	private User createDanielUser() {
@@ -322,7 +328,7 @@ public class UsersControllerTest {
 	public void testGetProposal() throws Exception {
 		User luis = createLuisUser();
 		Resource<User> luisResource = userAssembler.toResource(luis);
-		Proposal prop1 = createProposal_1();
+		Proposal prop1 = luis.getProposals().get().iterator().next();
 		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
 
 		given(usersService.getUser(luis.getId())).willReturn(Optional.of(luis));
@@ -338,7 +344,7 @@ public class UsersControllerTest {
 	public void testGetBidding() throws Exception {
 		User joao = createJoaoUser();
 		Resource<User> joaoResource = userAssembler.toResource(joao);
-		Proposal prop1 = createProposal_1();
+		Proposal prop1 = joao.getBiddings().get().iterator().next();
 		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
 
 		given(usersService.getUser(joao.getId())).willReturn(Optional.of(joao));
@@ -410,16 +416,17 @@ public class UsersControllerTest {
 
 	@Test
 	public void testNotFound_Proposal() throws Exception{
-		User luis = createLuisUser();
-		Resource<User> luisResource = userAssembler.toResource(luis);
+		User manuel = createManuelUser();
+		Proposal p1 = createProposal_1();
+		manuel.addProposal(p1);
+		p1.setProposer(manuel);
+		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
-		given(usersService.getUser(luis.getId())).willReturn(Optional.of(luis));
+		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
-		mvc.perform(get("http://localhost/users/2/proposals/3"))
+		mvc.perform(get("http://localhost/users/4/proposals/3"))
 				.andExpect(status().isNotFound());
-		verify(usersService, times(1)).getUser(luis.getId());
-		verify(proposalsService, times(1)).getProposal(1L);
-		verify(proposalsService, times(1)).getProposal(2L);
+		verify(usersService, times(1)).getUser(manuel.getId());
 
 	}
 
@@ -432,6 +439,7 @@ public class UsersControllerTest {
 
 		mvc.perform(get("http://localhost/users/4/biddings/2"))
 				.andExpect(status().isNotFound());
+		verify(usersService, times(1)).getUser(manuel.getId());
 	}
 
 	@Test
