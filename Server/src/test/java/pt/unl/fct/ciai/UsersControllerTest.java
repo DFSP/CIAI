@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -41,8 +40,6 @@ import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.repository.ProposalsRepository;
-import pt.unl.fct.ciai.repository.UsersRepository;
 import pt.unl.fct.ciai.service.ProposalsService;
 import pt.unl.fct.ciai.service.UsersService;
 

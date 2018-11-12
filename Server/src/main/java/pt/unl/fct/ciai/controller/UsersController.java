@@ -74,16 +74,17 @@ public class UsersController implements UsersApi {
     @GetMapping("/{id}/proposals")
     public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
             @PathVariable("id") long id, @RequestParam(value = "searchProposals", required = false) String search) {
-        User user = getUserIfPresent(id);
+        getUserIfPresent(id);
         Iterable<Proposal> proposals = usersService.getProposals(id, search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
         return ResponseEntity.ok(resources);
     }
 
     @GetMapping("/{uid}/proposals/{pid}")
+    // @CanReadOneProposal
     public ResponseEntity<Resource<Proposal>> getProposal(
             @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
-        User user = getUserIfPresent(uid);
+        getUserIfPresent(uid);
         Proposal proposal = usersService.getProposal(uid, pid).orElseThrow(() ->
                 new NotFoundException(String.format("Proposal with id %d doesn't have a member/staff with id %d", pid, uid)));
         Resource<Proposal> resource = proposalAssembler.toResource(proposal);
@@ -91,20 +92,18 @@ public class UsersController implements UsersApi {
     }
 
     @GetMapping("/{id}/biddings")
-    // @CanGetUserBiddings //TODO
     public ResponseEntity<Resources<Resource<Proposal>>> getBiddings(
             @PathVariable("id") long id, @RequestParam(value = "searchProposals", required = false) String search) {
-        User user = getUserIfPresent(id);
+        getUserIfPresent(id);
         Iterable<Proposal> proposals = usersService.getBiddings(id, search);
         Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
         return ResponseEntity.ok(resources);
     }
 
     @GetMapping("/{uid}/biddings/{pid}")
-    // @CanGetUserBidding //TODO
     public ResponseEntity<Resource<Proposal>> getBidding(
             @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
-        User user = getUserIfPresent(uid);
+        getUserIfPresent(uid);
         Proposal proposal = usersService.getBidding(uid, pid).orElseThrow(() ->
                 new NotFoundException(String.format("Proposal with id %d is not bid by a member/staff with id %d", pid, uid)));
         Resource<Proposal> resource = proposalAssembler.toResource(proposal);

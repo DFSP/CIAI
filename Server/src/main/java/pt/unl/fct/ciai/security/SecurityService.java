@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import pt.unl.fct.ciai.model.Comment;
-import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.Review;
@@ -140,6 +139,11 @@ public class SecurityService {
     public boolean isProposalApproved(long id) {
     	Optional<Proposal> p = proposals.findById(id);
     	return p.isPresent() && p.get().getState() == Proposal.ProposalState.APPROVED;
+    }
+    
+    public boolean employeeIsMemberOfCompany(long cid, long eid) {
+    	Optional<Employee> employee = employees.findById(eid);
+    	return employee.isPresent() && employee.get().getCompany().getId() == cid;
     }
 
 	@Bean

@@ -3,7 +3,6 @@ package pt.unl.fct.ciai.assembler;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
-import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.model.Proposal;
 
 @Component

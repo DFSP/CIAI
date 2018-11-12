@@ -63,14 +63,14 @@ public class CompaniesService {
     }
 
     public Employee updateEmployee(long cid, Employee newEmployee) {
-        Company company = getCompanyIfPresent(cid);
+        getCompanyIfPresent(cid);
         Employee employee = getEmployeeIfPresent(cid, newEmployee.getId());
         Utils.copyNonNullProperties(newEmployee, employee);
         return employeesRepository.save(employee);
     }
 
     public void deleteEmployee(long cid, long eid) {
-        Company company = getCompanyIfPresent(cid); // Opcional, apenas retorna uma mensagem diferente
+        getCompanyIfPresent(cid); // Opcional, apenas retorna uma mensagem diferente
         Employee employee = getEmployeeIfPresent(cid, eid);
         employeesRepository.delete(employee);
     }
