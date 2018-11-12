@@ -18,5 +18,5 @@ public interface ReviewsRepository extends CrudRepository<Review, Long> {
             + "OR r.classification LIKE CONCAT('%',:search,'%') "
             + "OR r.creationDate LIKE CONCAT('%',:search,'%')"
     )
-    Iterable<Review> searchReviews(@Param(value = "search") String search);
+    Iterable<Review> search(@Param(value = "search") String search);
 }

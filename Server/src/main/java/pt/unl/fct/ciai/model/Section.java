@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,19 +14,22 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Section {
 
-    //TODO definir quais campos são not null
-    //TODO definir campos unique -> @Column(unique = true)
-
     @Id @GeneratedValue
     private long id;
+    @NotEmpty
     private String title;
+    @NotEmpty
     private String description;
+    @NotEmpty
     private String goals; //TODO String[] se nao complicar muito as queries
+    @NotEmpty
     private String material; //TODO String[] se nao complicar muito as queries
+    @NotEmpty
     private String workPlan;
+    @Min(0)
     private float budget;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne @JoinColumn(name = "proposal_id")
+    @ManyToOne(cascade = CascadeType.REFRESH) @JoinColumn(name = "proposal_id")
     private Proposal proposal;
 
     public Section() { }

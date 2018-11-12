@@ -87,7 +87,7 @@ public class CompaniesControllerTest {
 		joao.setZipCode("1234-992");
 		joao.setCellPhone("+351 918888888");
 		joao.setHomePhone("+351 221212121");
-		joao.setGender('M');
+		joao.setGender(User.Gender.MALE);
 		joao.setSalary(1000.0);
 		joao.setBirthday(new Date());
 		fct.addEmployee(joao);		
@@ -106,7 +106,7 @@ public class CompaniesControllerTest {
 		luis.setZipCode("1234-1111");
 		luis.setCellPhone("+351 912222222");
 		luis.setHomePhone("+351 221111111");
-		luis.setGender('M');
+		luis.setGender(User.Gender.MALE);
 		luis.setSalary(1500.0);
 		luis.setBirthday(new Date());
 		fct.addEmployee(luis);
@@ -125,7 +125,7 @@ public class CompaniesControllerTest {
 		daniel.setZipCode("1234-999");
 		daniel.setCellPhone("+351 919999999");
 		daniel.setHomePhone("+351 221000000");
-		daniel.setGender('M');
+		daniel.setGender(User.Gender.MALE);
 		daniel.setSalary(750.0);
 		daniel.setBirthday(new Date());
 		fct.addEmployee(daniel);
@@ -157,7 +157,7 @@ public class CompaniesControllerTest {
 		manuel.setZipCode("4321-999");
 		manuel.setCellPhone("+351 912345678");
 		manuel.setHomePhone("+351 222111222");
-		manuel.setGender('M');
+		manuel.setGender(User.Gender.MALE);
 		manuel.setSalary(1250.0);
 		manuel.setBirthday(new Date());
 		ist.addEmployee(manuel);
@@ -463,7 +463,7 @@ public class CompaniesControllerTest {
 		andre.setZipCode("4322-939");
 		andre.setCellPhone("+351 916785678");
 		andre.setHomePhone("+351 212117922");
-		andre.setGender('M');
+		andre.setGender(User.Gender.MALE);
 		andre.setSalary(1250.0);
 		andre.setBirthday(new Date());
 		andre.setCompany(fct);

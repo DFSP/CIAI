@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,54 +21,50 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
-    //TODO definir quais campos são not null -> @NotNull
-    //TODO definir campos unique -> @Column(unique = true)
-
-    public enum Role {
-        ROLE_SYS_ADMIN, ROLE_COMPANY_ADMIN
+    public enum Gender {
+        MALE, FEMALE;
     }
 
+    public enum Role {
+        ROLE_SYS_ADMIN, ROLE_COMPANY_ADMIN, ROLE_PROPOSAL_APPROVER
+    }
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id @GeneratedValue
     private long id;
+    @NotEmpty
     private String firstName;
+    @NotEmpty
     private String lastName;
+    @NotEmpty
     @Column(unique = true)
     private String username;
+    @NotEmpty
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
+    @NotEmpty
+    @Column(unique = true)
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REFRESH)
     private Set<Proposal> proposals;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "approver")
-    private Set<Proposal> approveProposals;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REFRESH)
     private Set<Proposal> biddings;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "proposer", cascade = CascadeType.REMOVE) //TODO remover utilizador remove tambem as suas propostas?
-    private Set<Proposal> myProposals;
-/*	@JsonIgnore
-	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private Set<Review> authorOfReviews;
-	@JsonIgnore
-	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private Set<Comment> authorOfComments;*/
 
     public User() {
     }
 
     public User(String firstName, String lastName, String username,
-                String email, Role role, String password) {
+                String password, String email, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
+        this.password = password;
         this.email = email;
         this.role = role;
-        this.password = password;
     }
 
     public long getId() {
@@ -122,6 +119,19 @@ public class User {
         return this;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public User password(String password) {
+        setPassword(password);
+        return this;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -148,29 +158,16 @@ public class User {
         return this;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public User password(String password) {
-        setPassword(password);
-        return this;
-    }
-
     public Optional<Set<Proposal>> getProposals() {
         return Optional.ofNullable(this.proposals);
     }
 
-    public void setProposal(Set<Proposal> proposals) {
+    public void setProposals(Set<Proposal> proposals) {
         this.proposals = proposals;
     }
 
     public User proposals(Set<Proposal> proposals) {
-        setProposal(proposals);
+        setProposals(proposals);
         return this;
     }
 
@@ -185,34 +182,6 @@ public class User {
     public User removeProposal(Proposal proposal) {
         if (this.proposals != null) {
             this.proposals.remove(proposal);
-        }
-        return this;
-    }
-
-    public Optional<Set<Proposal>> getApproveProposals() {
-        return Optional.ofNullable(this.approveProposals);
-    }
-
-    public void setApproveProposals(Set<Proposal> proposals) {
-        this.approveProposals = proposals;
-    }
-
-    public User approveProposals(Set<Proposal> proposals) {
-        setApproveProposals(proposals);
-        return this;
-    }
-
-    public User addApproveProposal(Proposal proposal) {
-        if (this.approveProposals == null) {
-            this.approveProposals = new HashSet<Proposal>();
-        }
-        this.approveProposals.add(proposal);
-        return this;
-    }
-
-    public User removeApproveProposal(Proposal proposal) {
-        if (this.approveProposals != null) {
-            this.approveProposals.remove(proposal);
         }
         return this;
     }
@@ -241,34 +210,6 @@ public class User {
     public User removeBidding(Proposal proposal) {
         if (this.biddings != null) {
             this.biddings.remove(proposal);
-        }
-        return this;
-    }
-
-    public Optional<Set<Proposal>> getMyProposals() {
-        return Optional.ofNullable(this.myProposals);
-    }
-
-    public void setMyProposals(Set<Proposal> proposals) {
-        this.myProposals = proposals;
-    }
-
-    public User myProposals(Set<Proposal> proposals) {
-        setMyProposals(proposals);
-        return this;
-    }
-
-    public User addMyProposal(Proposal proposal) {
-        if (this.myProposals == null) {
-            this.myProposals = new HashSet<Proposal>();
-        }
-        this.myProposals.add(proposal);
-        return this;
-    }
-
-    public User removeMyProposal(Proposal proposal) {
-        if (this.myProposals != null) {
-            this.myProposals.remove(proposal);
         }
         return this;
     }
@@ -306,13 +247,7 @@ public class User {
                 ", proposals=" + getProposals()
                 .map(p -> p.stream().map(Proposal::getId).collect(Collectors.toList()))
                 .orElse(Collections.emptyList()) +
-                ", approveProposals=" + getApproveProposals()
-                .map(p -> p.stream().map(Proposal::getId).collect(Collectors.toList()))
-                .orElse(Collections.emptyList()) +
                 ", biddings=" + getBiddings()
-                .map(p -> p.stream().map(Proposal::getId).collect(Collectors.toList()))
-                .orElse(Collections.emptyList()) +
-                ", myProposals=" + getMyProposals()
                 .map(p -> p.stream().map(Proposal::getId).collect(Collectors.toList()))
                 .orElse(Collections.emptyList()) +
                 '}';

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,25 +13,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Company {
 
-	//TODO definir quais campos são not null
-	//TODO definir campos unique -> @Column(unique = true)
-
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Id @GeneratedValue
 	private long id;
+	@NotEmpty
 	private String name;
+	@NotEmpty
 	private String city;
+	@NotEmpty
 	private String zipCode;
+	@NotEmpty
 	private String address;
+	@NotEmpty
 	private String phone;
+	@NotEmpty
 	private String email;
 	private String fax;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy="company", cascade = CascadeType.ALL)
 	private Set<Employee> employees;
-/*	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@OneToOne(mappedBy = "adminOfCompany", cascade = CascadeType.ALL)
-	private Employee myAdmin;*/ //TODO substituir pela query
-// pode ser feito com query: select employee where employee.role == admin
 
 	public Company() { }
 

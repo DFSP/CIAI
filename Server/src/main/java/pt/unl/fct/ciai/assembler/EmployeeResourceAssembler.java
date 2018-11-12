@@ -13,9 +13,11 @@ import org.springframework.hateoas.Resources;
 import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.CompaniesController;
+import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
+import pt.unl.fct.ciai.model.Proposal;
 
 @Component
 public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Resource<Employee>> {
@@ -23,12 +25,23 @@ public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Re
 	@Override
 	public Resource<Employee> toResource(Employee employee) {
 		long eid = employee.getId();
-		long cid = employee.getCompany().get().getId(); //TODO o que fazer quando retorna null?
+		long cid = employee.getCompany().getId();
 		return new Resource<>(employee,
 			linkTo(methodOn(CompaniesController.class).getEmployee(cid, eid)).withSelfRel(),
 			linkTo(methodOn(CompaniesController.class).getEmployees(cid, "")).withRel("employees"));
-	}	
-	
+	}
+
+	public Resources<Resource<Employee>> toResources(Iterable<? extends Employee> entities, Proposal proposal) {
+		long pid = proposal.getId();
+		List<Resource<Employee>> employees =
+				StreamSupport.stream(entities.spliterator(), false)
+						.map(this::toResource)
+						.collect(Collectors.toList());
+		return new Resources<>(employees,
+				linkTo(methodOn(ProposalsController.class).getMembers(pid, "")).withSelfRel(),
+				linkTo(methodOn(RootController.class).root()).withRel("root"));
+	}
+
 	public Resources<Resource<Employee>> toResources(Iterable<? extends Employee> entities, Company company) {
 		long cid = company.getId();
 		List<Resource<Employee>> employees = 

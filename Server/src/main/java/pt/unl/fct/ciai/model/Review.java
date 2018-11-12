@@ -7,35 +7,39 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.validator.constraints.Range;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Review {
 
-    //TODO definir quais campos são not null
-    //TODO definir campos unique -> @Column(unique = true)
-
     @Id @GeneratedValue
     private long id;
+    @NotEmpty
     private String title;
+    @NotEmpty
     private String text;
+    @NotEmpty
     private String summary;
-    private double classification; 
+    @Range(min = 0, max = 10)
+    private int classification;
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date creationDate;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne @JoinColumn(name = "author_id")
+    @ManyToOne(cascade = CascadeType.REFRESH) @JoinColumn(name = "author_id")
     private User author;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne @JoinColumn(name = "proposal_id")
+    @ManyToOne(cascade = CascadeType.REFRESH) @JoinColumn(name = "proposal_id")
     private Proposal proposal;
 
     public Review() { }
 
-    public Review(String title, String text, String summary, double classification) {
+    public Review(String title, String text, String summary, int classification) {
         this.title = title;
         this.text = text;
         this.summary = summary;
@@ -98,11 +102,11 @@ public class Review {
         return this.classification;
     }
 
-    public void setClassification(double classification) {
+    public void setClassification(int classification) {
         this.classification = classification;
     }
 
-    public Review classification(double classification) {
+    public Review classification(int classification) {
         setClassification(classification);
         return this;
     }
@@ -168,7 +172,7 @@ public class Review {
                 ", summary='" + summary + '\'' +
                 ", classification=" + classification +
                 ", creationDate=" + creationDate +
-                ", author="  + getAuthor().map(User::getId).orElse(null) +
+                ", author="  + getAuthor().map(User::getUsername).orElse(null) +
                 ", proposal="  + getProposal().map(Proposal::getId).orElse(null) +
                 '}';
     }

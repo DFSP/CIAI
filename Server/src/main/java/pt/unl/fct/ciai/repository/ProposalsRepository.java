@@ -34,13 +34,13 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.sections s "
             + "WHERE p.id = :pid "
             + "AND "
-            + "s.title LIKE CONCAT('%',:search,'%') "
+            + "(s.title LIKE CONCAT('%',:search,'%') "
             + "OR s.description LIKE CONCAT('%',:search,'%') "
             + "OR s.id LIKE CONCAT('%',:search,'%') "
             + "OR s.goals LIKE CONCAT('%',:search,'%') "
             + "OR s.material LIKE CONCAT('%',:search,'%') "
             + "OR s.workPlan LIKE CONCAT('%',:search,'%') "
-            + "OR s.budget LIKE CONCAT('%',:search,'%')"
+            + "OR s.budget LIKE CONCAT('%',:search,'%'))"
     )
     Iterable<Section> searchSections(@Param(value = "pid") long pid, @Param(value = "search") String search);
 
@@ -67,12 +67,12 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.staff s "
             + "WHERE p.id = :pid "
             + "AND "
-            + "s.id LIKE CONCAT('%',:search,'%')"
+            + "(s.id LIKE CONCAT('%',:search,'%')"
             + "OR s.firstName LIKE CONCAT('%',:search,'%') "
             + "OR s.lastName LIKE CONCAT('%',:search,'%') "
             + "OR s.username LIKE CONCAT('%',:search,'%') "
             + "OR s.email LIKE CONCAT('%',:search,'%') "
-            + "OR s.role LIKE CONCAT('%',:search,'%')"
+            + "OR s.role LIKE CONCAT('%',:search,'%'))"
     )
     Iterable<User> searchStaff(@Param(value = "pid") long pid, @Param(value = "search") String search);
 
@@ -80,7 +80,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.staff u "
             + "WHERE p.id = :pid AND u.id = :uid"
     )
-    User getOneStaff(@Param(value = "pid") long pid, @Param(value = "uid") long uid); //TODO mudar para getStaff
+    User getStaff(@Param(value = "pid") long pid, @Param(value = "uid") long uid); //TODO mudar para getStaff
 
 
     // Member queries
@@ -95,7 +95,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.members e "
             + "WHERE p.id = :pid "
             + "AND "
-            + "e.id LIKE CONCAT('%',:search,'%') "
+            + "(e.id LIKE CONCAT('%',:search,'%') "
             + "OR e.city LIKE CONCAT('%',:search,'%') "
             + "OR e.address LIKE CONCAT('%',:search,'%') "
             + "OR e.zipCode LIKE CONCAT('%',:search,'%') "
@@ -103,7 +103,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "OR e.homePhone LIKE CONCAT('%',:search,'%') "
             + "OR e.gender LIKE CONCAT('%',:search,'%') "
             + "OR e.salary LIKE CONCAT('%',:search,'%') "
-            + "OR e.birthday LIKE CONCAT('%',:search,'%')"
+            + "OR e.birthday LIKE CONCAT('%',:search,'%'))"
     )
 
     Iterable<Employee> searchMembers(@Param(value = "pid") long pid, @Param(value = "search") String search);
@@ -113,15 +113,6 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "WHERE p.id = :pid AND e.id = :eid"
     )
     Employee getMember(@Param(value = "pid") long pid, @Param(value = "eid") long eid);
-
-
-    // Approver queries
-
-    @Query("SELECT a "
-            + "FROM Proposal p JOIN p.approver a "
-            + "WHERE p.id = :pid"
-    )
-    User getApprover(@Param(value = "pid") long pid);
 
 
     // Review queries
@@ -136,12 +127,12 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.reviews r "
             + "WHERE p.id = :pid "
             + "AND "
-            + "r.id LIKE CONCAT('%',:search,'%') "
+            + "(r.id LIKE CONCAT('%',:search,'%') "
             + "OR r.title LIKE CONCAT('%',:search,'%') "
             + "OR r.text LIKE CONCAT('%',:search,'%') "
             + "OR r.summary LIKE CONCAT('%',:search,'%') "
             + "OR r.classification LIKE CONCAT('%',:search,'%') "
-            + "OR r.creationDate LIKE CONCAT('%',:search,'%')"
+            + "OR r.creationDate LIKE CONCAT('%',:search,'%'))"
     )
     Iterable<Review> searchReviews(@Param(value = "pid") long pid, @Param(value = "search") String search);
 
@@ -169,10 +160,10 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.comments c "
             + "WHERE p.id = :pid "
             + "AND "
-            + "c.id LIKE CONCAT('%',:search,'%') "
+            + "(c.id LIKE CONCAT('%',:search,'%') "
             + "OR c.title LIKE CONCAT('%',:search,'%') "
             + "OR c.text LIKE CONCAT('%',:search,'%') "
-            + "OR c.creationDate LIKE CONCAT('%',:search,'%')"
+            + "OR c.creationDate LIKE CONCAT('%',:search,'%'))"
     )
     Iterable<Comment> searchComments(@Param(value = "pid") long pid, @Param(value = "search") String search);
 
@@ -200,12 +191,12 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "FROM Proposal p JOIN p.reviewBiddings u "
             + "WHERE p.id = :pid "
             + "AND "
-            + "u.id LIKE CONCAT('%',:search,'%') "
+            + "(u.id LIKE CONCAT('%',:search,'%') "
             + "OR u.firstName LIKE CONCAT('%',:search,'%') "
             + "OR u.lastName LIKE CONCAT('%',:search,'%') "
             + "OR u.username LIKE CONCAT('%',:search,'%') "
             + "OR u.email LIKE CONCAT('%',:search,'%') "
-            + "OR u.role LIKE CONCAT('%',:search,'%')"
+            + "OR u.role LIKE CONCAT('%',:search,'%'))"
     )
     Iterable<User> searchReviewBiddings(@Param(value = "pid") long pid, @Param(value = "search") String search);
 

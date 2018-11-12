@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,15 +22,19 @@ public class Comment {
 
     @Id @GeneratedValue
     private long id;
+    @NotEmpty
+    @Column(nullable = false)
     private String title;
+    @NotEmpty
+    @Column(nullable = false)
     private String text;
     @Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
     private Date creationDate;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne @JoinColumn(name = "author_id")
+    @ManyToOne(cascade = CascadeType.REFRESH) @JoinColumn(name = "author_id")
     private User author;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne @JoinColumn(name = "proposal_id")
+    @ManyToOne(cascade = CascadeType.REFRESH) @JoinColumn(name = "proposal_id")
     private Proposal proposal;
 	
     public Comment() { }
@@ -136,7 +142,7 @@ public class Comment {
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
                 ", creationDate=" + creationDate +
-                ", author="  + getAuthor().map(User::getId).orElse(null) +
+                ", author="  + getAuthor().map(User::getUsername).orElse(null) +
                 ", proposal="  + getProposal().map(Proposal::getId).orElse(null) +
                 '}';
     }

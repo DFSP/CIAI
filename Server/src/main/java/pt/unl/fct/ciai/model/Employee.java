@@ -2,8 +2,12 @@ package pt.unl.fct.ciai.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,34 +16,39 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee extends User {
 
-	//TODO definir quais campos são not null
-	//TODO definir campos unique -> @Column(unique = true)
-
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Id @GeneratedValue
 	private long id;
+	@NotEmpty
 	private String city;
+	@NotEmpty
 	private String address;
+	@NotEmpty
 	private String zipCode;
+	@NotEmpty
 	private String cellPhone;
+	@NotEmpty
 	private String homePhone;
-	private char gender;
+	@Enumerated(EnumType.STRING)
+	@NotNull
+	private Gender gender;
+	@Min(0)
 	private double salary;
+	@NotNull
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private Date birthday;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToOne
-	@JoinColumn(name = "company_id")
+	@ManyToOne(cascade = CascadeType.REFRESH) @JoinColumn(name = "company_id")
 	private Company company;
-/*	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@OneToOne
-	@JoinColumn(name = "company_id")
-    private Company adminOfCompany;*/  // pode ser feito com if (getrole == admin) then is admin of company
 	
-	public Employee() { }
+	public Employee() {
 
-	public Employee(String firstName, String lastName, String username, String email, Role role, String password,
+	}
+
+	public Employee(String firstName, String lastName, String username,  String password, String email, Role role,
 			String city, String address, String zipCode, String cellPhone,
-			String homePhone, char gender, double salary, Date birthday) {
-		super(firstName, lastName, username, email, role, password);
+			String homePhone, Gender gender, double salary, Date birthday) {
+		super(firstName, lastName, username, password, email, role);
 		this.city = city;
 		this.address = address;
 		this.zipCode = zipCode;
@@ -128,15 +137,15 @@ public class Employee extends User {
 		return this;
 	}
 
-	public char getGender() {
+	public Gender getGender() {
 		return this.gender;
 	}
 
-	public void setGender(char gender) {
+	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
 
-	public Employee gender(char gender) {
+	public Employee gender(Gender gender) {
 		setGender(gender);
 		return this;
 	}
@@ -167,8 +176,8 @@ public class Employee extends User {
 		return this;
 	}
 
-	public Optional<Company> getCompany() {
-		return Optional.ofNullable(company);
+	public Company getCompany() {
+		return company;
 	}
 
 	public void setCompany(Company company) {
@@ -206,7 +215,7 @@ public class Employee extends User {
 				", gender=" + gender +
 				", salary=" + salary +
 				", birthday=" + birthday +
-				", company=" + getCompany().map(Company::getId).orElse(null) +
+				", company=" + Optional.ofNullable(getCompany()).map(Company::getId).orElse(null) +
 				'}';
 	}
 

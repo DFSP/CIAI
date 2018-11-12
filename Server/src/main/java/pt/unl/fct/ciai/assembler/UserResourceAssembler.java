@@ -25,8 +25,7 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 	public Resource<User> toResource(User user) {
 		return new Resource<>(user,
 				linkTo(methodOn(UsersController.class).getUser(user.getId())).withSelfRel(),
-				linkTo(methodOn(UsersController.class).getUsers("")).withRel("users"),
-				linkTo(methodOn(UsersController.class).getApproverInProposals(user.getId(), "")).withRel("approverInProposals"));
+				linkTo(methodOn(UsersController.class).getUsers("")).withRel("users"));
 	}
 
 	@Override
@@ -47,7 +46,7 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 				.map(this::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(users,
-				linkTo(methodOn(ProposalsController.class).getReviewBiddings(pid, "")).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getReviewBiddings(pid, "")).withRel("biddings"),
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 	

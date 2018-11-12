@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,18 +16,18 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Proposal {
 
-	//TODO definir quais campos são not null
-	//TODO definir campos unique -> @Column(unique = true)
-
 	public enum ProposalState {
-		PENDING_APPROVAL, APPROVED, REJECTED;
+		PENDING_APPROVAL, APPROVED, REJECTED
 	}
 
 	@Id @GeneratedValue
 	private long id;
+	@NotEmpty @Column(nullable = false)
 	private String title;
+	@NotEmpty @Column(nullable = false)
 	private String description;
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private ProposalState state;
 	@Temporal(TemporalType.TIMESTAMP) @CreationTimestamp
 	private Date creationDate;
@@ -34,14 +35,13 @@ public class Proposal {
 	@OneToMany(mappedBy="proposal", cascade = CascadeType.ALL)
 	private Set<Section> sections;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "proposals")
+	@ManyToMany(mappedBy = "proposals", cascade = CascadeType.REFRESH)
+	@Column(nullable = false)
 	private Set<User> staff;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "proposals")
+	@ManyToMany(mappedBy = "proposals", cascade = CascadeType.REFRESH)
+	@Column(nullable = false)
 	private Set<Employee> members;
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToOne @JoinColumn(name="approver_id")
-	private User approver;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
 	private Set<Review> reviews;
@@ -49,10 +49,11 @@ public class Proposal {
 	@OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
 	private Set<Comment> comments;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "biddings", cascade = CascadeType.ALL)
-	private Set<User> reviewBiddings;
+	@ManyToMany(mappedBy = "biddings", cascade = CascadeType.REFRESH)
+	private Set<User> reviewBiddings; //TODO ver se é possivel ter Map<User, Boolean> para saber se o bid foi ganho
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToOne @JoinColumn(name="proposer_id")
+	@ManyToOne(cascade = CascadeType.REFRESH)
+	@JoinColumn(name="proposer_id")
 	private User proposer;
 
 	public Proposal() {
@@ -229,7 +230,7 @@ public class Proposal {
 		this.members = members;
 	}
 
-	public Proposal member(Set<Employee> member) {
+	public Proposal members(Set<Employee> member) {
 		setMembers(member);
 		return this;
 	}
@@ -244,19 +245,6 @@ public class Proposal {
 
 	public Proposal removeMember(Employee member) {
 		this.getMembers().ifPresent(members -> members.remove(member));
-		return this;
-	}
-
-	public Optional<User> getApprover() {
-		return Optional.ofNullable(this.approver);
-	}
-
-	public void setApprover(User approver) {
-		this.approver = approver;
-	}
-
-	public Proposal approver(User approver) {
-		setApprover(approver);
 		return this;
 	}
 
@@ -365,7 +353,7 @@ public class Proposal {
 				new IllegalStateException(String.format("Proposal %d has no review biddings", getId())));
 		if (!biddings.remove(bidding)) {
 			throw new IllegalArgumentException(
-					String.format("Proposal %d doesn't have a bidding %d", getId(), bidding.getId()));
+					String.format("Proposal %d doesn't have a bidding of user %d", getId(), bidding.getUsername()));
 		}
 		biddings.add(bidding); //TODO verificar se mudança local tambem afeta o global
 		return this;
@@ -410,26 +398,24 @@ public class Proposal {
 				", state=" + state +
 				", creationDate=" + creationDate +
 				", sections=" + getSections()
-				.map(p -> p.stream().map(Section::getId).collect(Collectors.toList()))
+				.map(p -> p.stream().map(Section::getTitle).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
 				", staff=" + getStaff()
-				.map(p -> p.stream().map(User::getId).collect(Collectors.toList()))
+				.map(p -> p.stream().map(User::getUsername).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
 				", members=" + getMembers()
-				.map(p -> p.stream().map(Employee::getId).collect(Collectors.toList()))
+				.map(p -> p.stream().map(Employee::getUsername).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
-				", approver=" + getApprover().map(User::getId)
-				.orElse(null) +
 				", reviews=" + getReviews()
-				.map(p -> p.stream().map(Review::getId).collect(Collectors.toList()))
+				.map(p -> p.stream().map(Review::getTitle).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
 				", comments=" + getComments()
-				.map(p -> p.stream().map(Comment::getId).collect(Collectors.toList()))
+				.map(p -> p.stream().map(Comment::getTitle).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
 				", reviewBiddings=" + getReviewBiddings()
-				.map(p -> p.stream().map(User::getId).collect(Collectors.toList()))
+				.map(p -> p.stream().map(User::getUsername).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
-				", proposer=" + getProposer().map(User::getId)
+				", proposer=" + getProposer().map(User::getUsername)
 				.orElse(null) +
 				'}';
 	}

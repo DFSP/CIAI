@@ -5,6 +5,7 @@ import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.*;
 import pt.unl.fct.ciai.repository.*;
+import pt.unl.fct.ciai.utils.Utils;
 
 import java.util.Optional;
 
@@ -12,24 +13,28 @@ import java.util.Optional;
 public class ProposalsService {
 
     private final ProposalsRepository proposalsRepository;
+    private final UsersRepository usersRepository;
+    private final EmployeesRepository employeesRepository;
     private final SectionsRepository sectionsRepository;
     private final ReviewsRepository reviewsRepository;
     private final CommentsRepository commentsRepository;
-    private final UsersRepository usersRepository;
 
-    public ProposalsService(ProposalsRepository proposalsRepository, SectionsRepository sectionsRepository,
-                            ReviewsRepository reviewsRepository, CommentsRepository commentsRepository,
-                            UsersRepository usersRepository) {
+    public ProposalsService(ProposalsRepository proposalsRepository, UsersRepository usersRepository,
+                            EmployeesRepository employeesRepository, SectionsRepository sectionsRepository,
+                            ReviewsRepository reviewsRepository, CommentsRepository commentsRepository) {
         this.proposalsRepository = proposalsRepository;
+        this.usersRepository = usersRepository;
+        this.employeesRepository = employeesRepository;
         this.sectionsRepository = sectionsRepository;
         this.reviewsRepository = reviewsRepository;
         this.commentsRepository = commentsRepository;
-        this.usersRepository = usersRepository;
     }
 
     public Iterable<Proposal> getProposals(String search) {
         //TODO esconder proposals não aprovadas (com uma query)
-        return search == null ? proposalsRepository.findAll() : proposalsRepository.search(search);
+        return search == null ?
+                proposalsRepository.findAll() :
+                proposalsRepository.search(search);
     }
 
     public Proposal addProposal(Proposal proposal) {
@@ -41,8 +46,9 @@ public class ProposalsService {
         return proposalsRepository.findById(id);
     }
 
-    public Proposal updateProposal(Proposal proposal) {
-        getProposalIfPresent(proposal.getId());
+    public Proposal updateProposal(Proposal newProposal) {
+        Proposal proposal = getProposalIfPresent(newProposal.getId());
+        Utils.copyNonNullProperties((Object) newProposal, (Object) proposal);
         return proposalsRepository.save(proposal);
     }
 
@@ -52,15 +58,18 @@ public class ProposalsService {
     }
 
     public Iterable<Section> getSections(long id, String search) {
-        return search == null ? proposalsRepository.getSections(id) : proposalsRepository.searchSections(id, search);
+        return search == null ?
+                proposalsRepository.getSections(id) :
+                proposalsRepository.searchSections(id, search);
     }
 
     public Section addSection(long pid, Section section) {
         Proposal proposal = getProposalIfPresent(pid);
         section.setProposal(proposal);
-        proposal.addSection(section);
-        proposalsRepository.save(proposal); //TODO verificar se é necessário
         return sectionsRepository.save(section);
+      /*  proposal.addSection(newSection);
+        proposalsRepository.save(proposal);
+        return newSection;*/ //TODO testar se realmente adiciona em todos
     }
 
     public Optional<Section> getSection(long pid, long sid) {
@@ -68,34 +77,80 @@ public class ProposalsService {
         return Optional.ofNullable(proposalsRepository.getSection(pid, sid));
     }
 
-    public Section updateSection(long pid, Section section) {
+    public Section updateSection(long pid, Section newSection) {
         Proposal proposal = getProposalIfPresent(pid);
-        if (!proposalsRepository.existsSection(pid, section.getId())) {
-            throw new BadRequestException(String.format(
-                    "Section with id %d doesn't belong to proposal with id %d", section.getId(), pid));
-        }
-        proposal.updateSection(section);
-        proposalsRepository.save(proposal);
+        Section section = getSectionIfPresent(pid, newSection.getId());
+        Utils.copyNonNullProperties((Object) newSection, (Object) section);
         return sectionsRepository.save(section);
     }
 
     public void deleteSection(long pid, long sid) {
         Proposal proposal = getProposalIfPresent(pid);
         Section section = getSectionIfPresent(pid, sid);
-        proposal.removeSection(section);
-        proposalsRepository.save(proposal); //TODO necessario?
         sectionsRepository.delete(section);
     }
 
+    public Iterable<User> getStaff(long id, String search) {
+        return search == null ?
+                proposalsRepository.getStaff(id) :
+                proposalsRepository.searchStaff(id, search);
+    }
+
+    public User addStaff(long pid, User user) {
+        Proposal proposal = getProposalIfPresent(pid);
+        user.addProposal(proposal);
+        return usersRepository.save(user);
+    }
+
+    public Optional<User> getStaff(long pid, long uid) {
+        getProposalIfPresent(pid);
+        return Optional.ofNullable(proposalsRepository.getStaff(pid, uid));
+    }
+
+    public void removeStaff(long pid, long uid) {
+        Proposal proposal = getProposalIfPresent(pid);
+        User staff = getStaffIfPresent(pid, uid);
+        proposal.removeStaff(staff);
+        proposalsRepository.save(proposal); //TODO ver qual destes não é necessário
+        staff.removeProposal(proposal);
+        usersRepository.save(staff);
+    }
+
+    public Iterable<Employee> getMembers(long id, String search) {
+        return search == null ?
+                proposalsRepository.getMembers(id) :
+                proposalsRepository.searchMembers(id, search);
+    }
+
+    public Employee addMember(long pid, Employee member) {
+        Proposal proposal = getProposalIfPresent(pid);
+        member.addProposal(proposal);
+        return employeesRepository.save(member);
+    }
+
+    public Optional<Employee> getMember(long pid, long mid) {
+        getProposalIfPresent(pid);
+        return Optional.ofNullable(proposalsRepository.getMember(pid, mid));
+    }
+
+    public void removeMember(long pid, long mid) {
+        Proposal proposal = getProposalIfPresent(pid);
+        Employee member = getMemberIfPresent(pid, mid);
+        proposal.removeMember(member);
+        proposalsRepository.save(proposal);
+        member.removeProposal(proposal);
+        employeesRepository.save(member);
+    }
+
     public Iterable<Review> getReviews(long id, String search) {
-        return search == null ? proposalsRepository.getReviews(id) : proposalsRepository.searchReviews(id, search);
+        return search == null ?
+                proposalsRepository.getReviews(id) :
+                proposalsRepository.searchReviews(id, search);
     }
 
     public Review addReview(long pid, Review review) {
         Proposal proposal = getProposalIfPresent(pid);
         review.setProposal(proposal);
-        proposal.addReview(review);
-        proposalsRepository.save(proposal); //TODO verificar se é necessário
         return reviewsRepository.save(review);
     }
 
@@ -103,34 +158,28 @@ public class ProposalsService {
         return Optional.ofNullable(proposalsRepository.getReview(pid, rid));
     }
 
-    public Review updateReview(long pid, Review review) {
+    public Review updateReview(long pid, Review newReview) {
         Proposal proposal = getProposalIfPresent(pid);
-        if (!proposalsRepository.existsReview(pid, review.getId())) {
-            throw new BadRequestException(String.format(
-                    "Review with id %d doesn't belong to proposal with id %d", review.getId(), pid));
-        }
-        proposal.updateReview(review);
-        proposalsRepository.save(proposal);
+        Review review = getReviewIfPresent(pid, newReview.getId());
+        Utils.copyNonNullProperties((Object) newReview, (Object) review);
         return reviewsRepository.save(review);
     }
 
     public void deleteReview(long pid, long rid) {
         Proposal proposal = getProposalIfPresent(pid);
         Review review = getReviewIfPresent(pid, rid);
-        proposal.removeReview(review);
-        proposalsRepository.save(proposal); //TODO necessario?
         reviewsRepository.delete(review);
     }
 
     public Iterable<Comment> getComments(long id, String search) {
-        return search == null ? proposalsRepository.getComments(id) : proposalsRepository.searchComments(id, search);
+        return search == null ?
+                proposalsRepository.getComments(id) :
+                proposalsRepository.searchComments(id, search);
     }
 
     public Comment addComment(long pid, Comment comment) {
         Proposal proposal = getProposalIfPresent(pid);
         comment.setProposal(proposal);
-        proposal.addComment(comment);
-        proposalsRepository.save(proposal); //TODO verificar se é necessário
         return commentsRepository.save(comment);
     }
 
@@ -138,35 +187,29 @@ public class ProposalsService {
         return Optional.ofNullable(proposalsRepository.getComment(pid, cid));
     }
 
-    public Comment updateComment(long pid, Comment comment) {
+    public Comment updateComment(long pid, Comment newComent) {
         Proposal proposal = getProposalIfPresent(pid);
-        if (!proposalsRepository.existsComment(pid, comment.getId())) {
-            throw new BadRequestException(String.format(
-                    "Comment with id %d doesn't belong to proposal with id %d", comment.getId(), pid));
-        }
-        proposal.updateComment(comment);
-        proposalsRepository.save(proposal);
+        Comment comment = proposalsRepository.getComment(pid, newComent.getId());
+        Utils.copyNonNullProperties((Object) newComent, (Object) comment);
         return commentsRepository.save(comment);
     }
 
     public void deleteComment(long pid, long cid) {
         Proposal proposal = getProposalIfPresent(pid);
         Comment comment = getCommentIfPresent(pid, cid);
-        proposal.removeComment(comment);
-        proposalsRepository.save(proposal); //TODO necessario?
         commentsRepository.delete(comment);
     }
 
     public Iterable<User> getReviewBiddings(long pid, String search) {
-        return search == null ? proposalsRepository.getReviewBiddings(pid) : proposalsRepository.searchReviewBiddings(pid, search);
+        return search == null ?
+                proposalsRepository.getReviewBiddings(pid) :
+                proposalsRepository.searchReviewBiddings(pid, search);
     }
 
     public User addReviewBidding(long pid, User user) {
         Proposal proposal = getProposalIfPresent(pid);
         //TODO user tem que existir no sistema
         user.addBidding(proposal);
-        proposal.addReviewBidding(user);
-        proposalsRepository.save(proposal); //TODO verificar se é necessário
         return usersRepository.save(user);
     }
 
@@ -178,37 +221,57 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         User user = getBiddingIfPresent(pid, uid);
         proposal.removeReviewBidding(user);
-        proposalsRepository.save(proposal);
+        proposalsRepository.save(proposal); //TODO ver qual destes não é necessário
         user.removeBidding(proposal);
         usersRepository.save(user);
     }
 
     private Proposal getProposalIfPresent(long id) {
         return this.getProposal(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Proposal with id %d not found.", id)));
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Proposal with id %d not found.", id)));
+    }
+
+    private User getStaffIfPresent(long pid, long uid) {
+        return this.getStaff(pid, uid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Staff with id %d is not part of proposal with id %d.", uid, pid)));
+    }
+
+    private Employee getMemberIfPresent(long pid, long mid) {
+        return this.getMember(pid, mid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Member with id %d is not part of proposal with id %d.", mid, pid)));
     }
 
     private Section getSectionIfPresent(long pid, long sid) {
-        return getSection(pid, sid)
-                .orElseThrow(() -> new BadRequestException(
-                        String.format("Section with id %d doesn't belong to proposal with id %d.", sid, pid)));
+        return this.getSection(pid, sid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Section with id %d doesn't belong to proposal with id %d.", sid, pid)));
     }
 
     private Review getReviewIfPresent(long pid, long rid) {
-        return getReview(pid, rid)
-                .orElseThrow(() -> new BadRequestException(
-                        String.format("Review with id %d doesn't belong to proposal with id %d.", rid, pid)));
+        return this.getReview(pid, rid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Review with id %d doesn't belong to proposal with id %d.", rid, pid)));
     }
 
     private Comment getCommentIfPresent(long pid, long cid) {
-        return getComment(pid, cid)
-                .orElseThrow(() -> new BadRequestException(
-                        String.format("Comment with id %d doesn't belong to proposal with id %d.", cid, pid)));
+        return this.getComment(pid, cid)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Comment with id %d doesn't belong to proposal with id %d.", cid, pid)));
     }
 
     private User getBiddingIfPresent(long pid, long uid) {
         return this.getReviewBidding(pid, uid)
-                .orElseThrow(() -> new BadRequestException(
-                        String.format("Bidding with id %d doesn't belong to proposal with id %d.", uid, pid)));
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Bidding with id %d doesn't belong to proposal with id %d.", uid, pid)));
     }
 }

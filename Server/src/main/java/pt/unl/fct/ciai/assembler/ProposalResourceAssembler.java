@@ -22,15 +22,16 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 
 	@Override
 	public Resource<Proposal> toResource(Proposal proposal) {
+		long id = proposal.getId();
 		Resource<Proposal> resource = new Resource<>(proposal,
-				linkTo(methodOn(ProposalsController.class).getProposal(proposal.getId())).withSelfRel(),
+				linkTo(methodOn(ProposalsController.class).getProposal(id)).withSelfRel(),
 				linkTo(methodOn(ProposalsController.class).getProposals("")).withRel("proposals"),
-				linkTo(methodOn(ProposalsController.class).getReviews(proposal.getId(), "")).withRel("reviews"),
-				linkTo(methodOn(ProposalsController.class).getComments(proposal.getId(), "")).withRel("comments"),
-				linkTo(methodOn(ProposalsController.class).getSections(proposal.getId(), "")).withRel("sections"),
-				linkTo(methodOn(ProposalsController.class).getReviewBiddings(proposal.getId(), "")).withRel("reviewBiddings"));
-		proposal.getApprover().ifPresent(approver -> 
-		resource.add(linkTo(methodOn(UsersController.class).getUser(approver.getId())).withRel("approver")));
+				linkTo(methodOn(ProposalsController.class).getStaff(id, "")).withRel("staff"),
+				linkTo(methodOn(ProposalsController.class).getMembers(id, "")).withRel("members"),
+				linkTo(methodOn(ProposalsController.class).getSections(id, "")).withRel("sections"),
+				linkTo(methodOn(ProposalsController.class).getReviews(id, "")).withRel("reviews"),
+				linkTo(methodOn(ProposalsController.class).getComments(id, "")).withRel("comments"),
+				linkTo(methodOn(ProposalsController.class).getReviewBiddings(id, "")).withRel("reviewBiddings"));
 		//TODO adicionar mais links baseados noutros campos
 		return resource;
 	}
