@@ -19,17 +19,15 @@ paths:
     get:
       tags:
         - Users
-      description: Obter todos os utilizadores do sistema
+      description: Obter todos os utilizadores do sistema.
       operationId: getUsers
       parameters:
         - name: criteria
           in: query
-          description: Filtrar os utilizadores que satisfazem o critério
+          description: Filtrar os utilizadores que satisfazem o critério.
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            type: string
       responses:
         '200':
           description: Lista com a informação sobre os utilizadores
@@ -70,7 +68,7 @@ paths:
     get:
       tags:
         - Users
-      description: 'Obter o utilizador identificado pelo {id}'
+      description: 'Obter o utilizador identificado pelo {id}.'
       operationId: getUser
       parameters:
         - name: id
@@ -98,7 +96,7 @@ paths:
     put:
       tags:
         - Users
-      description: 'Atualizar o utilizador identificado pelo {id}'
+      description: 'Atualizar o utilizador identificado pelo {id}.'
       operationId: updateUser
       parameters:
         - name: id
@@ -130,7 +128,7 @@ paths:
     delete:
       tags:
         - Users
-      description: 'Remover do sistema o utilizador identificado pelo {id}'
+      description: 'Remover do sistema o utilizador identificado pelo {id}.'
       operationId: deleteUser
       parameters:
         - name: id
@@ -151,23 +149,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/users/{id}/approverInProposals':
+  '/users/{id}/proposals':
     get:
       tags:
         - Users
-      description: 'Obter a lista de propostas que o utilizador {id} pode aprovar.'
-      operationId: getUserApproverInProposals
+      description: 'Obter as propostas do utilizador identificado pelo {id}.'
+      operationId: getProposals
       parameters:
         - name: id
           in: path
-          description: Identificador do utilizador a obter
+          description: Identificador do utilizador
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Ids das propostas que o utilizador pode aprovar
+          description: Propostas do utilizador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
         '404':
           description: Utilizador não encontrado
         default:
@@ -176,12 +178,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/users/{uid}/approverInProposals/{pid}':
-    post:
+  '/users/{uid}/proposals/{pid}':
+    get:
       tags:
         - Users
-      description: 'Adicionar a proposta {pid} a lista de aprovação do utilizador {uid}'
-      operationId: addUserApproverInProposals
+      description: 'Obter as propostas do utilizador identificado pelo {id}.'
+      operationId: getProposal
       parameters:
         - name: uid
           in: path
@@ -199,9 +201,11 @@ paths:
             format: int64
       responses:
         '200':
-          description: Id da proposta adicionado à lista de aprovação do utilizador
-        '400':
-          description: Id especificado do utilizador ou proposta inválidos
+          description: Proposta do utilizador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
         '404':
           description: Utilizador ou proposta não encontrados
         default:
@@ -210,11 +214,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    delete:
+  '/users/{id}/biddings':
+    get:
       tags:
         - Users
-      description: 'Remover a proposta {pid} da lista de aprovação do utilizador {uid}'
-      operationId: deleteUserApproverInProposals
+      description: 'Obter as propostas nas quais o utilizador identificado pelo {id} tem interesse em ser reviewer.'
+      operationId: getBiddings
+      parameters:
+        - name: id
+          in: path
+          description: Identificador do utilizador
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Propostas nas quais o utilizador tem interesse em ser reviewer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+        '404':
+          description: Utilizador não encontrado
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/users/{uid}/biddings/{pid}':
+    get:
+      tags:
+        - Users
+      description: 'Obter a propostas {pid}, na qual o utilizador identificado pelo {id} tem interesse em ser reviewer.'
+      operationId: getBidding
       parameters:
         - name: uid
           in: path
@@ -225,37 +259,39 @@ paths:
             format: int64
         - name: pid
           in: path
-          description: Identificador da proposta a remover da lista de aprovação do utilizador
+          description: Identificador da proposta
           required: true
           schema:
             type: integer
             format: int64
       responses:
-        '204':
-          description: Proposta removida da lista de aporvação do utilizador
+        '200':
+          description: Propostas do utilizador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
         '404':
-          description: Utilizador ou porposta não encontrados
+          description: Utilizador ou proposta não encontrados
         default:
           description: Erro não esperado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /partners:
+  /companies:
     get:
       tags:
         - Partner Company
       description: Obter todas as empresas parceiras
-      operationId: getPartnerCompanies
+      operationId: getCompanies
       parameters:
         - name: criteria
           in: query
           description: Filtrar as empresas que satisfazem o critério
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            type: string
       responses:
         '200':
           description: Lista com a informação sobre as empresas parceiras
@@ -264,7 +300,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PartnerCompany'
+                  $ref: '#/components/schemas/Company'
         default:
           description: Erro não esperado
           content:
@@ -275,14 +311,14 @@ paths:
       tags:
         - Partner Company
       description: Adicionar uma companhia parceira ao sistema
-      operationId: addPartnerCompany
+      operationId: addCompany
       requestBody:
         description: Todos os necessários dados da empresa
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PartnerCompany'
+              $ref: '#/components/schemas/Company'
       responses:
         '200':
           description: Empresa adicionada com sucesso
@@ -292,12 +328,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/partners/{id}':
+  '/companies/{id}':
     get:
       tags:
         - Partner Company
       description: 'Obter a empresa identificada pelo {id}'
-      operationId: getPartnerCompany
+      operationId: getCompany
       parameters:
         - name: id
           in: path
@@ -312,7 +348,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PartnerCompany'
+                $ref: '#/components/schemas/Company'
         '404':
           description: Empresa não encontrada
         default:
@@ -325,7 +361,7 @@ paths:
       tags:
         - Partner Company
       description: 'Atualizar a empresa identificada pelo {id}'
-      operationId: updatePartnerCompany
+      operationId: updateCompany
       parameters:
         - name: id
           in: path
@@ -339,7 +375,7 @@ paths:
           description: Objeto da empresa que é atualizada
           required: true
           schema:
-            $ref: '#/components/schemas/PartnerCompany'
+            $ref: '#/components/schemas/Company'
       responses:
         '200':
           description: Empresa atualizada
@@ -357,7 +393,7 @@ paths:
       tags:
         - Partner Company
       description: 'Remover do sistema a empresa identificada pelo {id}'
-      operationId: deletePartnerCompany
+      operationId: deleteCompany
       parameters:
         - name: id
           in: path
@@ -377,14 +413,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/partners/{pid}/employee/{eid}':
+  '/companies/{cid}/employee/{eid}':
     get:
       tags:
         - Partner Company
-      description: 'Obter o empregado identificado pelo {eid} na empresa {pid}'
-      operationId: getPartnerCompanyEmployee
+      description: 'Obter o empregado identificado pelo {eid} na empresa {cid}'
+      operationId: getEmployee
       parameters:
-        - name: pid
+        - name: cid
           in: path
           description: Identificador da empresa
           required: true
@@ -416,10 +452,10 @@ paths:
     put:
       tags:
         - Partner Company
-      description: 'Atualizar o empregado identificado pelo {eid} na empresa {pid}'
-      operationId: updatePartnerCompanyEmployee
+      description: 'Atualizar o empregado identificado pelo {eid} na empresa {cid}'
+      operationId: updateEmployee
       parameters:
-        - name: pid
+        - name: cid
           in: path
           description: Identificador da empresa
           required: true
@@ -455,10 +491,10 @@ paths:
     delete:
       tags:
         - Partner Company
-      description: 'Remover do sistema o empregado identificado pelo {eid} na empresa {pid}'
-      operationId: deletePartnerCompanyEmployee
+      description: 'Remover do sistema o empregado identificado pelo {eid} na empresa {cid}'
+      operationId: deleteEmployee
       parameters:
-        - name: pid
+        - name: cid
           in: path
           description: Identificador da empresa
           required: true
@@ -483,12 +519,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Employee'
-  '/partners/{id}/employees':
+  '/companies/{id}/employees':
     get:
       tags:
         - Partner Company
       description: 'Obter todos os empregados da empresa parceira identificada pelo {id}'
-      operationId: getCompanyEmployees
+      operationId: getEmployees
       parameters:
         - name: id
           in: path
@@ -558,16 +594,14 @@ paths:
       tags:
         - Event Proposal
       description: Obter todas as propostas de eventos do sistema
-      operationId: getEventProposals
+      operationId: getProposals
       parameters:
         - name: criteria
           in: query
           description: Filtrar as propostas de eventos que satisfazem o critério
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            type: string
       responses:
         '200':
           description: Lista com a informação sobre as propostas de eventos
@@ -576,7 +610,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventProposal'
+                  $ref: '#/components/schemas/Proposal'
         default:
           description: Erro não esperado
           content:
@@ -587,14 +621,14 @@ paths:
       tags:
         - Event Proposal
       description: Adicionar uma proposta de evento ao sistema
-      operationId: addEventProposal
+      operationId: addProposal
       requestBody:
         description: Todos os necessários dados da proposta de evento
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventProposal'
+              $ref: '#/components/schemas/Proposal'
       responses:
         '200':
           description: Proposta de evento adicionada com sucesso
@@ -609,7 +643,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Obter a proposta de evento identificado pelo {id}'
-      operationId: getEventProposal
+      operationId: getProposal
       parameters:
         - name: id
           in: path
@@ -624,7 +658,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventProposal'
+                $ref: '#/components/schemas/Proposal'
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -637,7 +671,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Atualizar a proposta de evento identificada pelo {id}'
-      operationId: updateEventProposal
+      operationId: updateProposal
       parameters:
         - name: id
           in: path
@@ -651,7 +685,7 @@ paths:
           description: Objeto proposta de evento que é atualizado
           required: true
           schema:
-            $ref: '#/components/schemas/EventProposal'
+            $ref: '#/components/schemas/Proposal'
       responses:
         '200':
           description: Proposta de evento atualizada
@@ -669,7 +703,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Remover do sistema a proposta de evento identificada pelo {id}'
-      operationId: deleteEventProposal
+      operationId: deleteProposal
       parameters:
         - name: id
           in: path
@@ -693,8 +727,8 @@ paths:
     get:
       tags:
         - Event Proposal
-      description: 'Obter todos as secçõe da proposta de evento identificada pelo {id}'
-      operationId: getEventProposalSections
+      description: 'Obter todos as secções da proposta de evento identificada pelo {id}'
+      operationId: getSections
       parameters:
         - name: id
           in: path
@@ -703,23 +737,15 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: criteria
-          in: query
-          description: Filtrar as secções que satisfazem o critério
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
       responses:
         '200':
-          description: Lista com as secções da proposta de evento em questão
+          description: Secções da proposta de evento
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventProposalSection'
+                  $ref: '#/components/schemas/Section'
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -732,7 +758,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Adicionar uma secção à proposta de evento identificada pelo {id}'
-      operationId: addEventProposalSection
+      operationId: addSection
       parameters:
         - name: id
           in: path
@@ -747,7 +773,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventProposalSection'
+              $ref: '#/components/schemas/Section'
       responses:
         '200':
           description: Secção adicionada com sucesso
@@ -760,11 +786,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   '/proposals/{pid}/sections/{sid}':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter a secção {sid} da proposta de evento identificada pelo {pid}'
+      operationId: getSection
+      parameters:
+        - name: pid
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: sid
+          in: path
+          description: Identificador da secção a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Secções da proposta de evento
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Section'
+        '404':
+          description: Proposta de evento ou secção não encontradas
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       tags:
         - Event Proposal
       description: 'Atualizar a secção identificada pelo {sid} na proposta {pid}'
-      operationId: updateProposalSection
+      operationId: updateSection
       parameters:
         - name: pid
           in: path
@@ -785,7 +848,7 @@ paths:
           description: Objeto section que é atualizado
           required: true
           schema:
-            $ref: '#/components/schemas/EventProposalSection'
+            $ref: '#/components/schemas/Section'
       responses:
         '200':
           description: Secção atualizada
@@ -803,7 +866,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Remover do sistema a secção identificada pelo {sid} da proposta {pid}'
-      operationId: deleteProposalSection
+      operationId: deleteSection
       parameters:
         - name: pid
           in: path
@@ -835,7 +898,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Obter todas as revisões da proposta de evento identificada pelo {id}'
-      operationId: getEventProposalReviews
+      operationId: getReviews
       parameters:
         - name: id
           in: path
@@ -849,9 +912,7 @@ paths:
           description: Filtrar as revisões que satisfazem o critério
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            type: string
       responses:
         '200':
           description: Lista com as revisões da proposta de evento em questão
@@ -860,7 +921,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventProposalReview'
+                  $ref: '#/components/schemas/Review'
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -873,7 +934,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Adicionar uma revisão à proposta de evento identificada pelo {id}'
-      operationId: addEventProposalReview
+      operationId: addReview
       parameters:
         - name: id
           in: path
@@ -888,7 +949,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventProposalReview'
+              $ref: '#/components/schemas/Review'
       responses:
         '200':
           description: Revisão adicionada com sucesso
@@ -905,7 +966,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Obter a revisão identificada pelo {rid} da proposta {pid}'
-      operationId: getProposalReview
+      operationId: getReview
       parameters:
         - name: pid
           in: path
@@ -927,7 +988,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventProposalReview'
+                $ref: '#/components/schemas/Review'
         '404':
           description: Proposta ou revisão não encontradas
         default:
@@ -940,7 +1001,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Atualizar a revisão identificada pelo {rid} na empresa {pid}'
-      operationId: updateProposalReview
+      operationId: updateReview
       parameters:
         - name: pid
           in: path
@@ -961,7 +1022,7 @@ paths:
           description: Objeto review que é atualizado
           required: true
           schema:
-            $ref: '#/components/schemas/EventProposalReview'
+            $ref: '#/components/schemas/Review'
       responses:
         '200':
           description: Revisão atualizada
@@ -979,7 +1040,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Remover do sistema a revisão identificada pelo {rid} da proposta {pid}'
-      operationId: deleteProposalReview
+      operationId: deleteReview
       parameters:
         - name: pid
           in: path
@@ -1006,12 +1067,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/proposals/{id}/comments':
+  '/proposals/{id}/staff':
     get:
       tags:
         - Event Proposal
-      description: 'Obter todos os comentários da proposta de evento identificada pelo {id}'
-      operationId: getEventProposalComments
+      description: 'Obter todos os staff da proposta de evento identificada pelo {id}.'
+      operationId: getStaff
       parameters:
         - name: id
           in: path
@@ -1022,21 +1083,19 @@ paths:
             format: int64
         - name: criteria
           in: query
-          description: Filtrar os comentários que satisfazem o critério
+          description: Filtrar os staff que satisfazem o critério
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            type: string
       responses:
         '200':
-          description: Lista com os comentários da proposta de evento em questão
+          description: Staff da proposta de evento
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventProposalComment'
+                  $ref: '#/components/schemas/User'
         '404':
           description: Proposta de evento não encontrada
         default:
@@ -1048,8 +1107,8 @@ paths:
     post:
       tags:
         - Event Proposal
-      description: 'Adicionar um comentário à proposta de evento identificada pelo {id}'
-      operationId: addEventProposalComment
+      description: 'Adicionar um utilizador ao staff da proposta de evento identificada pelo {id}.'
+      operationId: addStaff
       parameters:
         - name: id
           in: path
@@ -1064,7 +1123,277 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventProposalComment'
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Utilizador adicionado com sucesso
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{pid}/staff/{uid}':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter o utilizador identificado pelo {uid} na proposta {pid}'
+      operationId: getStaff
+      parameters:
+        - name: pid
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: uid
+          in: path
+          description: Identificador utilizador a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação do utilizador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Proposta ou utilizador não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal
+      description: 'Remover do staff da proposta {pid} o utilizador identificado pelo {uid}.'
+      operationId: deleteStaff
+      parameters:
+        - name: pid
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: uid
+          in: path
+          description: Identificador do utilizador a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Utilizador removido do staff da proposta
+        '404':
+          description: Proposta ou utilizador não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{id}/members':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter todos os membros da proposta de evento identificada pelo {id}.'
+      operationId: getMembers
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: criteria
+          in: query
+          description: Filtrar os membros que satisfazem o critério
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Membros da proposta de evento
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Event Proposal
+      description: 'Adicionar um utilizador ao membros da proposta de evento identificada pelo {id}.'
+      operationId: addMember
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Todos os necessários dados do utilizador
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Utilizador adicionado com sucesso
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{pid}/members/{mid}':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter o utilizador identificado pelo {mid} na proposta {pid}'
+      operationId: getMember
+      parameters:
+        - name: pid
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: mid
+          in: path
+          description: Identificador utilizador a obter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Informação do utilizador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Proposta ou utilizador não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Event Proposal
+      description: 'Remover dos membros da proposta {pid} o utilizador identificado pelo {mid}.'
+      operationId: deleteMember
+      parameters:
+        - name: pid
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: mid
+          in: path
+          description: Identificador do utilizador a remover
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Utilizador removido dos membros da proposta
+        '404':
+          description: Proposta ou utilizador não encontrados
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{id}/comments':
+    get:
+      tags:
+        - Event Proposal
+      description: 'Obter todos os comentários da proposta de evento identificada pelo {id}'
+      operationId: getComments
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: criteria
+          in: query
+          description: Filtrar os comentários que satisfazem o critério
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista com os comentários da proposta de evento em questão
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Proposta de evento não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Event Proposal
+      description: 'Adicionar um comentário à proposta de evento identificada pelo {id}'
+      operationId: addComment
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta de evento
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Todos os necessários dados do comentário
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
       responses:
         '200':
           description: Comentário adicionado com sucesso
@@ -1081,7 +1410,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Obter o comentário identificado pelo {cid} na proposta {pid}'
-      operationId: getProposalComment
+      operationId: getComment
       parameters:
         - name: pid
           in: path
@@ -1103,7 +1432,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventProposalComment'
+                $ref: '#/components/schemas/Comment'
         '404':
           description: Proposta ou comentário não encontrados
         default:
@@ -1116,7 +1445,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Atualizar o comentário identificado pelo {cid} na proposta {pid}'
-      operationId: updateProposalComment
+      operationId: updateComment
       parameters:
         - name: pid
           in: path
@@ -1137,7 +1466,7 @@ paths:
           description: Objeto comentário que é atualizado
           required: true
           schema:
-            $ref: '#/components/schemas/EventProposalComment'
+            $ref: '#/components/schemas/Comment'
       responses:
         '200':
           description: Comentário atualizado
@@ -1155,7 +1484,7 @@ paths:
       tags:
         - Event Proposal
       description: 'Remover do sistema o comentário identificado pelo {cid} na proposta {id}'
-      operationId: deleteProposalComment
+      operationId: deleteComment
       parameters:
         - name: pid
           in: path
@@ -1182,12 +1511,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/proposals/{id}/usersForBidding':
+  '/proposals/{id}/biddings':
     get:
       tags:
         - Event Proposal
-      description: 'Obter os Ids dos utilizadores interessados em fazer review à proposta {id}.'
-      operationId: getProposalUsersForBidding
+      description: >-
+        Obter os Ids dos utilizadores interessados em fazer review à proposta
+        {id}.
+      operationId: getReviewBiddings
       parameters:
         - name: id
           in: path
@@ -1198,11 +1529,11 @@ paths:
             format: int64
       responses:
         '200':
-          description: Ids dos utilizadores
+          description: Utilizadores interessados em fazer review à proposta
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventProposalComment'
+                $ref: '#/components/schemas/User'
         '404':
           description: Proposta não encontrada
         default:
@@ -1211,12 +1542,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/proposals/{pid}/usersForBidding/{uid}':
     post:
       tags:
         - Event Proposal
-      description: 'Adiciona o id de utilizador {uid} à lista de utilizadores interessados em fazer review à proposta {pid}'
-      operationId: addProposalUserForBidding
+      description: >-
+        Adiciona um utilizador à lista de utilizadores interessados
+        em fazer review à proposta {id}.
+      operationId: addReviewBidding
+      parameters:
+        - name: id
+          in: path
+          description: Identificador da proposta
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Utilizador adicionado
+        '400':
+          description: Id especificado da proposta inválido
+        '404':
+          description: Proposta não encontrada
+        default:
+          description: Erro não esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/proposals/{pid}/biddings/{uid}':
+    get:
+      tags:
+        - Event Proposal
+      description: >-
+        Obter o utilizadores {uid} interessado em fazer review à proposta
+        {pid}.
+      operationId: getReviewBidding
       parameters:
         - name: pid
           in: path
@@ -1227,18 +1588,20 @@ paths:
             format: int64
         - name: uid
           in: path
-          description: Identificador da utilizador
+          description: Identificador do utilizador
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Id do utilizador adicionado
-        '400':
-          description: Id especificado da proposta ou utiizador inválido
+          description: Utilizadores interessados em fazer review à proposta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
-          description: Proposta ou utilizador não encontrados
+          description: Proposta não encontrada
         default:
           description: Erro não esperado
           content:
@@ -1248,8 +1611,10 @@ paths:
     delete:
       tags:
         - Event Proposal
-      description: 'Remover o id do utilizador {uid} da lista de utilizadores interessados em fazer review à proposta {pid}'
-      operationId: deleteProposalUserForBidding
+      description: >-
+        Remover o utilizador {uid} da lista de utilizadores interessados
+        em fazer review à proposta {pid}
+      operationId: deleteReviewBidding
       parameters:
         - name: pid
           in: path
@@ -1260,14 +1625,14 @@ paths:
             format: int64
         - name: uid
           in: path
-          description: Identificador a remover da lista
+          description: Identificador do utilizador a remover da lista
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '204':
-          description: Id do utilizador removido
+          description: Utilizador removido
         '404':
           description: Proposta ou utilizador não encontrados
         default:
@@ -1283,8 +1648,9 @@ components:
         - firstName
         - lastName
         - userName
-        - emailAddress
-        - passwordHash
+        - email
+        - password
+        - role
       properties:
         id:
           type: integer
@@ -1299,22 +1665,35 @@ components:
         userName:
           type: string
           example: user1
-        emailAddress:
+        email:
           type: string
           example: user1@ecma.com
-        passwordHash:
+        password:
           type: string
           example: $2y$12$95z6mYtPI371qXLCTWzP0elvLNv7Znh8dlwoseWncIm2zQb4u94xS
-        approverInProposals:
+          writeOnly: true
+        role:
+          type: "string"
+          enum:
+          - "SYS_ADMIN"
+          - "COMPANY_ADMIN"
+          - "PROPOSAL_APPROVER"
+        proposals:
           type: array
           items:
-            type: number
-    PartnerCompany:
+            $ref: '#/components/schemas/Proposal'
+          writeOnly: true
+        biddings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Proposal'
+          writeOnly: true
+    Company:
       required:
         - name
         - city
         - zipCode
-        - streetAddress
+        - address
       properties:
         id:
           type: integer
@@ -1329,14 +1708,14 @@ components:
         zipCode:
           type: string
           example: 1000-261
-        streetAddress:
+        address:
           type: string
           example: Long Street
         phone:
           type: integer
           format: int64
           example: 212121212
-        emailAddress:
+        email:
           type: string
           example: info@ecma.com
         fax:
@@ -1346,38 +1725,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Employee'
-          readOnly: true
+          writeOnly: true
     Employee:
       required:
-        - userId
-        - companyId
         - city
         - zipCode
-        - streetAddress
+        - address
         - cellPhone
         - homePhone
         - gender
         - salary
         - birthday
         - job
+        - company
       properties:
         id:
           type: integer
           format: int64
           readOnly: true
-        userId:
-          type: integer
-          format: int64
-        companyId:
-          type: integer
-          format: int64
         city:
           type: string
           example: Lisbon
         zipCode:
           type: string
           example: 1000-260
-        streetAddress:
+        address:
           type: string
           example: Short Street
         cellPhone:
@@ -1405,61 +1777,82 @@ components:
         job:
           type: string
           example: CEO
-        isAdmin:
-          type: boolean
-          default: false
-    EventProposal:
+        company:
+          $ref: "#/components/schemas/Company"
+    Proposal:
+      required:
+        - title
+        - description
+        - state
+        - creationDate
+        - proposer
       properties:
         id:
           type: integer
           format: int64
           readOnly: true
-        isApproved:
-          type: boolean
-          default: false
-        date:
+        title:
+          type: string
+        description:
+          type: string
+        state:
+          type: string
+          enum:
+            - PENDING_APPROVAL
+            - APPROVED
+            - REJECTED
+        creationDate:
           type: string
           format: date
           readOnly: true
         sections:
           type: array
           items:
-            $ref: '#/components/schemas/EventProposalSection'
-          readOnly: true
+            $ref: '#/components/schemas/Section'
+          writeOnly: true
         reviewers:
           type: array
           items:
             $ref: '#/components/schemas/User'
-          readOnly: true
+          writeOnly: true
         staff:
           type: array
           items:
             $ref: '#/components/schemas/User'
-          readOnly: true
+          writeOnly: true
         members:
           type: array
           items:
             $ref: '#/components/schemas/Employee'
-          readOnly: true
-        usersForBidding:
+          writeOnly: true
+        reviews:
           type: array
           items:
-            type: number
-    EventProposalSection:
+            $ref: '#/components/schemas/Review'
+          writeOnly: true
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+          writeOnly: true
+        reviewBiddings:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          writeOnly: true
+        proposer:
+          $ref: "#/components/schemas/User"
+    Section:
       required:
-        - proposalId
         - title
         - description
         - goals
         - material
         - budget
         - workPlan
+        - proposal
       properties:
         id:
-          type: integer
-          format: int64
-          readOnly: true
-        proposalId:
           type: integer
           format: int64
           readOnly: true
@@ -1484,23 +1877,18 @@ components:
           example: >-
             Go to a place and promote the new perfume by allowing interested
             people to try it
-    EventProposalReview:
+        proposal:
+          $ref: "#/components/schemas/Proposal"
+    Review:
       required:
-        - proposalId
-        - reviewerId
         - title
         - text
         - classification
+        - creationDate
+        - author
+        - proposal
       properties:
         id:
-          type: integer
-          format: int64
-          readOnly: true
-        proposalId:
-          type: integer
-          format: int64
-          readOnly: true
-        reviewerId:
           type: integer
           format: int64
           readOnly: true
@@ -1522,26 +1910,23 @@ components:
           minimum: 0
           maximum: 10
           example: 0
-        date:
+        creationDate:
           type: string
           format: date
           example: '2018-10-10'
-    EventProposalComment:
+        author:
+          $ref: "#/components/schemas/User"
+        proposal:
+          $ref: "#/components/schemas/Proposal"
+    Comment:
       required:
-        - proposalId
-        - commenterId
         - title
         - text
+        - creationDate
+        - author
+        - proposal
       properties:
         id:
-          type: integer
-          format: int64
-          readOnly: true
-        proposalId:
-          type: integer
-          format: int64
-          readOnly: true
-        commenterId:
           type: integer
           format: int64
           readOnly: true
@@ -1553,10 +1938,14 @@ components:
           example: >-
             Hello, can someone involved give a bit more detail about the
             workplan?
-        date:
+        creationDate:
           type: string
           format: date
           example: '2018-10-15'
+        author:
+          $ref: "#/components/schemas/User"
+        proposal:
+          $ref: "#/components/schemas/Proposal"
     Error:
       required:
         - code
