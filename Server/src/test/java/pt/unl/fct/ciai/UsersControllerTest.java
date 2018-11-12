@@ -57,8 +57,6 @@ public class UsersControllerTest {
 	private MockMvc mvc;
 	@MockBean
 	private UsersService usersService;
-	@MockBean
-	private ProposalsService proposalsService;
 	@Autowired
 	private UserResourcesAssembler userAssembler;
 	@Autowired
