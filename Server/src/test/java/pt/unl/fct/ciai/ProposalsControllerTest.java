@@ -471,58 +471,418 @@ public class ProposalsControllerTest {
 	}
 
 	@Test
-	public void testDeleteSection() {
-		//TODO
+	public void testDeleteSection() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> proposalResource = proposalAssembler.toResource(p1);
+		Section s1 = p1.getSections().get().iterator().next();
+		String href = sectionAssembler.toResource(s1).getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+
+		when(sectionsRepository.findById(s1.getId()))
+				.thenReturn(Optional.of(s1))
+				.thenReturn(Optional.of(s1))
+				.thenReturn(Optional.ofNullable(null));
+
+		performGetSection(s1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(sectionsRepository, times(1)).findById(s1.getId());
+
+		mvc.perform(delete(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(sectionsRepository, times(2)).findById(s1.getId());
+		verify(sectionsRepository, times (1)).delete(s1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(sectionsRepository, times(3)).findById(s1.getId());
+
 	}
 
 	@Test
-	public void testGetReviews() {
-		//TODO
+	public void testGetReviews() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Iterator<Review> it = p1.getReviews().get().iterator();
+
+		Review r1 =  it.next();
+		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
+
+		Review r2 = it.next();
+		Resource<Review> r2Resource = reviewAssembler.toResource(r2);
+
+		Review r3 = it.next();
+		Resource<Review> r3Resource = reviewAssembler.toResource(r3);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+
+		String href = p1Resource.getLink("reviews").getHref();
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.reviews", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.reviews[0].id", is((int)r1.getId())))
+				.andExpect(jsonPath("$._embedded.reviews[0].title", is(r1.getTitle())))
+				.andExpect(jsonPath("$._embedded.reviews[0].text", is(r1.getText())))
+				.andExpect(jsonPath("$._embedded.reviews[0].summary", is(r1.getSummary())))
+				.andExpect(jsonPath("$._embedded.reviews[0].classification", is(r1.getClassification())))
+				.andExpect(jsonPath("$._embedded.reviews[0]._links.self.href", is(ROOT + r1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.reviews[0]._links.reviews.href", is(ROOT + r1Resource.getLink("reviews").getHref())))
+
+				.andExpect(jsonPath("$._embedded.reviews[1].id", is((int)r2.getId())))
+				.andExpect(jsonPath("$._embedded.reviews[1].title", is(r2.getTitle())))
+				.andExpect(jsonPath("$._embedded.reviews[1].text", is(r2.getText())))
+				.andExpect(jsonPath("$._embedded.reviews[1].summary", is(r2.getSummary())))
+				.andExpect(jsonPath("$._embedded.reviews[1].classification", is(r2.getClassification())))
+				.andExpect(jsonPath("$._embedded.reviews[1]._links.self.href", is(ROOT + r2Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.reviews[1]._links.reviews.href", is(ROOT + r2Resource.getLink("reviews").getHref())))
+
+				.andExpect(jsonPath("$._embedded.reviews[2].id", is((int)r3.getId())))
+				.andExpect(jsonPath("$._embedded.reviews[2].title", is(r3.getTitle())))
+				.andExpect(jsonPath("$._embedded.reviews[2].text", is(r3.getText())))
+				.andExpect(jsonPath("$._embedded.reviews[2].summary", is(r3.getSummary())))
+				.andExpect(jsonPath("$._embedded.reviews[2].classification", is(r3.getClassification())))
+				.andExpect(jsonPath("$._embedded.reviews[2]._links.self.href", is(ROOT + r3Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.reviews[2]._links.reviews.href", is(ROOT + r3Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
+				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
 	}
 
 	@Test
-	public void testAddReview() {
-		//TODO
+	public void testAddReview() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+
+		String href = p1Resource.getLink("reviews").getHref();
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.reviews", hasSize(2)));
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+
+		Review r1 = create_Review_1();
+		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		when(proposalsRepository.save(p1)).thenReturn(p1);
+		when(reviewsRepository.save(r1)).thenReturn(r1);
+
+		String json = objectMapper.writeValueAsString(r1);
+		mvc.perform(post(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isCreated())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)r1.getId())))
+				.andExpect(jsonPath("$.title", is(r1.getTitle())))
+				.andExpect(jsonPath("$.text", is(r1.getText())))
+				.andExpect(jsonPath("$.summary", is(r1.getSummary())))
+				.andExpect(jsonPath("$.classification", is(r1.getClassification())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + r1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + href)));
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(proposalsRepository, times(1)).save(p1);
+		verify(reviewsRepository, times(1)).save(r1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.reviews", hasSize(3)));
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
 	}
 
 	@Test
-	public void testGetReview() {
-		//TODO
+	public void testGetReview() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Review r1 = create_Review_1();
+		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		given(reviewsRepository.findById(r1.getId()))
+				.willReturn(Optional.of(r1));
+
+		performGetReview(r1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(reviewsRepository, times(1)).findById(r1.getId());
 	}
 
 	@Test
-	public void testUpdateReview() {
-		//TODO
+	public void testUpdateReview() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		Review r1 = create_Review_1();
+		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
+		String href = r1Resource.getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		given(reviewsRepository.findById(r1.getId()))
+				.willReturn(Optional.of(r1));
+
+		performGetReview(r1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(reviewsRepository, times(1)).findById(r1.getId());
+
+		given(reviewsRepository.save(r1)).willReturn(r1);
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(reviewsRepository.findById(p1.getId())).willReturn(Optional.of(r1));
+
+		r1.setTitle("Novo titulo");
+		String json = objectMapper.writeValueAsString(r1);
+		mvc.perform(put(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isNoContent());
+
+		verify(reviewsRepository, times(1)).save(r1);
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(reviewsRepository, times(2)).findById(r1.getId());
+
+		performGetReview(r1);
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(reviewsRepository, times(3)).findById(r1.getId());
 	}
 
 	@Test
-	public void testDeleteReview() {
-		//TODO
+	public void testDeleteReview() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> proposalResource = proposalAssembler.toResource(p1);
+		Review r1 = p1.getReviews().get().iterator().next();
+		String href = reviewAssembler.toResource(r1).getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+
+		when(reviewsRepository.findById(r1.getId()))
+				.thenReturn(Optional.of(r1))
+				.thenReturn(Optional.of(r1))
+				.thenReturn(Optional.ofNullable(null));
+
+		performGetReview(r1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(reviewsRepository, times(1)).findById(r1.getId());
+
+		mvc.perform(delete(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(reviewsRepository, times(2)).findById(r1.getId());
+		verify(reviewsRepository, times (1)).delete(r1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(reviewsRepository, times(3)).findById(r1.getId());
 	}
 
 	@Test
-	public void testGetComments() {
-		//TODO
+	public void testGetComments() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Iterator<Comment> it = p1.getComments().get().iterator();
+
+		Comment c1 =  it.next();
+		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
+
+		Comment c2 = it.next();
+		Resource<Comment> c2Resource = commentAssembler.toResource(c2);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+
+		String href = p1Resource.getLink("comments").getHref();
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.comments", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.comments[0].id", is((int)c1.getId())))
+				.andExpect(jsonPath("$._embedded.comments[0].title", is(c1.getTitle())))
+				.andExpect(jsonPath("$._embedded.comments[0].text", is(c1.getText())))
+				.andExpect(jsonPath("$._embedded.comments[0]._links.self.href", is(ROOT + c1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.comments[0]._links.comments.href", is(ROOT + c1Resource.getLink("comments").getHref())))
+
+				.andExpect(jsonPath("$._embedded.comments[1].id", is((int)c2.getId())))
+				.andExpect(jsonPath("$._embedded.comments[1].title", is(c2.getTitle())))
+				.andExpect(jsonPath("$._embedded.comments[1].text", is(c2.getText())))
+				.andExpect(jsonPath("$._embedded.comments[1]._links.self.href", is(ROOT + c2Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.comments[1]._links.comments.href", is(ROOT + c2Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
+				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
 	}
 
 	@Test
-	public void testAddComment() {
-		//TODO
+	public void testAddComment() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+
+		String href = p1Resource.getLink("comments").getHref();
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.comments", hasSize(2)));
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+
+		Comment c1 = create_Comment_1();
+		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		when(proposalsRepository.save(p1)).thenReturn(p1);
+		when(commentsRepository.save(c1)).thenReturn(c1);
+
+		String json = objectMapper.writeValueAsString(c1);
+		mvc.perform(post(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isCreated())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)c1.getId())))
+				.andExpect(jsonPath("$.title", is(c1.getTitle())))
+				.andExpect(jsonPath("$.text", is(c1.getText())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + c1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.comments.href", is(ROOT + href)));
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(proposalsRepository, times(1)).save(p1);
+		verify(commentsRepository, times(1)).save(c1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.comments", hasSize(3)));
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
 	}
 
 	@Test
-	public void testGetComment() {
-		//TODO
+	public void testGetComment() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Comment c1 = create_Comment_1();
+		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		given(commentsRepository.findById(c1.getId()))
+				.willReturn(Optional.of(c1));
+
+		performGetComment(c1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(commentsRepository, times(1)).findById(c1.getId());
 	}
 
 	@Test
-	public void testUpdateComment() {
-		//TODO
+	public void testUpdateComment() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		Comment c1 = create_Comment_1();
+		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
+		String href = c1Resource.getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		given(commentsRepository.findById(c1.getId()))
+				.willReturn(Optional.of(c1));
+
+		performGetComment(c1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(commentsRepository, times(1)).findById(c1.getId());
+
+		given(commentsRepository.save(c1)).willReturn(c1);
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(commentsRepository.findById(p1.getId())).willReturn(Optional.of(c1));
+
+		c1.setTitle("Novo titulo");
+		String json = objectMapper.writeValueAsString(c1);
+		mvc.perform(put(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isNoContent());
+
+		verify(commentsRepository, times(1)).save(c1);
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(commentsRepository, times(2)).findById(c1.getId());
+
+		performGetComment(c1);
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(commentsRepository, times(3)).findById(c1.getId());
 	}
 
 	@Test
-	public void testDeleteComment() {
-		//TODO
+	public void testDeleteComment() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> proposalResource = proposalAssembler.toResource(p1);
+		Comment c1 = p1.getComments().get().iterator().next();
+		String href = commentAssembler.toResource(c1).getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+
+		when(commentsRepository.findById(c1.getId()))
+				.thenReturn(Optional.of(c1))
+				.thenReturn(Optional.of(c1))
+				.thenReturn(Optional.ofNullable(null));
+
+		performGetComment(c1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(commentsRepository, times(1)).findById(c1.getId());
+
+		mvc.perform(delete(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(commentsRepository, times(2)).findById(c1.getId());
+		verify(commentsRepository, times (1)).delete(c1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(commentsRepository, times(3)).findById(c1.getId());
 	}
 
 	@Test
@@ -575,5 +935,34 @@ public class ProposalsControllerTest {
 				.andReturn();
 	}
 
+	private MvcResult performGetReview(Review review) throws Exception {
+		Resource<Review> resourceReview = reviewAssembler.toResource(review);
+		return mvc.perform(get(resourceReview.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)review.getId())))
+				.andExpect(jsonPath("$.title", is(review.getTitle())))
+				.andExpect(jsonPath("$.text", is(review.getText())))
+				.andExpect(jsonPath("$.summary", is(review.getSummary())))
+				.andExpect(jsonPath("$.classification", is(review.getClassification())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceReview.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + resourceReview.getLink("reviews").getHref())))
+				.andReturn();
+	}
+
+	private MvcResult performGetComment(Comment comment) throws Exception {
+		Resource<Comment> resourceComment = commentAssembler.toResource(comment);
+		return mvc.perform(get(resourceComment.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)comment.getId())))
+				.andExpect(jsonPath("$.title", is(comment.getTitle())))
+				.andExpect(jsonPath("$.text", is(comment.getText())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceComment.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.comments.href", is(ROOT + resourceComment.getLink("comments").getHref())))
+				.andReturn();
+	}
 
 }
