@@ -35,11 +35,11 @@ public class Proposal {
 	@OneToMany(mappedBy="proposal", cascade = CascadeType.ALL)
 	private Set<Section> sections;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "proposals", cascade = CascadeType.REFRESH)
+	@ManyToMany(cascade = CascadeType.REFRESH)
 	@Column(nullable = false)
 	private Set<User> staff;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "proposals", cascade = CascadeType.REFRESH)
+	@ManyToMany(cascade = CascadeType.REFRESH)
 	@Column(nullable = false)
 	private Set<Employee> members;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -49,15 +49,15 @@ public class Proposal {
 	@OneToMany(mappedBy = "proposal", cascade = CascadeType.ALL)
 	private Set<Comment> comments;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "biddings", cascade = CascadeType.REFRESH)
+	@ManyToMany(cascade = CascadeType.REFRESH)
 	private Set<User> reviewBiddings; //TODO ver se é possivel ter Map<User, Boolean> para saber se o bid foi ganho
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToMany(mappedBy = "proposals")
+	private Set<User> reviewers;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@JoinColumn(name="proposer_id")
 	private User proposer;
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "proposals")
-	private Set<User> reviewers;
 
 	public Proposal() {
 		this.state = ProposalState.PENDING_APPROVAL;

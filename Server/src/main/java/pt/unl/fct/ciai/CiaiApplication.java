@@ -10,7 +10,9 @@ import org.springframework.hateoas.core.EvoInflectorRelProvider;
 @EnableHypermediaSupport(type = { HypermediaType.HAL })
 @SpringBootApplication
 public class CiaiApplication {
-    
+
+	//TODO adicionar application.properties ao repositorio bitbucket
+
 	public static void main(String[] args) {
 		SpringApplication.run(CiaiApplication.class, args);
 	}

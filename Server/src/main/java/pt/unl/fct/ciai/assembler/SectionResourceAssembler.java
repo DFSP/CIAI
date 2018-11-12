@@ -24,7 +24,7 @@ public class SectionResourceAssembler implements ResourceAssembler<Section, Reso
 	@Override
 	public Resource<Section> toResource(Section section) {
 		long sid = section.getId();
-		long pid = section.getProposal().get().getId(); //TODO o que fazer quando getProposal retorna null?
+		long pid = section.getProposal().getId();
 		return new Resource<>(section, Collections.emptyList());
 			//	linkTo(methodOn(ProposalsController.class).getSection(pid, sid)).withSelfRel(),
 			//	linkTo(methodOn(ProposalsController.class).getSections(pid, "")).withRel("sections"));

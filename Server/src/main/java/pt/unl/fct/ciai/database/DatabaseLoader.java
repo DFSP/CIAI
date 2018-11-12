@@ -157,15 +157,17 @@ public class DatabaseLoader {
                     .members(new HashSet<Employee>(Arrays.asList(joao, daniel)))
                     .reviewBiddings(Collections.singleton(luis))
                     .proposer(joao);
-            System.out.println(proposal1);
+            manuel.addProposal(proposal1);
+            joao.addProposal(proposal1);
+            daniel.addProposal(proposal1);
+            luis.addBidding(proposal1);
             proposal1 = proposals.save(proposal1);
-            System.out.println(proposal1);
-            System.out.println("staff: " + proposals.getStaff(proposal1.getId()));
-            System.out.println("members: " + proposals.getMembers(proposal1.getId()));
-            System.out.println("biddings: " + proposals.getReviewBiddings(proposal1.getId()));
-            System.out.println("proposer: " + proposals.getProposer(proposal1.getId()));
-            System.out.println("user: " + users.getProposals(daniel.getId()));
+            manuel = users.save(manuel);
+            joao = employees.save(joao);
+            daniel = employees.save(daniel);
+            luis = employees.save(luis);
 
+            //TODO mudar tambem proposal2 e proposal3 para como está a proposal1
 
             Proposal proposal2 = new Proposal()
                     .title("Evento Vegan")

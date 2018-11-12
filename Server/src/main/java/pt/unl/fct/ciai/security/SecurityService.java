@@ -100,7 +100,7 @@ public class SecurityService {
     public boolean isMemberOrStaffOfProposal(User user, long id) {
     	pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
     	return myself != null && 
-    			(proposals.getMember(id, myself.getId()) != null || proposals.getOneStaff(id, myself.getId()) != null);
+    			(proposals.getMember(id, myself.getId()) != null || proposals.getStaff(id, myself.getId()) != null);
     }
     
     public boolean isAuthorOfProposal(User user, long id) {

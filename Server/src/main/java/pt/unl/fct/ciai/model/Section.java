@@ -134,8 +134,8 @@ public class Section {
         return this;
     }
 
-    public Optional<Proposal> getProposal() {
-        return Optional.ofNullable(this.proposal);
+    public Proposal getProposal() {
+        return this.proposal;
     }
 
     public void setProposal(Proposal proposal) {
@@ -170,7 +170,7 @@ public class Section {
                 ", material='" + material + '\'' +
                 ", workPlan='" + workPlan + '\'' +
                 ", budget=" + budget +
-                ", proposal=" + getProposal().map(Proposal::getId).orElse(null) +
+                ", proposal=" + Optional.ofNullable(getProposal()).map(Proposal::getId).orElse(null) +
                 '}';
     }
 }

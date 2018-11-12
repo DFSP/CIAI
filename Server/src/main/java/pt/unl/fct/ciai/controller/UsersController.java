@@ -9,6 +9,7 @@ import pt.unl.fct.ciai.api.UsersApi;
 import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
 import pt.unl.fct.ciai.assembler.UserResourceAssembler;
 import pt.unl.fct.ciai.exception.NotFoundException;
+import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 import pt.unl.fct.ciai.service.UsersService;
 
@@ -50,8 +51,7 @@ public class UsersController implements UsersApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<Resource<User>> getUser(@PathVariable("id") long id) {
-        User user = usersService.getUser(id).orElseThrow(() ->
-                new NotFoundException(String.format("User with id %d not found.", id)));
+        User user = getUserIfPresent(id);
         Resource<User> resource = userAssembler.toResource(user);
         return ResponseEntity.ok(resource);
     }
@@ -70,6 +70,51 @@ public class UsersController implements UsersApi {
         usersService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/proposals")
+    public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        User user = getUserIfPresent(id);
+        Iterable<Proposal> proposals = usersService.getProposals(id, search);
+        Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping("/{uid}/proposals/{pid}")
+    public ResponseEntity<Resource<Proposal>> getProposal(
+            @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
+        User user = getUserIfPresent(uid);
+        Proposal proposal = usersService.getProposal(uid, pid).orElseThrow(() ->
+                new NotFoundException(String.format("Proposal with id %d doesn't have a member/staff with id %d", pid, uid)));
+        Resource<Proposal> resource = proposalAssembler.toResource(proposal);
+        return ResponseEntity.ok(resource);
+    }
+
+    @GetMapping("/{id}/biddings")
+    public ResponseEntity<Resources<Resource<Proposal>>> getBiddings(
+            @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
+        User user = getUserIfPresent(id);
+        Iterable<Proposal> proposals = usersService.getBiddings(id, search);
+        Resources<Resource<Proposal>> resources = proposalAssembler.toResources(proposals);
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping("/{uid}/biddings/{pid}")
+    public ResponseEntity<Resource<Proposal>> getBidding(
+            @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
+        User user = getUserIfPresent(uid);
+        Proposal proposal = usersService.getBidding(uid, pid).orElseThrow(() ->
+                new NotFoundException(String.format("Proposal with id %d is not bid by a member/staff with id %d", pid, uid)));
+        Resource<Proposal> resource = proposalAssembler.toResource(proposal);
+        return ResponseEntity.ok(resource);
+    }
+
+    private User getUserIfPresent(long id) {
+        return usersService.getUser(id).orElseThrow(() ->
+                new NotFoundException(String.format("User with id %d not found.", id)));
+    }
+
+
 
 /*
 	@GetMapping("/{id}/approverInProposals")

@@ -1,6 +1,7 @@
 package pt.unl.fct.ciai.service;
 
 import org.springframework.stereotype.Service;
+import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.utils.Utils;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.User;
@@ -43,6 +44,26 @@ public class UsersService {
     public void deleteUser(long id) {
         User user = getUserIfPresent(id);
         usersRepository.delete(user);
+    }
+
+    public Iterable<Proposal> getProposals(long id, String search) {
+        return search ==  null ?
+                usersRepository.getProposals(id) :
+                usersRepository.searchProposals(id, search);
+    }
+
+    public Optional<Proposal> getProposal(long uid, long pid) {
+        return Optional.ofNullable(usersRepository.getProposal(uid, pid));
+    }
+
+    public Iterable<Proposal> getBiddings(long id, String search) {
+        return search ==  null ?
+                usersRepository.getBiddings(id) :
+                usersRepository.searchBiddings(id, search);
+    }
+
+    public Optional<Proposal> getBidding(long uid, long pid) {
+        return Optional.ofNullable(usersRepository.getBidding(uid, pid));
     }
 
     private User getUserIfPresent(long id) {

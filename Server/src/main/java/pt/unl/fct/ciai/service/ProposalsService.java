@@ -1,7 +1,6 @@
 package pt.unl.fct.ciai.service;
 
 import org.springframework.stereotype.Service;
-import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.*;
 import pt.unl.fct.ciai.repository.*;
@@ -13,18 +12,18 @@ import java.util.Optional;
 public class ProposalsService {
 
     private final ProposalsRepository proposalsRepository;
-    private final UsersRepository usersRepository;
-    private final EmployeesRepository employeesRepository;
+    private final UsersRepository staffRepository;
+    private final EmployeesRepository membersRepository;
     private final SectionsRepository sectionsRepository;
     private final ReviewsRepository reviewsRepository;
     private final CommentsRepository commentsRepository;
 
-    public ProposalsService(ProposalsRepository proposalsRepository, UsersRepository usersRepository,
-                            EmployeesRepository employeesRepository, SectionsRepository sectionsRepository,
+    public ProposalsService(ProposalsRepository proposalsRepository, UsersRepository staffRepository,
+                            EmployeesRepository membersRepository, SectionsRepository sectionsRepository,
                             ReviewsRepository reviewsRepository, CommentsRepository commentsRepository) {
         this.proposalsRepository = proposalsRepository;
-        this.usersRepository = usersRepository;
-        this.employeesRepository = employeesRepository;
+        this.staffRepository = staffRepository;
+        this.membersRepository = membersRepository;
         this.sectionsRepository = sectionsRepository;
         this.reviewsRepository = reviewsRepository;
         this.commentsRepository = commentsRepository;
@@ -67,9 +66,6 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         section.setProposal(proposal);
         return sectionsRepository.save(section);
-      /*  proposal.addSection(newSection);
-        proposalsRepository.save(proposal);
-        return newSection;*/ //TODO testar se realmente adiciona em todos
     }
 
     public Optional<Section> getSection(long pid, long sid) {
@@ -98,8 +94,10 @@ public class ProposalsService {
 
     public User addStaff(long pid, User user) {
         Proposal proposal = getProposalIfPresent(pid);
+        proposal.addStaff(user);
+        proposalsRepository.save(proposal); //TODO verificar se é preciso tambem guardar a proposal
         user.addProposal(proposal);
-        return usersRepository.save(user);
+        return staffRepository.save(user);
     }
 
     public Optional<User> getStaff(long pid, long uid) {
@@ -111,9 +109,9 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         User staff = getStaffIfPresent(pid, uid);
         proposal.removeStaff(staff);
-        proposalsRepository.save(proposal); //TODO ver qual destes não é necessário
+        proposalsRepository.save(proposal); //TODO ver se algum dos saves não é necessário
         staff.removeProposal(proposal);
-        usersRepository.save(staff);
+        staffRepository.save(staff);
     }
 
     public Iterable<Employee> getMembers(long id, String search) {
@@ -124,8 +122,10 @@ public class ProposalsService {
 
     public Employee addMember(long pid, Employee member) {
         Proposal proposal = getProposalIfPresent(pid);
+        proposal.addMember(member);
+        proposalsRepository.save(proposal); //TODO verificar se é preciso tambem guardar a proposal
         member.addProposal(proposal);
-        return employeesRepository.save(member);
+        return membersRepository.save(member);
     }
 
     public Optional<Employee> getMember(long pid, long mid) {
@@ -137,9 +137,9 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         Employee member = getMemberIfPresent(pid, mid);
         proposal.removeMember(member);
-        proposalsRepository.save(proposal);
+        proposalsRepository.save(proposal); //TODO ver se algum dos saves não é necessário
         member.removeProposal(proposal);
-        employeesRepository.save(member);
+        membersRepository.save(member);
     }
 
     public Iterable<Review> getReviews(long id, String search) {
@@ -210,7 +210,7 @@ public class ProposalsService {
         Proposal proposal = getProposalIfPresent(pid);
         //TODO user tem que existir no sistema
         user.addBidding(proposal);
-        return usersRepository.save(user);
+        return staffRepository.save(user);
     }
 
     public Optional<User> getReviewBidding(long pid, long uid) {
@@ -223,7 +223,7 @@ public class ProposalsService {
         proposal.removeReviewBidding(user);
         proposalsRepository.save(proposal); //TODO ver qual destes não é necessário
         user.removeBidding(proposal);
-        usersRepository.save(user);
+        staffRepository.save(user);
     }
 
     private Proposal getProposalIfPresent(long id) {

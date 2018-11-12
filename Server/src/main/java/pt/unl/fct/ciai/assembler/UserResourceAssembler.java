@@ -20,12 +20,14 @@ import pt.unl.fct.ciai.model.User;
 @Component
 public class UserResourceAssembler implements ResourcesAssembler<User, Resource<User>> {
 
-
 	@Override
 	public Resource<User> toResource(User user) {
+		long id = user.getId();
 		return new Resource<>(user,
-				linkTo(methodOn(UsersController.class).getUser(user.getId())).withSelfRel(),
-				linkTo(methodOn(UsersController.class).getUsers("")).withRel("users"));
+				linkTo(methodOn(UsersController.class).getUser(id)).withSelfRel(),
+				linkTo(methodOn(UsersController.class).getUsers("")).withRel("users"),
+				linkTo(methodOn(UsersController.class).getProposals(id, "")).withRel("proposals"),
+				linkTo(methodOn(UsersController.class).getBiddings(id, "")).withRel("biddings"));
 	}
 
 	@Override
