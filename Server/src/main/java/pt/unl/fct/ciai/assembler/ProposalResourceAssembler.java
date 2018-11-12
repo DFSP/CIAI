@@ -16,6 +16,7 @@ import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
 import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.model.Proposal;
+import pt.unl.fct.ciai.model.Section;
 import pt.unl.fct.ciai.model.User;
 
 @Component

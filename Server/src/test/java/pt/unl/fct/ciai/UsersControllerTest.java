@@ -406,6 +406,7 @@ public class UsersControllerTest {
 		System.out.println(joao.getBids().get());
 		Iterator<Proposal> it = joao.getBids().get().iterator();
 
+
 		Proposal bid1 = it.next();
 		bid1.setProposer(joao);
 		bid1.addReviewBid(joao);
