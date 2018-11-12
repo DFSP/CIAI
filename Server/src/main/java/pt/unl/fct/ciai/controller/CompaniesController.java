@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.hateoas.MediaTypes;
 
 import pt.unl.fct.ciai.api.CompaniesApi;
+import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
@@ -47,6 +48,9 @@ public class CompaniesController implements CompaniesApi {
 	@PostMapping
 	@CanAddCompany
 	public ResponseEntity<Resource<Company>> addCompany(@RequestBody Company company) throws URISyntaxException {
+		if (company.getId() > 0) {
+            throw new BadRequestException(String.format("Expected non negative company id, instead got %d", company.getId()));
+        }
 		Company newCompany = companiesService.addCompany(company);
 		Resource<Company> resource = companyAssembler.toResource(newCompany);
 		return ResponseEntity
@@ -64,7 +68,9 @@ public class CompaniesController implements CompaniesApi {
 	@PutMapping(value = "/{id}")
 	// @CanModifyCompany
 	public ResponseEntity<?> updateCompany(@PathVariable("id") long id, @RequestBody Company company) {
-		company.setId(id);
+		if (id != company.getId()) {
+			throw new BadRequestException(String.format("Path id %d and company id %d don't match.", id, company.getId()));
+		}
 		companiesService.updateCompany(company);
 		return ResponseEntity.noContent().build();
 	}
@@ -87,9 +93,11 @@ public class CompaniesController implements CompaniesApi {
 	
 	@PostMapping(value = "/{id}/employees")
 	// @CanAddEmployee
-	public ResponseEntity<Resource<Employee>> addEmployee(@PathVariable("id") long id,
-														  @Valid @RequestBody Employee employee)
-			throws URISyntaxException {
+	public ResponseEntity<Resource<Employee>> addEmployee(
+			@PathVariable("id") long id, @Valid @RequestBody Employee employee) throws URISyntaxException {
+		if (employee.getId() > 0) {
+			throw new BadRequestException(String.format("Expected non negative employee id, instead got %d", employee.getId()));
+		}
 		Employee newEmployee = companiesService.addEmployee(id, employee);
 		Resource<Employee> resource = employeeAssembler.toResource(newEmployee);
 		return ResponseEntity
@@ -107,9 +115,11 @@ public class CompaniesController implements CompaniesApi {
 
 	@PutMapping(value = "/{cid}/employees/{eid}")
 	// @CanModifyEmployee
-	public ResponseEntity<?> updateEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid,
-											@RequestBody Employee employee) {
-		employee.setId(eid);
+	public ResponseEntity<?> updateEmployee(
+			@PathVariable("cid") long cid, @PathVariable("eid") long eid, @RequestBody Employee employee) {
+		if (eid != employee.getId()) {
+			throw new BadRequestException(String.format("Path id %d and employee id %d don't match.", eid, employee.getId()));
+		}
 		companiesService.updateEmployee(cid, employee);
 		return ResponseEntity.noContent().build();
 	}
