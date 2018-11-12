@@ -17,9 +17,6 @@ import org.hibernate.annotations.CreationTimestamp;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Comment {
 
-    //TODO definir quais campos são not null
-    //TODO definir campos unique -> @Column(unique = true)
-
     @Id @GeneratedValue
     private long id;
     @NotEmpty
@@ -96,8 +93,8 @@ public class Comment {
         return this;
     }
 
-    public Optional<User> getAuthor() {
-        return Optional.ofNullable(this.author);
+    public User getAuthor() {
+        return this.author;
     }
 
     public void setAuthor(User author) {
@@ -109,8 +106,8 @@ public class Comment {
         return this;
     }
 
-    public Optional<Proposal> getProposal() {
-        return Optional.ofNullable(this.proposal);
+    public Proposal getProposal() {
+        return this.proposal;
     }
 
     public void setProposal(Proposal proposal) {
@@ -142,8 +139,8 @@ public class Comment {
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
                 ", creationDate=" + creationDate +
-                ", author="  + getAuthor().map(User::getUsername).orElse(null) +
-                ", proposal="  + getProposal().map(Proposal::getId).orElse(null) +
+                ", author="  + Optional.ofNullable(getAuthor()).map(User::getUsername).orElse(null) +
+                ", proposal="  + Optional.ofNullable(getProposal()).map(Proposal::getId).orElse(null) +
                 '}';
     }
 

@@ -20,7 +20,7 @@ import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.model.Proposal;
 
 @Component
-public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Resource<Employee>> {
+public class EmployeeResourceAssembler implements SubResourcesAssembler<Employee, Company, Resource<Employee>> {
 
 	@Override
 	public Resource<Employee> toResource(Employee employee) {
@@ -31,17 +31,7 @@ public class EmployeeResourceAssembler implements ResourceAssembler<Employee, Re
 			linkTo(methodOn(CompaniesController.class).getEmployees(cid, "")).withRel("employees"));
 	}
 
-	public Resources<Resource<Employee>> toResources(Iterable<? extends Employee> entities, Proposal proposal) {
-		long pid = proposal.getId();
-		List<Resource<Employee>> employees =
-				StreamSupport.stream(entities.spliterator(), false)
-						.map(this::toResource)
-						.collect(Collectors.toList());
-		return new Resources<>(employees,
-				linkTo(methodOn(ProposalsController.class).getMembers(pid, "")).withSelfRel(),
-				linkTo(methodOn(RootController.class).root()).withRel("root"));
-	}
-
+	@Override
 	public Resources<Resource<Employee>> toResources(Iterable<? extends Employee> entities, Company company) {
 		long cid = company.getId();
 		List<Resource<Employee>> employees = 

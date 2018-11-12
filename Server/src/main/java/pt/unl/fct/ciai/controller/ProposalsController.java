@@ -22,25 +22,28 @@ public class ProposalsController implements ProposalsApi {
 	private final ProposalsService proposalsService;
 
 	private final ProposalResourceAssembler proposalAssembler;
-	private final UserResourceAssembler userAssembler;
-	private final EmployeeResourceAssembler employeeAssembler;
+	private final StaffResourceAssembler staffAssembler;
+	private final MemberResourceAssembler memberAssembler;
 	private final SectionResourceAssembler sectionAssembler;
 	private final ReviewResourceAssembler reviewAssembler;
 	private final CommentResourceAssembler commentAssembler;
+	private final UserResourceAssembler userAssembler;
 
 	public ProposalsController(ProposalsService proposalsService,
 			ProposalResourceAssembler proposalAssembler,
-							   UserResourceAssembler userAssembler,
-							   EmployeeResourceAssembler employeeAssembler,
+							   StaffResourceAssembler staffAssembler,
+							   MemberResourceAssembler memberAssembler,
 							   SectionResourceAssembler sectionAssembler,
-			ReviewResourceAssembler reviewAssembler, CommentResourceAssembler commentAssembler) {
+			ReviewResourceAssembler reviewAssembler, CommentResourceAssembler commentAssembler,
+							   UserResourceAssembler userAssembler) {
 		this.proposalsService = proposalsService;
 		this.proposalAssembler = proposalAssembler;
-		this.userAssembler = userAssembler;
-		this.employeeAssembler = employeeAssembler;
+		this.staffAssembler = staffAssembler;
+		this.memberAssembler = memberAssembler;
 		this.sectionAssembler = sectionAssembler;
 		this.reviewAssembler = reviewAssembler;
 		this.commentAssembler = commentAssembler;
+		this.userAssembler = userAssembler;
 	}
 
 	@GetMapping
@@ -129,13 +132,12 @@ public class ProposalsController implements ProposalsApi {
 		return ResponseEntity.noContent().build();
 	}
 
-
 	@GetMapping("/{id}/staff")
 	public ResponseEntity<Resources<Resource<User>>> getStaff(
 			@PathVariable("id") long id, @RequestParam(value="search", required = false) String search) {
 		Proposal proposal = getProposalIfPresent(id);
 		Iterable<User> staff = proposalsService.getStaff(id, search);
-		Resources<Resource<User>> resources = userAssembler.toResources(staff);
+		Resources<Resource<User>> resources = staffAssembler.toResources(staff, proposal);
 		return ResponseEntity.ok(resources);
 	}
 
@@ -143,7 +145,7 @@ public class ProposalsController implements ProposalsApi {
 	public ResponseEntity<Resource<User>> addStaff(@PathVariable("id") long id, @Valid @RequestBody User staff)
 			throws URISyntaxException {
 		User newStaff = proposalsService.addStaff(id, staff);
-		Resource<User> resource = userAssembler.toResource(newStaff);
+		Resource<User> resource = staffAssembler.toResource(newStaff);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);
@@ -153,7 +155,7 @@ public class ProposalsController implements ProposalsApi {
 	public ResponseEntity<Resource<User>> getStaff(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
 		User staff = proposalsService.getStaff(pid, uid).orElseThrow(() ->
 				new NotFoundException(String.format("Staff id %d does not belong to proposal with id %d", uid, pid)));
-		Resource<User> resource = userAssembler.toResource(staff);
+		Resource<User> resource = staffAssembler.toResource(staff);
 		return ResponseEntity.ok(resource);
 	}
 
@@ -168,7 +170,7 @@ public class ProposalsController implements ProposalsApi {
 			@PathVariable("id") long id, @RequestParam(value="search", required = false) String search) {
 		Proposal proposal = getProposalIfPresent(id);
 		Iterable<Employee> members = proposalsService.getMembers(id, search);
-		Resources<Resource<Employee>> resources = employeeAssembler.toResources(members, proposal);
+		Resources<Resource<Employee>> resources = memberAssembler.toResources(members, proposal);
 		return ResponseEntity.ok(resources);
 	}
 
@@ -176,7 +178,7 @@ public class ProposalsController implements ProposalsApi {
 	public ResponseEntity<Resource<Employee>> addMember(@PathVariable("id") long id, @Valid @RequestBody Employee member)
 			throws URISyntaxException {// TODO recebe objeto employee ou apenas o id?
 		Employee newMember = proposalsService.addMember(id, member);
-		Resource<Employee> resource = employeeAssembler.toResource(newMember);
+		Resource<Employee> resource = memberAssembler.toResource(newMember);
 		return ResponseEntity
 				.created(new URI(resource.getId().expand().getHref()))
 				.body(resource);
@@ -186,7 +188,7 @@ public class ProposalsController implements ProposalsApi {
 	public ResponseEntity<Resource<Employee>> getMember(@PathVariable("pid") long pid, @PathVariable("mid") long mid) {
 		Employee member = proposalsService.getMember(pid, mid).orElseThrow(() ->
 				new NotFoundException(String.format("Member id %d does not belong to proposal with id %d", mid, pid)));
-		Resource<Employee> resource = employeeAssembler.toResource(member);
+		Resource<Employee> resource = memberAssembler.toResource(member);
 		return ResponseEntity.ok(resource);
 	}
 
@@ -298,7 +300,6 @@ public class ProposalsController implements ProposalsApi {
 	@PostMapping("/{id}/biddings")
 	public ResponseEntity<Resource<User>> addReviewBidding(@PathVariable("id") long id, @Valid @RequestBody User user)
 			throws URISyntaxException {
-		System.out.println(user);
 		User newUser = proposalsService.addReviewBidding(id, user);
 		Resource<User> resource = userAssembler.toResource(newUser);
 		return ResponseEntity

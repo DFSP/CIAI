@@ -36,8 +36,14 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     Iterable<Proposal> searchPublicProposals(@Param(value = "search") String search);
 
     @Query("SELECT p "
-            + "FROM Proposal p "
-            + "WHERE p.id = :id AND p.state = APPROVED")
+            + "FROM Proposal p JOIN p.staff s JOIN p.members m "
+            + "WHERE p.id = :id "
+            + "AND "
+            + "(p.state = 'APPROVED' "
+            + "OR s.username = ?#{principal.username} "
+            + "OR m.username = ?#{principal.username} "
+            + "OR p.proposer.username = ?#{principal.username} "
+            + "OR 1=?#{hasRole('ROLE_SYS_ADMIN') ? 1 : 0})")
     Proposal getPublicProposal(@Param(value = "id") long id);
 
     // Section queries
@@ -101,6 +107,11 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     User getStaff(@Param(value = "pid") long pid, @Param(value = "uid") long uid); //TODO mudar para getStaff
 
 
+    @Query("SELECT CASE WHEN s IS NOT NULL THEN TRUE ELSE FALSE END " +
+            "FROM Proposal p JOIN p.staff s " +
+            "WHERE p.id = :pid AND s.id = :sid")
+    boolean existsStaff(@Param(value = "pid") long pid, @Param(value = "sid") long sid);
+
     // Member queries
 
     @Query("SELECT m "
@@ -132,6 +143,10 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     Employee getMember(@Param(value = "pid") long pid, @Param(value = "eid") long eid);
 
+    @Query("SELECT CASE WHEN m IS NOT NULL THEN TRUE ELSE FALSE END " +
+            "FROM Proposal p JOIN p.members m " +
+            "WHERE p.id = :pid AND m.id = :mid")
+    boolean existsMember(@Param(value = "pid") long pid, @Param(value = "mid") long mid);
 
     // Review queries
 
@@ -232,10 +247,17 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
             + "WHERE p.id = :pid"
     )
     User getProposer(@Param(value = "pid") long pid);
-    
-    @Query("SELECT CASE WHEN r IS NOT NULL THEN TRUE ELSE FALSE END " +
-            "FROM Proposal p JOIN p.reviewers r " +
-            "WHERE p.id = :pid AND r.id = :uid")
+
+    @Query("SELECT CASE WHEN u IS NOT NULL THEN TRUE ELSE FALSE END "
+            + "FROM Proposal p "
+            + "WHERE p.id = :pid AND p.proposer.id = :uid")
+    boolean existsProposer(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
+
+    // Reviewer queries
+
+    @Query("SELECT CASE WHEN r IS NOT NULL THEN TRUE ELSE FALSE END "
+            + "FROM Proposal p JOIN p.reviewers r "
+            + "WHERE p.id = :pid AND r.id = :uid")
     boolean existsReviewer(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
 
 }

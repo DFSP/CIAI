@@ -15,21 +15,26 @@ import org.springframework.stereotype.Component;
 
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.controller.RootController;
+import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.model.Comment;
 import pt.unl.fct.ciai.model.Proposal;
 
 @Component
-public class CommentResourceAssembler implements ResourceAssembler<Comment, Resource<Comment>> { //TODO resourcesAssembler
+public class CommentResourceAssembler implements SubResourcesAssembler<Comment, Proposal, Resource<Comment>> {
 
 	@Override
 	public Resource<Comment> toResource(Comment comment) {
 		long cid = comment.getId();
-		long pid = comment.getProposal().get().getId(); //TODO o que fazer quando get retorna null?
+		long pid = comment.getProposal().getId();
+		long aid = comment.getAuthor().getId();
 		return new Resource<>(comment,
 				linkTo(methodOn(ProposalsController.class).getComment(pid, cid)).withSelfRel(),
-				linkTo(methodOn(ProposalsController.class).getComments(pid, "")).withRel("comments"));
+				linkTo(methodOn(ProposalsController.class).getComments(pid, "")).withRel("comments"),
+				linkTo(methodOn(UsersController.class).getUser(aid)).withRel("author"),
+				linkTo(methodOn(ProposalsController.class).getProposal(pid)).withRel("proposal"));
 	}
-	
+
+	@Override
 	public Resources<Resource<Comment>> toResources(Iterable<? extends Comment> entities, Proposal proposal) {
 		long cid = proposal.getId();
 		List<Resource<Comment>> comments = 

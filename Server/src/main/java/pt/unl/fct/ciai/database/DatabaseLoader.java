@@ -52,7 +52,7 @@ public class DatabaseLoader {
                     .email("aoliveira@email.com")
                     .password(encoder.encode("password"))
                     .role(User.Role.ROLE_PROPOSAL_APPROVER);
-            andre = users.save(manuel);
+            andre = users.save(andre);
 
             //	-	-	-	-	-	-	-	COMPANIES	-	-	-	-	-	-	-
 
@@ -154,36 +154,53 @@ public class DatabaseLoader {
                     .title("Churrasco")
                     .description("Fazer um churrasco só com carne de porco.")
                     .staff(Collections.singleton(manuel))
-                    .members(new HashSet<Employee>(Arrays.asList(joao)))
+                    .members(Collections.singleton(joao))
                     .reviewBiddings(Collections.singleton(luis))
                     .proposer(joao);
             manuel.addProposal(proposal1);
-            joao.addProposal(proposal1);
             luis.addBidding(proposal1);
+            joao.addProposal(proposal1);
             proposal1 = proposals.save(proposal1);
             manuel = users.save(manuel);
-            joao = employees.save(joao);
             luis = employees.save(luis);
-
-            //TODO mudar tambem proposal2 e proposal3 para como está a proposal1
+            joao = employees.save(joao);
 
             Proposal proposal2 = new Proposal()
                     .title("Evento Vegan")
                     .description("Fazer um evento com comida vegan.")
                     .staff(Collections.singleton(andre))
-                    .members(Collections.singleton(luis))
+                    .members(new HashSet<Employee>(Collections.singleton(joao)))
                     .reviewBiddings(new HashSet<User>(Arrays.asList(joao, daniel)))
                     .proposer(luis);
-            proposals.save(proposal2);
+            andre.addProposal(proposal2);
+            joao.addProposal(proposal2);
+            joao.addBidding(proposal2);
+            daniel.addBidding(proposal2);
+            luis.addProposal(proposal2);
+            proposal2 = proposals.save(proposal2);
+            andre = users.save(andre);
+            joao = employees.save(joao);
+            daniel = employees.save(daniel);
+            luis = employees.save(luis);
 
             Proposal proposal3 = new Proposal()
                     .title("Evento de pesca")
                     .description("Evento de pesca no lago do departamental.")
                     .staff(new HashSet<User>(Arrays.asList(manuel, andre)))
-                    .members(new HashSet<Employee>(Arrays.asList(joao, daniel)))
+                    .members(new HashSet<Employee>(Arrays.asList(daniel, joao)))
                     .reviewBiddings(Collections.singleton(luis))
                     .proposer(daniel);
-            proposals.save(proposal3);
+            manuel.addProposal(proposal3);
+            andre.addProposal(proposal3);
+            joao.addProposal(proposal3);
+            luis.addProposal(proposal3);
+            daniel.addProposal(proposal3);
+            proposal3 = proposals.save(proposal3);
+            manuel = users.save(manuel);
+            andre = users.save(andre);
+            joao = employees.save(joao);
+            luis = employees.save(luis);
+            daniel = employees.save(daniel);
 
             //	-	-	-	-	-	-	-	SECTIONS	-	-	-	-	-	-	-
 

@@ -18,7 +18,8 @@ import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
 
 @Component
-public class UserResourceAssembler implements ResourcesAssembler<User, Resource<User>> {
+public class UserResourceAssembler implements ResourcesAssembler<User, Resource<User>>,
+		SubResourcesAssembler<User, Proposal, Resource<User>> {
 
 	@Override
 	public Resource<User> toResource(User user) {
@@ -41,9 +42,10 @@ public class UserResourceAssembler implements ResourcesAssembler<User, Resource<
 				linkTo(methodOn(RootController.class).root()).withRel("root"));
 	}
 
+	@Override
 	public Resources<Resource<User>> toResources(Iterable<? extends User> entities, Proposal proposal) {
 		long pid = proposal.getId();
-		List<Resource<User>> users = 
+		List<Resource<User>> users =
 				StreamSupport.stream(entities.spliterator(), false)
 				.map(this::toResource)
 				.collect(Collectors.toList());

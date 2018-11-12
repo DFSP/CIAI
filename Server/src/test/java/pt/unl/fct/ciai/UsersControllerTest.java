@@ -51,6 +51,8 @@ import pt.unl.fct.ciai.service.UsersService;
 @Import({UserResourceAssembler.class, ProposalResourceAssembler.class})
 public class UsersControllerTest {
 
+	//TODO segurança
+
 	@Autowired
 	private MockMvc mvc;
 	@MockBean
@@ -71,58 +73,54 @@ public class UsersControllerTest {
 	}
 
 	private Proposal createProposal() {
-		Proposal proposal = new Proposal().id(1L)
+		return new Proposal()
+				.id(1L)
 				.title("A proposal title")
 				.description("A very detailed description about this proposal")
 				.approved();
-		return proposal;
 	}
 
 	private User createJoaoUser() {
-		User joao = new User();
-		joao.setId(1L);
-		joao.setFirstName("João");
-		joao.setLastName("Reis");
-		joao.setUsername("jreis");
-		joao.setEmail("jreis@email.com");
-		joao.setRole(User.Role.ROLE_COMPANY_ADMIN);
-		joao.setPassword("password");
-		return joao;
+		return new User()
+				.id(1L)
+				.firstName("João")
+				.lastName("Reis")
+				.username("jreis")
+			.email("jreis@email.com")
+		.role(User.Role.ROLE_COMPANY_ADMIN)
+		.password("password");
 	}
 
 	private User createLuisUser() {
-		User luis = new User();
-		luis.setId(2L);
-		luis.setFirstName("Luis");
-		luis.setLastName("Martins");
-		luis.setUsername("lmartins");
-		luis.setEmail("lmartins@email.com");
-		luis.setRole(User.Role.ROLE_COMPANY_ADMIN);
-		luis.setPassword("password");
-		return luis;
+		return new User()
+		.id(2L)
+		.firstName("Luis")
+		.lastName("Martins")
+		.username("lmartins")
+		.email("lmartins@email.com")
+		.role(User.Role.ROLE_COMPANY_ADMIN)
+		.password("password");
 	}
 
 	private User createDanielUser() {
-		User daniel = new User();
-		daniel.setId(3L);
-		daniel.setFirstName("Daniel");
-		daniel.setLastName("Pimenta");
-		daniel.setUsername("dpimenta");
-		daniel.setEmail("dpimenta@email.com");
-		daniel.setRole(User.Role.ROLE_COMPANY_ADMIN);
-		daniel.setPassword("password");
-		return daniel;
+		return new User()
+		.id(3L)
+		.firstName("Daniel")
+		.lastName("Pimenta")
+		.username("dpimenta")
+		.email("dpimenta@email.com")
+		.role(User.Role.ROLE_COMPANY_ADMIN)
+		.password("password");
 	}
 
 	private User createManuelUser() {
-		User manuel = new User();
-		manuel.setId(4L);
-		manuel.setFirstName("Manuel");
-		manuel.setLastName("Coelho");
-		manuel.setUsername("mcoelho");
-		manuel.setEmail("mcoelho@email.com");
-		manuel.setPassword("password");
-		return manuel;
+		return new User()
+		.id(4L)
+		.firstName("Manuel")
+		.lastName("Coelho")
+		.username("mcoelho")
+		.email("mcoelho@email.com")
+		.password("password");
 	}
 
 	@Test

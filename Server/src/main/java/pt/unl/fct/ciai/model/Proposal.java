@@ -362,8 +362,8 @@ public class Proposal {
 		return this;
 	}
 
-	public Optional<User> getProposer() {
-		return Optional.ofNullable(this.proposer);
+	public User getProposer() {
+		return this.proposer;
 	}
 
 	public void setProposer(User user) {
@@ -444,7 +444,7 @@ public class Proposal {
 				", reviewBiddings=" + getReviewBiddings()
 				.map(p -> p.stream().map(User::getUsername).collect(Collectors.toList()))
 				.orElse(Collections.emptyList()) +
-				", proposer=" + getProposer().map(User::getUsername)
+				", proposer=" + Optional.ofNullable(getProposer()).map(User::getUsername)
 				.orElse(null) +
 				'}';
 	}

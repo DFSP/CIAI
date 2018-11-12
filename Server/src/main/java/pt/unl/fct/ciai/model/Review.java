@@ -124,8 +124,8 @@ public class Review {
         return this;
     }
 
-    public Optional<Proposal> getProposal() {
-        return Optional.ofNullable(this.proposal);
+    public Proposal getProposal() {
+        return this.proposal;
     }
 
     public void setProposal(Proposal proposal) {
@@ -137,8 +137,8 @@ public class Review {
         return this;
     }
 
-    public Optional<User> getAuthor() {
-    	return Optional.ofNullable(this.author);
+    public User getAuthor() {
+    	return this.author;
     }
     
     public void setAuthor(User author) {
@@ -172,8 +172,8 @@ public class Review {
                 ", summary='" + summary + '\'' +
                 ", classification=" + classification +
                 ", creationDate=" + creationDate +
-                ", author="  + getAuthor().map(User::getUsername).orElse(null) +
-                ", proposal="  + getProposal().map(Proposal::getId).orElse(null) +
+                ", author="  + Optional.ofNullable(getAuthor()).map(User::getUsername).orElse(null) +
+                ", proposal="  + Optional.ofNullable(getProposal()).map(Proposal::getId).orElse(null) +
                 '}';
     }
 }

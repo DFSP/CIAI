@@ -23,7 +23,8 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 	@Override
 	public Resource<Proposal> toResource(Proposal proposal) {
 		long id = proposal.getId();
-		Resource<Proposal> resource = new Resource<>(proposal,
+		long uid = proposal.getProposer().getId();
+		return new Resource<>(proposal,
 				linkTo(methodOn(ProposalsController.class).getProposal(id)).withSelfRel(),
 				linkTo(methodOn(ProposalsController.class).getProposals("")).withRel("proposals"),
 				linkTo(methodOn(ProposalsController.class).getStaff(id, "")).withRel("staff"),
@@ -31,9 +32,9 @@ public class ProposalResourceAssembler implements ResourcesAssembler<Proposal, R
 				linkTo(methodOn(ProposalsController.class).getSections(id, "")).withRel("sections"),
 				linkTo(methodOn(ProposalsController.class).getReviews(id, "")).withRel("reviews"),
 				linkTo(methodOn(ProposalsController.class).getComments(id, "")).withRel("comments"),
-				linkTo(methodOn(ProposalsController.class).getReviewBiddings(id, "")).withRel("reviewBiddings"));
-		//TODO adicionar mais links baseados noutros campos
-		return resource;
+				linkTo(methodOn(ProposalsController.class).getReviewBiddings(id, "")).withRel("reviewBiddings"),
+				//linkTo(methodOn(ProposalsController.class).getReviewers(id, "")).withRel("reviewers"), //TODO reviewers
+				linkTo(methodOn(UsersController.class).getUser(uid)).withRel("proposer"));
 	}
 
 	@Override
