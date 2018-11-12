@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MvcResult;
 import pt.unl.fct.ciai.assembler.*;
 import pt.unl.fct.ciai.controller.ProposalsController;
+import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.*;
 import pt.unl.fct.ciai.service.ProposalsService;
 import pt.unl.fct.ciai.service.UsersService;
@@ -75,16 +76,21 @@ public class ProposalsControllerTest {
 		p1.setDescription("Proposal 1 - Description");
 		p1.setCreationDate(new Date());
 
+
 		Review r1 = create_Review_1();
 		r1.setProposal(p1);
 		Section s1=create_Section_1();
 		s1.setProposal(p1);
 		Comment c1=create_Comment_1();
 		c1.setProposal(p1);
+		User u1 = create_User_1();
+		p1.setProposer(u1);
+		u1.addProposal(p1);
 
 		p1.addReview(r1);
 		p1.addSection(s1);
 		p1.addComment(c1);
+
 
 		return p1;
 	}
@@ -107,8 +113,11 @@ public class ProposalsControllerTest {
 		c1.setProposal(p2);
 		Comment c2=create_Comment_1();
 		c2.setProposal(p2);
-		User bidder1 = create_User_1();
-		bidder1.addBid(p2);
+		User u1 = create_User_1();
+		p2.setProposer(u1);
+		u1.addProposal(p2);
+
+
 		User bidder2 = create_User_2();
 		bidder2.addBid(p2);
 
@@ -118,7 +127,7 @@ public class ProposalsControllerTest {
 		p2.addSection(s2);
 		p2.addComment(c1);
 		p2.addComment(c2);
-		p2.addReviewBid(bidder1);
+
 		p2.addReviewBid(bidder2);
 
 		return p2;
@@ -197,7 +206,7 @@ public class ProposalsControllerTest {
 
 	@Test
 	public void testGetProposals() throws Exception {
-		Proposal p1 =  createProposal_1();
+		Proposal p1 = createProposal_1();
 		Proposal p2 = createProposal_2();
 
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
@@ -207,27 +216,20 @@ public class ProposalsControllerTest {
 
 		String href = p1Resource.getLink("proposals").getHref();
 		mvc.perform(get(href))
+				.andExpect(status().isOk())
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.proposals", hasSize(2)))
 				.andExpect(jsonPath("$._embedded.proposals[0].id", is((int)p1.getId())))
 				.andExpect(jsonPath("$._embedded.proposals[0].title", is(p1.getTitle())))
 				.andExpect(jsonPath("$._embedded.proposals[0].description", is(p1.getDescription())))
-				.andExpect(jsonPath("$._embedded.proposals[0].date", is(p1.getCreationDate())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.self.href", is(ROOT + p1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.proposals.href", is(ROOT + p1Resource.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._embedded.proposals[0]._links.reviews.href", is(ROOT + p1Resource.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._embedded.proposals[0]._links.sections.href", is(ROOT + p1Resource.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._embedded.proposals[0]._links.comments.href", is(ROOT + p1Resource.getLink("comments").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[1].id", is((int)p2.getId())))
 				.andExpect(jsonPath("$._embedded.proposals[1].title", is(p2.getTitle())))
 				.andExpect(jsonPath("$._embedded.proposals[1].description", is(p2.getDescription())))
-				.andExpect(jsonPath("$._embedded.proposals[1].date", is(p2.getCreationDate())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.self.href", is(ROOT + p2Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.proposals.href", is(ROOT + p2Resource.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._embedded.proposals[1]._links.reviews.href", is(ROOT + p2Resource.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._embedded.proposals[1]._links.sections.href", is(ROOT + p2Resource.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._embedded.proposals[1]._links.comments.href", is(ROOT + p2Resource.getLink("comments").getHref())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
@@ -238,12 +240,14 @@ public class ProposalsControllerTest {
 	@Test
 	public void testAddProposal() throws Exception {
 		Proposal p1 = createProposal_1();
+		p1.setId(0);
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
 		given(proposalsService.addProposal(p1)).willReturn(p1);
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		String json = objectMapper.writeValueAsString(p1);
+		String json = "{\"title\":\"Proposal 1\",\"description\":\"Proposal 1 - Description\"}";
+
 		mvc.perform(post(p1Resource.getLink("proposals").getHref())
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -252,14 +256,10 @@ public class ProposalsControllerTest {
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.id", is((int)p1.getId())))
-				.andExpect(jsonPath("$.name", is(p1.getTitle())))
+				.andExpect(jsonPath("$.title", is(p1.getTitle())))
 				.andExpect(jsonPath("$.description", is(p1.getDescription())))
-				.andExpect(jsonPath("$.date", is(p1.getCreationDate())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + p1Resource.getLink("self").getHref())))
-				.andExpect(jsonPath("$._links.proposals.href", is(ROOT + p1Resource.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + p1Resource.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._links.sections.href", is(ROOT + p1Resource.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._links.comments.href", is(ROOT + p1Resource.getLink("comments").getHref())));
+				.andExpect(jsonPath("$._links.proposals.href", is(ROOT + p1Resource.getLink("proposals").getHref())));
 
 		verify(proposalsService, times(1)).addProposal(p1);
 
@@ -282,7 +282,9 @@ public class ProposalsControllerTest {
 
 	@Test
 	public void testUpdateProposal() throws Exception {
-		Proposal p1 = createProposal_1();
+		String json = "{\"id\":1,\"title\":\"Proposal 1\",\"description\":\"New description updated\"}";
+
+		Proposal p1 = objectMapper.readValue(json, Proposal.class);
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
@@ -294,16 +296,13 @@ public class ProposalsControllerTest {
 		given(proposalsService.addProposal(p1)).willReturn(p1);
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		p1.setTitle("New title");
-		String json = objectMapper.writeValueAsString(p1);
 		mvc.perform(put(p1Resource.getLink("self").getHref())
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(proposalsService, times(1)).addProposal(p1);
-		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).updateProposal(p1);
 
 		performGetProposal(p1);
 
@@ -313,12 +312,13 @@ public class ProposalsControllerTest {
 	@Test
 	public void testDeleteProposal() throws Exception {
 		Proposal p1 = createProposal_1();
-		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Resource<Proposal> proposalResource = proposalAssembler.toResource(p1);
 
 		when(proposalsService.getProposal(p1.getId()))
 				.thenReturn(Optional.of(p1))
-				.thenReturn(Optional.ofNullable(null));
-		String href = p1Resource.getLink("self").getHref();
+				.thenThrow(NotFoundException.class);
+
+		String href = proposalResource.getLink("self").getHref();
 
 		performGetProposal(p1);
 
@@ -327,13 +327,12 @@ public class ProposalsControllerTest {
 		mvc.perform(delete(href))
 				.andExpect(status().isNoContent());
 
-		verify(proposalsService, times(2)).getProposal(p1.getId());
 		verify(proposalsService, times(1)).deleteProposal(p1.getId());
 
 		mvc.perform(get(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getProposal(p1.getId());
 	}
 
 
@@ -349,8 +348,13 @@ public class ProposalsControllerTest {
 		Section s2 = it.next();
 		Resource<Section> s2Resource = sectionAssembler.toResource(s2);
 
+		//given(proposalsService.getSections(p1.getId(), "").willReturn(Arrays.asList(s1, s2)));
+
 		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
+
+
+
 
 		String href = p1Resource.getLink("sections").getHref();
 		mvc.perform(get(href))
@@ -444,6 +448,7 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 		Section s1 = create_Section_1();
+		s1.setProposal(p1);
 		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
 
 		given(proposalsService.getProposal(p1.getId()))
@@ -1068,14 +1073,10 @@ public class ProposalsControllerTest {
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.id", is((int)proposal.getId())))
-				.andExpect(jsonPath("$.name", is(proposal.getTitle())))
+				.andExpect(jsonPath("$.title", is(proposal.getTitle())))
 				.andExpect(jsonPath("$.description", is(proposal.getDescription())))
-				.andExpect(jsonPath("$.date", is(proposal.getCreationDate())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceProposal.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.proposals.href", is(ROOT + resourceProposal.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + resourceProposal.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._links.sections.href", is(ROOT + resourceProposal.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._links.comments.href", is(ROOT + resourceProposal.getLink("comments").getHref())))
 				.andReturn();
 	}
 
@@ -1087,10 +1088,8 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$.id", is((int)section.getId())))
 				.andExpect(jsonPath("$.title", is(section.getTitle())))
-				.andExpect(jsonPath("$.discription", is(section.getDescription())))
 				.andExpect(jsonPath("$.material", is(section.getMaterial())))
 				.andExpect(jsonPath("$.workPlan", is(section.getWorkPlan())))
-				.andExpect(jsonPath("$.budget", is(section.getBudget())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceSection.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.sections.href", is(ROOT + resourceSection.getLink("sections").getHref())))
 				.andReturn();
