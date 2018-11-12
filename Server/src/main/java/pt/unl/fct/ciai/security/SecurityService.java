@@ -1,5 +1,6 @@
 package pt.unl.fct.ciai.security;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,7 @@ public class SecurityService {
 	private ReviewsRepository reviews;
 	private CommentsRepository comments;
 
-    public SecurityService(UsersRepository users, CompaniesRepository companies, 
+    public SecurityService(UsersRepository users, CompaniesRepository companies,
     			EmployeesRepository employees, ProposalsRepository proposals, 
     			ReviewsRepository reviews, CommentsRepository comments) {
         this.users = users;
@@ -40,111 +41,85 @@ public class SecurityService {
         this.comments = comments;
     }
     
-    public boolean isPrincipal(User user, long id) {
-    	Optional<pt.unl.fct.ciai.model.User> u = users.findById(id);
-    	return u.isPresent() && u.get().getUsername().equals(user.getUsername());
+    public boolean isPrincipal(User principal, long id) {
+    	Optional<pt.unl.fct.ciai.model.User> user = users.findById(id);
+    	return user.isPresent() && user.get().getUsername().equals(principal.getUsername());
     }
 
-    public boolean isCompanyAdmin(User user, long id) {
-		pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-		return u != null && u.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN && 
-				companies.existsEmployee(id, u.getId());
+    public boolean isCompanyAdmin(User principal, long cid) {
+		Employee employee = employees.findByUsername(principal.getUsername());
+		return employee != null &&
+				employee.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN &&
+				companies.existsEmployee(cid, employee.getId());
 	}
 
-	public boolean membersOfSameCompany(User user, long uid) {
-		pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
-		Optional<pt.unl.fct.ciai.model.User> otherUser = users.findById(uid);
-		if (myself != null && otherUser.isPresent()) {
-			Optional<Employee> amIAnEmployee = employees.findById(myself.getId());
-			Optional<Employee> isOtherUserAnEmployee = employees.findById(uid);
-			if (amIAnEmployee.isPresent() == isOtherUserAnEmployee.isPresent()) {
-				if (!amIAnEmployee.isPresent())
-					return true; // both are members of ecma
-				else return amIAnEmployee.get().getCompany().equals(isOtherUserAnEmployee.get().getCompany());
-			}
-		}
-		return false;
+	public boolean membersOfSameCompany(User principal, long uid) {
+		Employee employee = employees.findByUsername(principal.getUsername());
+		Employee otherEmployee = employees.findById(uid).orElse(null);
+		return employee != null && otherEmployee != null &&
+				Objects.equals(employee.getCompany(), otherEmployee.getCompany());
     }
 	
-	public boolean isAdminOfAuthorOfProposal(User user, long id) {
-		pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
-		if (myself != null) {
-			Optional<Proposal> p = proposals.findById(id);
-			if (p.isPresent()) {
-				Optional<pt.unl.fct.ciai.model.User> proposer = p.get().getProposer();
-				return proposer.isPresent() && membersOfSameCompany(user, proposer.get().getId()) && 
-						myself.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN;
-			}
-		}
-		return false;
+	public boolean isAdminOfAuthorOfProposal(User principal, long pid) {
+		pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+		pt.unl.fct.ciai.model.User proposer = proposals.getProposer(pid);
+		return user != null && proposer != null && isAdminOfUser(principal, proposer.getId());
+	}
+
+	public boolean isAdminOfAuthorOfReview(User principal, long rid) {
+		pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+		pt.unl.fct.ciai.model.User author = reviews.findById(rid).map(Review::getAuthor).orElse(null);
+		return user != null && author != null && isAdminOfUser(principal, author.getId());
 	}
 	
-	public boolean isAdminOfAuthorOfReview(User user, long id) {
-		pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
-		if (myself != null) {
-			Optional<Review> r = reviews.findById(id);
-			if (r.isPresent()) {
-				Optional<pt.unl.fct.ciai.model.User> author = r.get().getAuthor();
-				return author.isPresent() && membersOfSameCompany(user, author.get().getId()) && 
-						myself.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN;
-			}
-		}
-		return false;
+	public boolean isAdminOfUser(User principal, long id) {
+		pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+		return user != null &&
+				user.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN &&
+				membersOfSameCompany(principal, id);
 	}
-	
-	public boolean isAdminOfUser(User user, long id) {
-		pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
-		Optional<pt.unl.fct.ciai.model.User> u = users.findById(id);
-		return myself != null && u.isPresent() && membersOfSameCompany(user, u.get().getId()) && 
-				myself.getRole() == pt.unl.fct.ciai.model.User.Role.ROLE_COMPANY_ADMIN;
-	}
-    
-    public boolean isMemberOrStaffOfProposal(User user, long id) {
-    	pt.unl.fct.ciai.model.User myself = users.findByUsername(user.getUsername());
-    	return myself != null && 
-    			(proposals.getMember(id, myself.getId()) != null || proposals.getStaff(id, myself.getId()) != null);
+
+    public boolean isPartOfProposal(User principal, long pid) {
+    	pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+    	return user != null &&
+				(proposals.existsStaff(pid, user.getId()) ||
+				proposals.existsMember(pid, user.getId()) ||
+				proposals.existsProposer(pid, user.getId()));
     }
     
-    public boolean isAuthorOfProposal(User user, long id) {
-    	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-    	Optional<Proposal> p = proposals.findById(id);
-    	Optional<pt.unl.fct.ciai.model.User> proposer = Optional.empty();
-    	if (p.isPresent())
-    		proposer = p.get().getProposer();
-    	return u != null && proposer.isPresent() && u.equals(proposer.get());
+    public boolean isAuthorOfProposal(User principal, long id) {
+    	pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+		pt.unl.fct.ciai.model.User proposer = proposals.findById(id).map(Proposal::getProposer).orElse(null);
+    	return Objects.equals(user, proposer);
     }
     
-    public boolean isAuthorOfReview(User user, long id) {
-    	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-    	Optional<Review> r = reviews.findById(id);
-    	Optional<pt.unl.fct.ciai.model.User> author = Optional.empty();
-    	if (r.isPresent())
-    		author = r.get().getAuthor();
-    	return u != null && author.isPresent() && u.equals(author.get());
+    public boolean isAuthorOfReview(User principal, long id) {
+    	pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+    	pt.unl.fct.ciai.model.User author = reviews.findById(id).map(Review::getAuthor).orElse(null);
+    	return Objects.equals(user, author);
     }
     
-    public boolean isAuthorOfComment(User user, long id) {
-    	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-    	Optional<Comment> c = comments.findById(id);
-    	Optional<pt.unl.fct.ciai.model.User> author = Optional.empty();
-    	if (c.isPresent())
-    		author = c.get().getAuthor();
-    	return u != null && author.isPresent() && u.equals(author.get());
+    public boolean isAuthorOfComment(User principal, long id) {
+    	pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+    	pt.unl.fct.ciai.model.User author = comments.findById(id).map(Comment::getAuthor).orElse(null);
+    	return Objects.equals(user, author);
     }
     
-    public boolean isReviewerOfProposal(User user, long id) {
-    	pt.unl.fct.ciai.model.User u = users.findByUsername(user.getUsername());
-    	return u != null && proposals.existsReviewer(id, u.getId());
+    public boolean isReviewerOfProposal(User principal, long id) {
+    	pt.unl.fct.ciai.model.User user = users.findByUsername(principal.getUsername());
+    	return user != null && proposals.existsReviewer(id, user.getId());
     }
     
     public boolean isProposalApproved(long id) {
-    	Optional<Proposal> p = proposals.findById(id);
-    	return p.isPresent() && p.get().getState() == Proposal.ProposalState.APPROVED;
+    	Optional<Proposal> proposal = proposals.findById(id);
+    	return proposal.map(Proposal::isApproved).orElse(false);
     }
+
 
 	@Bean
 	EvaluationContextExtension securityExtension() {
 		return new SecurityEvaluationContextExtension();
 	}
+
 }
 
