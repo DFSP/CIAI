@@ -12,6 +12,7 @@ import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.*;
 import pt.unl.fct.ciai.service.ProposalsService;
 
+
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;

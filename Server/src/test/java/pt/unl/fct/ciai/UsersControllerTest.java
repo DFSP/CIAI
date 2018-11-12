@@ -362,10 +362,12 @@ public class UsersControllerTest {
 		Resource<User> joaoResource = userAssembler.toResource(joao);
 		Iterator<Proposal> it = joao.getBids().get().iterator();
 
+
 		Proposal bid1 = it.next();
 		Resource<Proposal> bid1Resource = proposalAssembler.toResource(bid1);
-
+		System.out.println(">>>>>>>> "+ bid1.getId()+" <<<<<<<<");
 		Proposal bid2 = it.next();
+		System.out.println(">>>>>>>> "+ bid2.getId()+" <<<<<<<<");
 		Resource<Proposal> bid2Resource = proposalAssembler.toResource(bid2);
 
 		given(usersService.getUser(joao.getId())).willReturn(Optional.of(joao));

@@ -19,7 +19,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import pt.unl.fct.ciai.assembler.*;
 import pt.unl.fct.ciai.controller.ProposalsController;
 import pt.unl.fct.ciai.model.*;
-import pt.unl.fct.ciai.repository.*;
+import pt.unl.fct.ciai.service.ProposalsService;
+import pt.unl.fct.ciai.service.UsersService;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -37,21 +38,17 @@ import java.util.Optional;
 @WebMvcTest(controllers = ProposalsController.class, secure = false)
 @Import({ProposalResourceAssembler.class, SectionResourcesAssembler.class,
 	ReviewResourcesAssembler.class, CommentResourcesAssembler.class,
-	UserResourcesAssembler.class})
+	UserResourcesAssembler.class, StaffResourcesAssembler.class,
+	MemberResourceAssembler.class})
 public class ProposalsControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
 	@MockBean
-	private ProposalsRepository proposalsRepository;
+	private ProposalsService proposalsService;
 	@MockBean
-	private SectionsRepository sectionsRepository;
-	@MockBean
-	private ReviewsRepository reviewsRepository;
-	@MockBean
-	private CommentsRepository commentsRepository;
-	@MockBean
-	private UsersRepository usersRepository;
+	private UsersService usersService;
+
 	@Autowired
 	private ProposalResourceAssembler proposalAssembler;
 	@Autowired
@@ -206,7 +203,7 @@ public class ProposalsControllerTest {
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 		Resource<Proposal> p2Resource = proposalAssembler.toResource(p2);
 
-		given(proposalsRepository.findAll()).willReturn(Arrays.asList(p1, p2));
+		given(proposalsService.getProposals("")).willReturn(Arrays.asList(p1, p2));
 
 		String href = p1Resource.getLink("proposals").getHref();
 		mvc.perform(get(href))
@@ -234,7 +231,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(proposalsRepository, times(1)).findAll();
+		verify(proposalsService, times(1)).getProposals("");
 
 	}
 
@@ -243,8 +240,8 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.save(p1)).willReturn(p1);
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.addProposal(p1)).willReturn(p1);
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
 		String json = objectMapper.writeValueAsString(p1);
 		mvc.perform(post(p1Resource.getLink("proposals").getHref())
@@ -264,11 +261,11 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.sections.href", is(ROOT + p1Resource.getLink("sections").getHref())))
 				.andExpect(jsonPath("$._links.comments.href", is(ROOT + p1Resource.getLink("comments").getHref())));
 
-		verify(proposalsRepository, times(1)).save(p1);
+		verify(proposalsService, times(1)).addProposal(p1);
 
 		performGetProposal(p1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -276,11 +273,11 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
 		performGetProposal(p1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -288,14 +285,14 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
 		performGetProposal(p1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 
-		given(proposalsRepository.save(p1)).willReturn(p1);
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.addProposal(p1)).willReturn(p1);
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
 		p1.setTitle("New title");
 		String json = objectMapper.writeValueAsString(p1);
@@ -305,12 +302,12 @@ public class ProposalsControllerTest {
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(proposalsRepository, times(1)).save(p1);
-		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
 
 		performGetProposal(p1);
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -318,25 +315,25 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		when(proposalsRepository.findById(p1.getId()))
+		when(proposalsService.getProposal(p1.getId()))
 				.thenReturn(Optional.of(p1))
 				.thenReturn(Optional.ofNullable(null));
 		String href = p1Resource.getLink("self").getHref();
 
 		performGetProposal(p1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 
 		mvc.perform(delete(href))
 				.andExpect(status().isNoContent());
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(proposalsRepository, times(1)).delete(p1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).deleteProposal(p1.getId());
 
 		mvc.perform(get(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
 	}
 
 
@@ -352,7 +349,7 @@ public class ProposalsControllerTest {
 		Section s2 = it.next();
 		Resource<Section> s2Resource = sectionAssembler.toResource(s2);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("sections").getHref();
@@ -383,7 +380,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -391,7 +388,7 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("sections").getHref();
@@ -401,15 +398,15 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.sections", hasSize(2)));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 
 		Section s1 = create_Section_1();
 		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsRepository.save(p1)).thenReturn(p1);
-		when(sectionsRepository.save(s1)).thenReturn(s1);
+		when(proposalsService.addProposal(p1)).thenReturn(p1);
+		when(proposalsService.addSection(s1.getId(), s1)).thenReturn(s1);
 
 		String json = objectMapper.writeValueAsString(s1);
 		mvc.perform(post(href)
@@ -428,9 +425,9 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + s1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.sections.href", is(ROOT + href)));
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(proposalsRepository, times(1)).save(p1);
-		verify(sectionsRepository, times(1)).save(s1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(1)).addSection(s1.getId(), s1);
 
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
@@ -438,7 +435,7 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.sections", hasSize(3)));
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
 	}
 
 
@@ -449,15 +446,15 @@ public class ProposalsControllerTest {
 		Section s1 = create_Section_1();
 		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		given(sectionsRepository.findById(s1.getId()))
+		given(proposalsService.getSection(p1.getId(), s1.getId()))
 				.willReturn(Optional.of(s1));
 
 		performGetSection(s1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(sectionsRepository, times(1)).findById(s1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getSection(p1.getId(), s1.getId());
 
 	}
 
@@ -470,19 +467,19 @@ public class ProposalsControllerTest {
 		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
 		String href = s1Resource.getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		given(sectionsRepository.findById(s1.getId()))
+		given(proposalsService.getSection(p1.getId(), s1.getId()))
 				.willReturn(Optional.of(s1));
 
 		performGetSection(s1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(sectionsRepository, times(1)).findById(s1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getSection(p1.getId(), s1.getId());
 
-		given(sectionsRepository.save(s1)).willReturn(s1);
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
-		given(sectionsRepository.findById(p1.getId())).willReturn(Optional.of(s1));
+		given(proposalsService.addSection(p1.getId(), s1)).willReturn(s1);
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getSection(p1.getId(), s1.getId())).willReturn(Optional.of(s1));
 
 		s1.setTitle("Novo titulo");
 		String json = objectMapper.writeValueAsString(s1);
@@ -492,14 +489,14 @@ public class ProposalsControllerTest {
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(sectionsRepository, times(1)).save(s1);
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(sectionsRepository, times(2)).findById(s1.getId());
+		verify(proposalsService, times(1)).addSection(p1.getId(), s1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getSection(p1.getId(), s1.getId());
 
 		performGetSection(s1);
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(sectionsRepository, times(3)).findById(s1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(3)).getSection(p1.getId(), s1.getId());
 	}
 
 	@Test
@@ -509,30 +506,30 @@ public class ProposalsControllerTest {
 		Section s1 = p1.getSections().get().iterator().next();
 		String href = sectionAssembler.toResource(s1).getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		when(sectionsRepository.findById(s1.getId()))
+		when(proposalsService.getSection(p1.getId(), s1.getId()))
 				.thenReturn(Optional.of(s1))
 				.thenReturn(Optional.of(s1))
 				.thenReturn(Optional.ofNullable(null));
 
 		performGetSection(s1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(sectionsRepository, times(1)).findById(s1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getSection(p1.getId(), s1.getId());
 
 		mvc.perform(delete(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(sectionsRepository, times(2)).findById(s1.getId());
-		verify(sectionsRepository, times (1)).delete(s1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getSection(p1.getId(), s1.getId());
+		verify(proposalsService, times (1)).deleteSection(p1.getId(), s1.getId());
 
 		mvc.perform(get(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(sectionsRepository, times(3)).findById(s1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(3)).getSection(p1.getId(), s1.getId());
 
 	}
 
@@ -551,7 +548,7 @@ public class ProposalsControllerTest {
 		Review r3 = it.next();
 		Resource<Review> r3Resource = reviewAssembler.toResource(r3);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("reviews").getHref();
@@ -586,7 +583,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -594,7 +591,7 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("reviews").getHref();
@@ -604,15 +601,15 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.reviews", hasSize(2)));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 
 		Review r1 = create_Review_1();
 		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsRepository.save(p1)).thenReturn(p1);
-		when(reviewsRepository.save(r1)).thenReturn(r1);
+		when(proposalsService.addProposal(p1)).thenReturn(p1);
+		when(proposalsService.addReview(p1.getId(), r1)).thenReturn(r1);
 
 		String json = objectMapper.writeValueAsString(r1);
 		mvc.perform(post(href)
@@ -630,9 +627,9 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + r1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + href)));
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(proposalsRepository, times(1)).save(p1);
-		verify(reviewsRepository, times(1)).save(r1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(1)).addReview(p1.getId(), r1);
 
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
@@ -640,7 +637,7 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.reviews", hasSize(3)));
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -650,15 +647,15 @@ public class ProposalsControllerTest {
 		Review r1 = create_Review_1();
 		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		given(reviewsRepository.findById(r1.getId()))
+		given(proposalsService.getReview(p1.getId(), r1.getId()))
 				.willReturn(Optional.of(r1));
 
 		performGetReview(r1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(reviewsRepository, times(1)).findById(r1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getReview(p1.getId(), r1.getId());
 	}
 
 	@Test
@@ -670,19 +667,19 @@ public class ProposalsControllerTest {
 		Resource<Review> r1Resource = reviewAssembler.toResource(r1);
 		String href = r1Resource.getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		given(reviewsRepository.findById(r1.getId()))
+		given(proposalsService.getReview(p1.getId(), r1.getId()))
 				.willReturn(Optional.of(r1));
 
 		performGetReview(r1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(reviewsRepository, times(1)).findById(r1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getReview(p1.getId(), r1.getId());
 
-		given(reviewsRepository.save(r1)).willReturn(r1);
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
-		given(reviewsRepository.findById(p1.getId())).willReturn(Optional.of(r1));
+		given(proposalsService.addReview(p1.getId(), r1)).willReturn(r1);
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getReview(p1.getId(), r1.getId())).willReturn(Optional.of(r1));
 
 		r1.setTitle("Novo titulo");
 		String json = objectMapper.writeValueAsString(r1);
@@ -692,14 +689,14 @@ public class ProposalsControllerTest {
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(reviewsRepository, times(1)).save(r1);
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(reviewsRepository, times(2)).findById(r1.getId());
+		verify(proposalsService, times(1)).addReview(p1.getId(), r1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getReview(p1.getId(), r1.getId());
 
 		performGetReview(r1);
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(reviewsRepository, times(3)).findById(r1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(3)).getReview(p1.getId(), r1.getId());
 	}
 
 	@Test
@@ -709,30 +706,30 @@ public class ProposalsControllerTest {
 		Review r1 = p1.getReviews().get().iterator().next();
 		String href = reviewAssembler.toResource(r1).getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		when(reviewsRepository.findById(r1.getId()))
+		when(proposalsService.getReview(p1.getId(), r1.getId()))
 				.thenReturn(Optional.of(r1))
 				.thenReturn(Optional.of(r1))
 				.thenReturn(Optional.ofNullable(null));
 
 		performGetReview(r1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(reviewsRepository, times(1)).findById(r1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getReview(p1.getId(), r1.getId());
 
 		mvc.perform(delete(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(reviewsRepository, times(2)).findById(r1.getId());
-		verify(reviewsRepository, times (1)).delete(r1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getReview(p1.getId(), r1.getId());
+		verify(proposalsService, times (1)).deleteReview(p1.getId(), r1.getId());
 
 		mvc.perform(get(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(reviewsRepository, times(3)).findById(r1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(3)).getReview(p1.getId(), r1.getId());
 	}
 
 	@Test
@@ -747,7 +744,7 @@ public class ProposalsControllerTest {
 		Comment c2 = it.next();
 		Resource<Comment> c2Resource = commentAssembler.toResource(c2);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("comments").getHref();
@@ -770,7 +767,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -778,7 +775,7 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("comments").getHref();
@@ -788,15 +785,15 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.comments", hasSize(2)));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 
 		Comment c1 = create_Comment_1();
 		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsRepository.save(p1)).thenReturn(p1);
-		when(commentsRepository.save(c1)).thenReturn(c1);
+		when(proposalsService.addProposal(p1)).thenReturn(p1);
+		when(proposalsService.addComment(p1.getId(), c1)).thenReturn(c1);
 
 		String json = objectMapper.writeValueAsString(c1);
 		mvc.perform(post(href)
@@ -812,9 +809,9 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + c1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.comments.href", is(ROOT + href)));
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(proposalsRepository, times(1)).save(p1);
-		verify(commentsRepository, times(1)).save(c1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(1)).addComment(p1.getId(), c1);
 
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
@@ -822,7 +819,7 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.comments", hasSize(3)));
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -832,15 +829,15 @@ public class ProposalsControllerTest {
 		Comment c1 = create_Comment_1();
 		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		given(commentsRepository.findById(c1.getId()))
+		given(proposalsService.getComment(p1.getId(), c1.getId()))
 				.willReturn(Optional.of(c1));
 
 		performGetComment(c1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(commentsRepository, times(1)).findById(c1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getComment(p1.getId(), c1.getId());
 	}
 
 	@Test
@@ -852,19 +849,19 @@ public class ProposalsControllerTest {
 		Resource<Comment> c1Resource = commentAssembler.toResource(c1);
 		String href = c1Resource.getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		given(commentsRepository.findById(c1.getId()))
+		given(proposalsService.getComment(p1.getId(), c1.getId()))
 				.willReturn(Optional.of(c1));
 
 		performGetComment(c1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(commentsRepository, times(1)).findById(c1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getComment(p1.getId(), c1.getId());
 
-		given(commentsRepository.save(c1)).willReturn(c1);
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
-		given(commentsRepository.findById(p1.getId())).willReturn(Optional.of(c1));
+		given(proposalsService.addComment(p1.getId(), c1)).willReturn(c1);
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getComment(p1.getId(), c1.getId())).willReturn(Optional.of(c1));
 
 		c1.setTitle("Novo titulo");
 		String json = objectMapper.writeValueAsString(c1);
@@ -874,14 +871,14 @@ public class ProposalsControllerTest {
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(commentsRepository, times(1)).save(c1);
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(commentsRepository, times(2)).findById(c1.getId());
+		verify(proposalsService, times(1)).addComment(p1.getId(), c1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getComment(p1.getId(), c1.getId());
 
 		performGetComment(c1);
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(commentsRepository, times(3)).findById(c1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(3)).getComment(p1.getId(), c1.getId());
 	}
 
 	@Test
@@ -891,30 +888,30 @@ public class ProposalsControllerTest {
 		Comment c1 = p1.getComments().get().iterator().next();
 		String href = commentAssembler.toResource(c1).getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		when(commentsRepository.findById(c1.getId()))
+		when(proposalsService.getComment(p1.getId(), c1.getId()))
 				.thenReturn(Optional.of(c1))
 				.thenReturn(Optional.of(c1))
 				.thenReturn(Optional.ofNullable(null));
 
 		performGetComment(c1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(commentsRepository, times(1)).findById(c1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getComment(p1.getId(), c1.getId());
 
 		mvc.perform(delete(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(commentsRepository, times(2)).findById(c1.getId());
-		verify(commentsRepository, times (1)).delete(c1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(2)).getComment(p1.getId(), c1.getId());
+		verify(proposalsService, times (1)).deleteComment(p1.getId(), c1.getId());
 
 		mvc.perform(get(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(commentsRepository, times(3)).findById(c1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(proposalsService, times(3)).getComment(p1.getId(), c1.getId());
 	}
 
 	@Test
@@ -929,7 +926,7 @@ public class ProposalsControllerTest {
 		User bid2 = it.next();
 		Resource<User> bid2Resource = userAssembler.toResource(bid2);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("bids").getHref();
@@ -956,7 +953,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -964,7 +961,7 @@ public class ProposalsControllerTest {
 		Proposal p1 = createProposal_1();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
 
 		String href = p1Resource.getLink("bids").getHref();
@@ -974,15 +971,15 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.bids", hasSize(2)));
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
 
 		User bid1 = create_User_1();
 		Resource<User> bid1Resource = userAssembler.toResource(bid1);
 
-		given(proposalsRepository.findById(p1.getId()))
+		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsRepository.save(p1)).thenReturn(p1);
-		when(usersRepository.save(bid1)).thenReturn(bid1);
+		when(proposalsService.addProposal(p1)).thenReturn(p1);
+		when(usersService.addUser(bid1)).thenReturn(bid1);
 
 		String json = objectMapper.writeValueAsString(bid1);
 		mvc.perform(post(href)
@@ -1000,9 +997,9 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + bid1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.bids.href", is(ROOT + href)));
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(proposalsRepository, times(1)).save(p1);
-		verify(usersRepository, times(1)).save(bid1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).addProposal(p1);
+		verify(usersService, times(1)).addUser(bid1);
 
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
@@ -1010,7 +1007,7 @@ public class ProposalsControllerTest {
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.bids", hasSize(3)));
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
 	}
 
 	@Test
@@ -1020,31 +1017,49 @@ public class ProposalsControllerTest {
 		User bid1 = p1.getReviewBids().get().iterator().next();
 		String href = userAssembler.toResource(bid1).getLink("self").getHref();
 
-		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
-		when(usersRepository.findById(bid1.getId()))
+		when(usersService.getUser(bid1.getId()))
 				.thenReturn(Optional.of(bid1))
 				.thenReturn(Optional.of(bid1))
 				.thenReturn(Optional.ofNullable(null));
 
 		performGetBidUser(bid1);
 
-		verify(proposalsRepository, times(1)).findById(p1.getId());
-		verify(usersRepository, times(1)).findById(bid1.getId());
+		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(usersService, times(1)).getUser(bid1.getId());
 
 		mvc.perform(delete(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(2)).findById(p1.getId());
-		verify(usersRepository, times(2)).findById(bid1.getId());
-		verify(usersRepository, times (1)).delete(bid1);
+		verify(proposalsService, times(2)).getProposal(p1.getId());
+		verify(usersService, times(2)).getUser(bid1.getId());
+		verify(usersService, times (1)).deleteUser(bid1.getId());
 
 		mvc.perform(get(href))
 				.andExpect(status().isNotFound());
 
-		verify(proposalsRepository, times(3)).findById(p1.getId());
-		verify(usersRepository, times(3)).findById(bid1.getId());
+		verify(proposalsService, times(3)).getProposal(p1.getId());
+		verify(usersService, times(3)).getUser(bid1.getId());
 	}
+
+	@Test
+	public void testNotFound_Proposal() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
+
+		mvc.perform(get("http://localhost/proposals/2"))
+				.andExpect(status().isNotFound());
+
+		verify(usersService, times(1)).getUser(2L);
+	}
+
+
+
+
+
 
 	private MvcResult performGetProposal(Proposal proposal) throws Exception {
 		Resource<Proposal> resourceProposal = proposalAssembler.toResource(proposal);
