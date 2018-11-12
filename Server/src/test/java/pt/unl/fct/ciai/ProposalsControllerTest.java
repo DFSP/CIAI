@@ -166,6 +166,24 @@ public class ProposalsControllerTest {
 		return c;
 	}
 
+	private User create_User_1(){
+		User u = new User();
+		u.setUsername("user1");
+		u.setFirstName("Utilizador");
+		u.setLastName("Uno");
+		u.setEmail("user1@mail.com");
+		return u;
+	}
+
+	private User create_User_2(){
+		User u = new User();
+		u.setUsername("user2");
+		u.setFirstName("User");
+		u.setLastName("Dois");
+		u.setEmail("utilizador2@mail.com");
+		return u;
+	}
+
 	@Test
 	public void testGetProposals() throws Exception {
 		Proposal p1 =  createProposal_1();
@@ -886,18 +904,132 @@ public class ProposalsControllerTest {
 	}
 
 	@Test
-	public void testGetBiddingUsers() {
-		//TODO
+	public void testGetBiddingUsers() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+		Iterator<User> it = p1.getReviewBiddings().get().iterator();
+
+		User bid1 =  it.next();
+		Resource<User> bidding1Resource = userAssembler.toResource(bid1);
+
+		User bid2 = it.next();
+		Resource<User> bidding2Resource = userAssembler.toResource(bid2);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+
+		String href = p1Resource.getLink("biddings").getHref();
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.biddings", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.biddings[0].id", is((int)bid1.getId())))
+				.andExpect(jsonPath("$._embedded.biddings[0].firstName", is(bid1.getFirstName())))
+				.andExpect(jsonPath("$._embedded.biddings[0].lastName", is(bid1.getLastName())))
+				.andExpect(jsonPath("$._embedded.biddings[0].username", is(bid1.getUsername())))
+				.andExpect(jsonPath("$._embedded.biddings[0].email", is(bid1.getEmail())))
+				.andExpect(jsonPath("$._embedded.biddings[0]._links.self.href", is(ROOT + bidding1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.biddings[0]._links.biddings.href", is(ROOT + bidding1Resource.getLink("biddings").getHref())))
+
+				.andExpect(jsonPath("$._embedded.biddings[1].id", is((int)bid2.getId())))
+				.andExpect(jsonPath("$._embedded.biddings[1].firstName", is(bid2.getFirstName())))
+				.andExpect(jsonPath("$._embedded.biddings[1].lastName", is(bid2.getLastName())))
+				.andExpect(jsonPath("$._embedded.biddings[1].username", is(bid2.getUsername())))
+				.andExpect(jsonPath("$._embedded.biddings[1].email", is(bid2.getEmail())))
+				.andExpect(jsonPath("$._embedded.biddings[1]._links.self.href", is(ROOT + bidding2Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.biddings[1]._links.biddings.href", is(ROOT + bidding2Resource.getLink("biddings").getHref())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
+				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
 	}
 
 	@Test
-	public void testAddUserForBidding() {
-		//TODO
+	public void testAddUserForBidding() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+
+		String href = p1Resource.getLink("biddings").getHref();
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.biddings", hasSize(2)));
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+
+		User bid1 = create_User_1();
+		Resource<User> bidding1Resource = userAssembler.toResource(bid1);
+
+		given(proposalsRepository.findById(p1.getId()))
+				.willReturn(Optional.of(p1));
+		when(proposalsRepository.save(p1)).thenReturn(p1);
+		when(usersRepository.save(bid1)).thenReturn(bid1);
+
+		String json = objectMapper.writeValueAsString(bid1);
+		mvc.perform(post(href)
+				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
+				.content(json))
+				.andExpect(status().isCreated())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)bid1.getId())))
+				.andExpect(jsonPath("$.firstName", is(bid1.getFirstName())))
+				.andExpect(jsonPath("$.lastName", is(bid1.getLastName())))
+				.andExpect(jsonPath("$.username", is(bid1.getUsername())))
+				.andExpect(jsonPath("$.email", is(bid1.getEmail())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + bidding1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.biddings.href", is(ROOT + href)));
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(proposalsRepository, times(1)).save(p1);
+		verify(usersRepository, times(1)).save(bid1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$._embedded.biddings", hasSize(3)));
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
 	}
 
 	@Test
-	public void testDeleteUserForBidding() {
-		//TODO
+	public void testDeleteUserForBidding() throws Exception {
+		Proposal p1 = createProposal_1();
+		Resource<Proposal> proposalResource = proposalAssembler.toResource(p1);
+		User bid1 = p1.getReviewBiddings().get().iterator().next();
+		String href = userAssembler.toResource(bid1).getLink("self").getHref();
+
+		given(proposalsRepository.findById(p1.getId())).willReturn(Optional.of(p1));
+
+		when(usersRepository.findById(bid1.getId()))
+				.thenReturn(Optional.of(bid1))
+				.thenReturn(Optional.of(bid1))
+				.thenReturn(Optional.ofNullable(null));
+
+		performGetBiddingUser(bid1);
+
+		verify(proposalsRepository, times(1)).findById(p1.getId());
+		verify(usersRepository, times(1)).findById(bid1.getId());
+
+		mvc.perform(delete(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(2)).findById(p1.getId());
+		verify(usersRepository, times(2)).findById(bid1.getId());
+		verify(usersRepository, times (1)).delete(bid1);
+
+		mvc.perform(get(href))
+				.andExpect(status().isNotFound());
+
+		verify(proposalsRepository, times(3)).findById(p1.getId());
+		verify(usersRepository, times(3)).findById(bid1.getId());
 	}
 
 	private MvcResult performGetProposal(Proposal proposal) throws Exception {
@@ -965,4 +1097,19 @@ public class ProposalsControllerTest {
 				.andReturn();
 	}
 
+	private MvcResult performGetBiddingUser(User bidUser) throws Exception {
+		Resource<User> resourceBidding = userAssembler.toResource(bidUser);
+		return mvc.perform(get(resourceBidding.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)bidUser.getId())))
+				.andExpect(jsonPath("$.firstName", is(bidUser.getFirstName())))
+				.andExpect(jsonPath("$.lastName", is(bidUser.getLastName())))
+				.andExpect(jsonPath("$.username", is(bidUser.getUsername())))
+				.andExpect(jsonPath("$.email", is(bidUser.getEmail())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceBidding.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.comments.href", is(ROOT + resourceBidding.getLink("biddings").getHref())))
+				.andReturn();
+	}
 }
