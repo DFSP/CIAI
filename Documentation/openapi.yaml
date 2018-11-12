@@ -1608,8 +1608,8 @@ paths:
       responses:
         '200':
           description: Utilizador adicionado
-        '400':
-          description: Id especificado da proposta inválido
+        '403':
+          description: Não tem permissão para executar esta ação
         '404':
           description: Proposta não encontrada
         default:
