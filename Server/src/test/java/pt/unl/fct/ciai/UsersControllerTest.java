@@ -35,7 +35,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import pt.unl.fct.ciai.assembler.BidProposalResourceAssembler;
 import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
+import pt.unl.fct.ciai.assembler.UserProposalResourceAssembler;
 import pt.unl.fct.ciai.assembler.UserResourcesAssembler;
 import pt.unl.fct.ciai.controller.UsersController;
 import pt.unl.fct.ciai.exception.NotFoundException;
@@ -46,7 +48,7 @@ import pt.unl.fct.ciai.service.UsersService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = UsersController.class, secure = false)
-@Import({UserResourcesAssembler.class, ProposalResourceAssembler.class})
+@Import({UserResourcesAssembler.class, UserProposalResourceAssembler.class, BidProposalResourceAssembler.class})
 public class UsersControllerTest {
 
 	//TODO testes segurança
@@ -60,7 +62,9 @@ public class UsersControllerTest {
 	@Autowired
 	private UserResourcesAssembler userAssembler;
 	@Autowired
-	private ProposalResourceAssembler proposalAssembler;
+	private UserProposalResourceAssembler userProposalAssembler;
+	@Autowired
+	private BidProposalResourceAssembler bidProposalAssembler;
 	private final ObjectMapper objectMapper;
 
 	private static final String ROOT = "http://localhost";
@@ -70,14 +74,14 @@ public class UsersControllerTest {
 		objectMapper.registerModule(new Jackson2HalModule());
 	}
 
-	private Proposal createProposal_1() {
+	private Proposal createProposal1() {
 		return new Proposal()
 				.id(1L)
 				.title("A proposal title")
 				.description("A very detailed description about this proposal")
 				.approved();
 	}
-	private Proposal createProposal_2() {
+	private Proposal createProposal2() {
 		return new Proposal()
 				.id(2L)
 				.title("A proposal title 2")
@@ -86,8 +90,8 @@ public class UsersControllerTest {
 	}
 
 	private User createJoaoUser() {
-		Proposal p1 = createProposal_1();
-		Proposal p2 = createProposal_2();
+		Proposal p1 = createProposal1();
+		Proposal p2 = createProposal2();
 		return new User()
 				.id(1L)
 				.firstName("João")
@@ -101,8 +105,8 @@ public class UsersControllerTest {
 	}
 
 	private User createLuisUser() {
-		Proposal p1 = createProposal_1();
-		Proposal p2 = createProposal_2();
+		Proposal p1 = createProposal1();
+		Proposal p2 = createProposal2();
 		return new User()
 		.id(2L)
 		.firstName("Luis")
@@ -158,7 +162,7 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._embedded.users[0].lastName", is(joao.getLastName())))
 		.andExpect(jsonPath("$._embedded.users[0].username", is(joao.getUsername())))
 		.andExpect(jsonPath("$._embedded.users[0].email", is(joao.getEmail())))
-		.andExpect(jsonPath("$._embedded.users[0].role", is(joao.getRole())))
+		.andExpect(jsonPath("$._embedded.users[0].role", is(joao.getRole().name())))
 		.andExpect(jsonPath("$._embedded.users[0]._links.self.href", is(ROOT + joaoResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.users[0]._links.users.href", is(ROOT + joaoResource.getLink("users").getHref())))
 		.andExpect(jsonPath("$._embedded.users[1].id", is((int)luis.getId())))
@@ -166,7 +170,7 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._embedded.users[1].lastName", is(luis.getLastName())))
 		.andExpect(jsonPath("$._embedded.users[1].username", is(luis.getUsername())))
 		.andExpect(jsonPath("$._embedded.users[1].email", is(luis.getEmail())))
-		.andExpect(jsonPath("$._embedded.users[1].role", is(luis.getRole())))
+		.andExpect(jsonPath("$._embedded.users[1].role", is(luis.getRole().name())))
 		.andExpect(jsonPath("$._embedded.users[1]._links.self.href", is(ROOT + luisResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.users[1]._links.users.href", is(ROOT + luisResource.getLink("users").getHref())))
 		.andExpect(jsonPath("$._embedded.users[2].id", is((int)daniel.getId())))
@@ -174,7 +178,7 @@ public class UsersControllerTest {
 		.andExpect(jsonPath("$._embedded.users[2].lastName", is(daniel.getLastName())))
 		.andExpect(jsonPath("$._embedded.users[2].username", is(daniel.getUsername())))
 		.andExpect(jsonPath("$._embedded.users[2].email", is(daniel.getEmail())))
-		.andExpect(jsonPath("$._embedded.users[2].role", is(daniel.getRole())))
+		.andExpect(jsonPath("$._embedded.users[2].role", is(daniel.getRole().name())))
 		.andExpect(jsonPath("$._embedded.users[2]._links.self.href", is(ROOT + danielResource.getLink("self").getHref())))
 		.andExpect(jsonPath("$._embedded.users[2]._links.users.href", is(ROOT + danielResource.getLink("users").getHref())))
 		.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
@@ -186,12 +190,14 @@ public class UsersControllerTest {
 	@Test
 	public void testAddUser() throws Exception {
 		User manuel = createManuelUser();
+		manuel.setId(0);
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
 		given(usersService.addUser(manuel)).willReturn(manuel);
 		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
-		String json = objectMapper.writeValueAsString(manuel);
+		String json = "{\"firstName\":\"Manuel\",\"lastName\":\"Coelho\",\"username\":\"mcoelho\"," +
+				"\"password\":\"password\",\"email\":\"mcoelho@email.com\"}";
 		mvc.perform(post(manuelResource.getLink("users").getHref())
 				.accept(MediaTypes.HAL_JSON_UTF8_VALUE)
 				.contentType(MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -279,13 +285,16 @@ public class UsersControllerTest {
 		Resource<User> luisResource = userAssembler.toResource(luis);
 		Iterator<Proposal> it = luis.getProposals().get().iterator();
 
-		Proposal prop1 = it.next();
-		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
+		Proposal p1 = it.next();
+		p1.setProposer(luis);
+		Resource<Proposal> prop1Resource = userProposalAssembler.toResource(p1, luis);
 
-		Proposal prop2 = it.next();
-		Resource<Proposal> prop2Resource = proposalAssembler.toResource(prop2);
+		Proposal p2 = it.next();
+		p2.setProposer(luis);
+		Resource<Proposal> prop2Resource = userProposalAssembler.toResource(p2, luis);
 
 		given(usersService.getUser(luis.getId())).willReturn(Optional.of(luis));
+		given(usersService.getProposals(luis.getId(), "")).willReturn(Arrays.asList(p1, p2));
 
 		String href = luisResource.getLink("proposals").getHref();
 		mvc.perform(get(href))
@@ -293,110 +302,167 @@ public class UsersControllerTest {
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.proposals", hasSize(2)))
-				.andExpect(jsonPath("$._embedded.proposals[0].id", is((int)prop1.getId())))
-				.andExpect(jsonPath("$._embedded.proposals[0].title", is(prop1.getTitle())))
-				.andExpect(jsonPath("$._embedded.proposals[0].description", is(prop1.getDescription())))
-				.andExpect(jsonPath("$._embedded.proposals[0].date", is(prop1.getCreationDate())))
+				.andExpect(jsonPath("$._embedded.proposals[0].id", is((int)p1.getId())))
+				.andExpect(jsonPath("$._embedded.proposals[0].title", is(p1.getTitle())))
+				.andExpect(jsonPath("$._embedded.proposals[0].description", is(p1.getDescription())))
+				.andExpect(jsonPath("$._embedded.proposals[0].creationDate", is(p1.getCreationDate())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.self.href", is(ROOT + prop1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.proposals.href", is(ROOT + prop1Resource.getLink("proposals").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.reviews.href", is(ROOT + prop1Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.reviewBids.href", is(ROOT + prop1Resource.getLink("reviewBids").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.sections.href", is(ROOT + prop1Resource.getLink("sections").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[0]._links.comments.href", is(ROOT + prop1Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.members.href", is(ROOT + prop1Resource.getLink("members").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.staff.href", is(ROOT + prop1Resource.getLink("staff").getHref())))
 
-				.andExpect(jsonPath("$._embedded.proposals[1].id", is((int)prop2.getId())))
-				.andExpect(jsonPath("$._embedded.proposals[1].title", is(prop2.getTitle())))
-				.andExpect(jsonPath("$._embedded.proposals[1].description", is(prop2.getDescription())))
-				.andExpect(jsonPath("$._embedded.proposals[1].date", is(prop2.getCreationDate())))
+				.andExpect(jsonPath("$._embedded.proposals[1].id", is((int)p2.getId())))
+				.andExpect(jsonPath("$._embedded.proposals[1].title", is(p2.getTitle())))
+				.andExpect(jsonPath("$._embedded.proposals[1].description", is(p2.getDescription())))
+				.andExpect(jsonPath("$._embedded.proposals[1].creationDate", is(p2.getCreationDate())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.self.href", is(ROOT + prop2Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.proposals.href", is(ROOT + prop2Resource.getLink("proposals").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.reviews.href", is(ROOT + prop2Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.reviewBids.href", is(ROOT + prop2Resource.getLink("reviewBids").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.sections.href", is(ROOT + prop2Resource.getLink("sections").getHref())))
 				.andExpect(jsonPath("$._embedded.proposals[1]._links.comments.href", is(ROOT + prop2Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.members.href", is(ROOT + prop2Resource.getLink("members").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.staff.href", is(ROOT + prop2Resource.getLink("staff").getHref())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(usersService, times(1)).getUser(luis.getId());
+		verify(usersService, times(1)).getProposals(luis.getId(), "");
 	}
 
 	@Test
 	public void testGetProposal() throws Exception {
 		User luis = createLuisUser();
+		Proposal prop1 = createProposal1();
+		prop1.setProposer(luis);
+		prop1.addStaff(luis);
+		luis.addProposal(prop1);
+
 		Resource<User> luisResource = userAssembler.toResource(luis);
-		Proposal prop1 = createProposal_1();
-		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
+		Resource<Proposal> prop1Resource = userProposalAssembler.toResource(prop1, luis);
 
 		given(usersService.getUser(luis.getId())).willReturn(Optional.of(luis));
-		given(proposalsService.getProposal(prop1.getId())).willReturn(Optional.of(prop1));
+		given(usersService.getProposal(luis.getId(), prop1.getId())).willReturn(Optional.of(prop1));
 
-		performGetProposal(prop1);
+		mvc.perform(get(prop1Resource.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)prop1.getId())))
+				.andExpect(jsonPath("$.title", is(prop1.getTitle())))
+				.andExpect(jsonPath("$.description", is(prop1.getDescription())))
+				.andExpect(jsonPath("$.creationDate", is(prop1.getCreationDate())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + prop1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.proposals.href", is(ROOT + prop1Resource.getLink("proposals").getHref())))
+				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + prop1Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._links.sections.href", is(ROOT + prop1Resource.getLink("sections").getHref())))
+				.andExpect(jsonPath("$._links.comments.href", is(ROOT + prop1Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._links.members.href", is(ROOT + prop1Resource.getLink("members").getHref())))
+				.andExpect(jsonPath("$._links.reviewBids.href", is(ROOT + prop1Resource.getLink("reviewBids").getHref())))
+				.andExpect(jsonPath("$._links.staff.href", is(ROOT + prop1Resource.getLink("staff").getHref())));
+
 
 		verify(usersService, times(1)).getUser(luis.getId());
-		verify(proposalsService, times(1)).getProposal(prop1.getId());
+		verify(usersService, times(1)).getProposal(luis.getId(), prop1.getId());
 	}
 
 	@Test
-	public void testGetBidding() throws Exception {
+	public void testGetBid() throws Exception {
 		User joao = createJoaoUser();
+		Proposal prop1 = createProposal1();
+		prop1.setProposer(joao);
+		prop1.addStaff(joao);
+		joao.addProposal(prop1);
+
 		Resource<User> joaoResource = userAssembler.toResource(joao);
-		Proposal prop1 = createProposal_1();
-		Resource<Proposal> prop1Resource = proposalAssembler.toResource(prop1);
+		Resource<Proposal> prop1Resource = bidProposalAssembler.toResource(prop1, joao);
 
 		given(usersService.getUser(joao.getId())).willReturn(Optional.of(joao));
-		given(proposalsService.getProposal(prop1.getId())).willReturn(Optional.of(prop1));
+		given(usersService.getBid(joao.getId(), prop1.getId())).willReturn(Optional.of(prop1));
 
-		performGetProposal(prop1);
+		mvc.perform(get(prop1Resource.getLink("self").getHref()))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
+				.andExpect(jsonPath("$.id", is((int)prop1.getId())))
+				.andExpect(jsonPath("$.title", is(prop1.getTitle())))
+				.andExpect(jsonPath("$.description", is(prop1.getDescription())))
+				.andExpect(jsonPath("$.creationDate", is(prop1.getCreationDate())))
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + prop1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._links.bids.href", is(ROOT + prop1Resource.getLink("bids").getHref())))
+				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + prop1Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._links.sections.href", is(ROOT + prop1Resource.getLink("sections").getHref())))
+				.andExpect(jsonPath("$._links.comments.href", is(ROOT + prop1Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._links.members.href", is(ROOT + prop1Resource.getLink("members").getHref())))
+				.andExpect(jsonPath("$._links.staff.href", is(ROOT + prop1Resource.getLink("staff").getHref())));
 
 		verify(usersService, times(1)).getUser(joao.getId());
-		verify(proposalsService, times(1)).getProposal(prop1.getId());
+		verify(usersService, times(1)).getBid(joao.getId(), prop1.getId());
 	}
 
 	@Test
-	public void testGetBiddings() throws Exception {
+	public void testGetBids() throws Exception {
 		User joao = createJoaoUser();
 		Resource<User> joaoResource = userAssembler.toResource(joao);
+		System.out.println(joao.getBids().get());
 		Iterator<Proposal> it = joao.getBids().get().iterator();
 
 		Proposal bid1 = it.next();
-		Resource<Proposal> bid1Resource = proposalAssembler.toResource(bid1);
+		bid1.setProposer(joao);
+		bid1.addReviewBid(joao);
+		Resource<Proposal> bid1Resource = bidProposalAssembler.toResource(bid1, joao);
 
 		Proposal bid2 = it.next();
-		Resource<Proposal> bid2Resource = proposalAssembler.toResource(bid2);
+		bid2.setProposer(joao);
+		bid2.addReviewBid(joao);
+		Resource<Proposal> bid2Resource = bidProposalAssembler.toResource(bid2, joao);
 
 		given(usersService.getUser(joao.getId())).willReturn(Optional.of(joao));
+		given(usersService.getBids(joao.getId(), "")).willReturn(Arrays.asList(bid1, bid2));
 
-		String href = joaoResource.getLink("biddings").getHref();
+		String href = joaoResource.getLink("bids").getHref();
+
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-				.andExpect(jsonPath("$._embedded.biddings", hasSize(2)))
-				.andExpect(jsonPath("$._embedded.biddings[0].id", is((int)bid1.getId())))
-				.andExpect(jsonPath("$._embedded.biddings[0].title", is(bid1.getTitle())))
-				.andExpect(jsonPath("$._embedded.biddings[0].description", is(bid1.getDescription())))
-				.andExpect(jsonPath("$._embedded.biddings[0].date", is(bid1.getCreationDate())))
-				.andExpect(jsonPath("$._embedded.biddings[0]._links.self.href", is(ROOT + bid1Resource.getLink("self").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[0]._links.proposals.href", is(ROOT + bid1Resource.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[0]._links.reviews.href", is(ROOT + bid1Resource.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[0]._links.sections.href", is(ROOT + bid1Resource.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[0]._links.comments.href", is(ROOT + bid1Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.proposals[0].id", is((int)bid1.getId())))
+				.andExpect(jsonPath("$._embedded.proposals[0].title", is(bid1.getTitle())))
+				.andExpect(jsonPath("$._embedded.proposals[0].description", is(bid1.getDescription())))
+				.andExpect(jsonPath("$._embedded.proposals[0].creationDate", is(bid1.getCreationDate())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.self.href", is(ROOT + bid1Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.bids.href", is(ROOT + bid1Resource.getLink("bids").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.reviews.href", is(ROOT + bid1Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.sections.href", is(ROOT + bid1Resource.getLink("sections").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.comments.href", is(ROOT + bid1Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.members.href", is(ROOT + bid1Resource.getLink("members").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.staff.href", is(ROOT + bid1Resource.getLink("staff").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[0]._links.reviewBids.href", is(ROOT + bid1Resource.getLink("reviewBids").getHref())))
 
-				.andExpect(jsonPath("$._embedded.biddings[1].id", is((int)bid2.getId())))
-				.andExpect(jsonPath("$._embedded.biddings[1].title", is(bid2.getTitle())))
-				.andExpect(jsonPath("$._embedded.biddings[1].description", is(bid2.getDescription())))
-				.andExpect(jsonPath("$._embedded.biddings[1].date", is(bid2.getCreationDate())))
-				.andExpect(jsonPath("$._embedded.biddings[1]._links.self.href", is(ROOT + bid2Resource.getLink("self").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[1]._links.proposals.href", is(ROOT + bid2Resource.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[1]._links.reviews.href", is(ROOT + bid2Resource.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[1]._links.sections.href", is(ROOT + bid2Resource.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._embedded.biddings[1]._links.comments.href", is(ROOT + bid2Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1].id", is((int)bid2.getId())))
+				.andExpect(jsonPath("$._embedded.proposals[1].title", is(bid2.getTitle())))
+				.andExpect(jsonPath("$._embedded.proposals[1].description", is(bid2.getDescription())))
+				.andExpect(jsonPath("$._embedded.proposals[1].creationDate", is(bid2.getCreationDate())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.self.href", is(ROOT + bid2Resource.getLink("self").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.bids.href", is(ROOT + bid2Resource.getLink("bids").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.reviews.href", is(ROOT + bid2Resource.getLink("reviews").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.sections.href", is(ROOT + bid2Resource.getLink("sections").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.comments.href", is(ROOT + bid2Resource.getLink("comments").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.members.href", is(ROOT + bid2Resource.getLink("members").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.staff.href", is(ROOT + bid2Resource.getLink("staff").getHref())))
+				.andExpect(jsonPath("$._embedded.proposals[1]._links.reviewBids.href", is(ROOT + bid2Resource.getLink("reviewBids").getHref())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
 				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
 
-		verify(usersService, times(1)).getUser(joao.getId());
+		verify(usersService, times(1)).getBids(joao.getId(), "");
 	}
 
 	@Test
-	public void testNotFound_Employee() throws Exception {
+	public void testNotFoundUser() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
@@ -409,33 +475,35 @@ public class UsersControllerTest {
 	}
 
 	@Test
-	public void testNotFound_Proposal() throws Exception{
+	public void testNotFoundProposal() throws Exception{
 		User luis = createLuisUser();
 		Resource<User> luisResource = userAssembler.toResource(luis);
 
 		given(usersService.getUser(luis.getId())).willReturn(Optional.of(luis));
 
-		mvc.perform(get("http://localhost/users/2/proposals/3"))
+		mvc.perform(get("http://localhost/users/"+luis.getId()+"/proposals/999"))
 				.andExpect(status().isNotFound());
-		verify(usersService, times(1)).getUser(luis.getId());
-		verify(proposalsService, times(1)).getProposal(1L);
-		verify(proposalsService, times(1)).getProposal(2L);
 
+		verify(usersService, times(1)).getUser(luis.getId());
+		verify(usersService, times(1)).getProposal(luis.getId(), 999);
 	}
 
 	@Test
-	public void testNotFound_Bidding() throws Exception{
+	public void testNotFoundBid() throws Exception{
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 
 		given(usersService.getUser(manuel.getId())).willReturn(Optional.of(manuel));
 
-		mvc.perform(get("http://localhost/users/4/biddings/2"))
+		mvc.perform(get("http://localhost/users/"+manuel.getId()+"/bids/999"))
 				.andExpect(status().isNotFound());
+
+		verify(usersService, times(1)).getUser(manuel.getId());
+		verify(usersService, times(1)).getBid(manuel.getId(),999);
 	}
 
 	@Test
-	public void testBadRequest_UpdateUser() throws Exception {
+	public void testBadRequestUpdateUser() throws Exception {
 		User manuel = createManuelUser();
 		Resource<User> manuelResource = userAssembler.toResource(manuel);
 		String href = manuelResource.getLink("self").getHref();
@@ -456,11 +524,6 @@ public class UsersControllerTest {
 		.andExpect(status().isBadRequest());
 	}
 
-
-
-
-
-
 	private MvcResult performGet(User user) throws Exception {
 		Resource<User> userResource = userAssembler.toResource(user);
 		return mvc.perform(get(userResource.getLink("self").getHref()))
@@ -477,21 +540,4 @@ public class UsersControllerTest {
 				.andExpect(jsonPath("$._links.users.href", is(ROOT + userResource.getLink("users").getHref()))).andReturn();
 	}
 
-	private MvcResult performGetProposal(Proposal prop) throws Exception{
-		Resource<Proposal> resourceProposal = proposalAssembler.toResource(prop);
-		return mvc.perform(get(resourceProposal.getLink("self").getHref()))
-				.andExpect(status().isOk())
-				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
-				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
-				.andExpect(jsonPath("$.id", is((int)prop.getId())))
-				.andExpect(jsonPath("$.name", is(prop.getTitle())))
-				.andExpect(jsonPath("$.description", is(prop.getDescription())))
-				.andExpect(jsonPath("$.date", is(prop.getCreationDate())))
-				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceProposal.getLink("self").getHref())))
-				.andExpect(jsonPath("$._links.proposals.href", is(ROOT + resourceProposal.getLink("proposals").getHref())))
-				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + resourceProposal.getLink("reviews").getHref())))
-				.andExpect(jsonPath("$._links.sections.href", is(ROOT + resourceProposal.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._links.comments.href", is(ROOT + resourceProposal.getLink("comments").getHref())))
-				.andReturn();
-	}
 }

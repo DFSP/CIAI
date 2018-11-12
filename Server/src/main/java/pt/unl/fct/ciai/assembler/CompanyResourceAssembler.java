@@ -22,10 +22,11 @@ public class CompanyResourceAssembler implements ResourceAssembler<Company, Reso
 
 	@Override
 	public Resource<Company> toResource(Company company) {
+		long cid = company.getId();
 		return new Resource<>(company,
-				linkTo(methodOn(CompaniesController.class).getCompany(company.getId())).withSelfRel(),
+				linkTo(methodOn(CompaniesController.class).getCompany(cid)).withSelfRel(),
 				linkTo(methodOn(CompaniesController.class).getCompanies("")).withRel("companies"),
-				linkTo(methodOn(CompaniesController.class).getEmployees(company.getId(), "")).withRel("employees"));
+				linkTo(methodOn(CompaniesController.class).getEmployees(cid, "")).withRel("employees"));
 	}
 	
 	@Override
