@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.hateoas.MediaTypes;
 
-import pt.unl.fct.ciai.api.CompaniesApi;
 import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.model.Company;
 import pt.unl.fct.ciai.model.Employee;
@@ -23,7 +22,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/companies", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class CompaniesController implements CompaniesApi {
+public class CompaniesController {
 
 	private final CompaniesService companiesService;
 

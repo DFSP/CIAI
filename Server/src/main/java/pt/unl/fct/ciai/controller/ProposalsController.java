@@ -5,7 +5,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.api.ProposalsApi;
 import pt.unl.fct.ciai.assembler.*;
 import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
@@ -20,7 +19,7 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(value = "/proposals", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class ProposalsController implements ProposalsApi {
+public class ProposalsController{
 
     private final ProposalsService proposalsService;
 

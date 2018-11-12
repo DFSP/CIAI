@@ -79,10 +79,13 @@ public class ProposalsControllerTest {
 
 		Review r1 = create_Review_1();
 		r1.setProposal(p1);
+
 		Section s1=create_Section_1();
 		s1.setProposal(p1);
+
 		Comment c1=create_Comment_1();
 		c1.setProposal(p1);
+
 		User u1 = create_User_1();
 		p1.setProposer(u1);
 		u1.addProposal(p1);
@@ -101,18 +104,30 @@ public class ProposalsControllerTest {
 		p2.setDescription("Proposal 2 - Description");
 		p2.setCreationDate(new Date());
 
-		Review r1 = create_Review_1();
-		r1.setProposal(p2);
-		Review r2 = create_Review_2();
-		r2.setProposal(p2);
 		Section s1=create_Section_1();
 		s1.setProposal(p2);
+		p2.addSection(s1);
+
 		Section s2=create_Section_2();
 		s2.setProposal(p2);
+		p2.addSection(s2);
+
+		Review r1 = create_Review_1();
+		r1.setProposal(p2);
+		p2.addReview(r1);
+
+		Review r2 = create_Review_2();
+		r2.setProposal(p2);
+		p2.addReview(r2);
+
 		Comment c1=create_Comment_1();
 		c1.setProposal(p2);
-		Comment c2=create_Comment_1();
+		p2.addComment(c1);
+
+		Comment c2=create_Comment_2();
 		c2.setProposal(p2);
+		p2.addComment(c2);
+
 		User u1 = create_User_1();
 		p2.setProposer(u1);
 		u1.addProposal(p2);
@@ -120,14 +135,6 @@ public class ProposalsControllerTest {
 
 		User bidder2 = create_User_2();
 		bidder2.addBid(p2);
-
-		p2.addReview(r1);
-		p2.addReview(r2);
-		p2.addSection(s1);
-		p2.addSection(s2);
-		p2.addComment(c1);
-		p2.addComment(c2);
-
 		p2.addReviewBid(bidder2);
 
 		return p2;
@@ -340,21 +347,17 @@ public class ProposalsControllerTest {
 	public void testGetSections() throws Exception {
 		Proposal p1 = createProposal_2();
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
+
 		Iterator<Section> it = p1.getSections().get().iterator();
 
-		Section s1 =  it.next();
+		Section s1 = it.next();
 		Resource<Section> s1Resource = sectionAssembler.toResource(s1);
 
 		Section s2 = it.next();
 		Resource<Section> s2Resource = sectionAssembler.toResource(s2);
 
-		//given(proposalsService.getSections(p1.getId(), "").willReturn(Arrays.asList(s1, s2)));
-
-		given(proposalsService.getProposal(p1.getId()))
-				.willReturn(Optional.of(p1));
-
-
-
+		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
+		given(proposalsService.getSections(p1.getId(), "")).willReturn(p1.getSections().get());
 
 		String href = p1Resource.getLink("sections").getHref();
 		mvc.perform(get(href))
@@ -362,13 +365,13 @@ public class ProposalsControllerTest {
 				.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_UTF8_VALUE))
 				.andExpect(jsonPath("$._embedded.sections", hasSize(2)))
+
 				.andExpect(jsonPath("$._embedded.sections[0].id", is((int)s1.getId())))
 				.andExpect(jsonPath("$._embedded.sections[0].title", is(s1.getTitle())))
 				.andExpect(jsonPath("$._embedded.sections[0].description", is(s1.getDescription())))
 				.andExpect(jsonPath("$._embedded.sections[0].material", is(s1.getMaterial())))
-				.andExpect(jsonPath("$._embedded.sections[0].goals", is(s1.getGoals())))
 				.andExpect(jsonPath("$._embedded.sections[0].workPlan", is(s1.getWorkPlan())))
-				.andExpect(jsonPath("$._embedded.sections[0].budget", is(s1.getBudget())))
+				.andExpect(jsonPath("$._embedded.sections[0].goals", is(s1.getGoals())))
 				.andExpect(jsonPath("$._embedded.sections[0]._links.self.href", is(ROOT + s1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._embedded.sections[0]._links.sections.href", is(ROOT + s1Resource.getLink("sections").getHref())))
 
@@ -376,15 +379,13 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._embedded.sections[1].title", is(s2.getTitle())))
 				.andExpect(jsonPath("$._embedded.sections[1].description", is(s2.getDescription())))
 				.andExpect(jsonPath("$._embedded.sections[1].material", is(s2.getMaterial())))
-				.andExpect(jsonPath("$._embedded.sections[1].goals", is(s2.getGoals())))
 				.andExpect(jsonPath("$._embedded.sections[1].workPlan", is(s2.getWorkPlan())))
-				.andExpect(jsonPath("$._embedded.sections[1].budget", is(s2.getBudget())))
+				.andExpect(jsonPath("$._embedded.sections[1].goals", is(s2.getGoals())))
 				.andExpect(jsonPath("$._embedded.sections[1]._links.self.href", is(ROOT + s2Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._embedded.sections[1]._links.sections.href", is(ROOT + s2Resource.getLink("sections").getHref())))
-				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)))
-				.andExpect(jsonPath("$._links.root.href", is(ROOT + "/")));
+				.andExpect(jsonPath("$._links.self.href", is(ROOT + href)));
 
-		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getSections(p1.getId(), "");
 	}
 
 	@Test
@@ -458,7 +459,7 @@ public class ProposalsControllerTest {
 
 		performGetSection(s1);
 
-		verify(proposalsService, times(1)).getProposal(p1.getId());
+		verify(proposalsService, times(1)).getProposal(0L);
 		verify(proposalsService, times(1)).getSection(p1.getId(), s1.getId());
 
 	}
@@ -1090,6 +1091,9 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$.title", is(section.getTitle())))
 				.andExpect(jsonPath("$.material", is(section.getMaterial())))
 				.andExpect(jsonPath("$.workPlan", is(section.getWorkPlan())))
+				.andExpect(jsonPath("$.budget", is(section.getBudget())))
+				.andExpect(jsonPath("$.description", is(section.getDescription())))
+				.andExpect(jsonPath("$.goals", is(section.getGoals())))
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + resourceSection.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.sections.href", is(ROOT + resourceSection.getLink("sections").getHref())))
 				.andReturn();

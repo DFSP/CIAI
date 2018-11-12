@@ -5,7 +5,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.ciai.api.UsersApi;
 import pt.unl.fct.ciai.assembler.BidProposalResourceAssembler;
 import pt.unl.fct.ciai.assembler.ProposalResourceAssembler;
 import pt.unl.fct.ciai.assembler.UserProposalResourceAssembler;
@@ -26,7 +25,7 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(value = "/users", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class UsersController implements UsersApi {
+public class UsersController{
 
     private final UsersService usersService;
 
