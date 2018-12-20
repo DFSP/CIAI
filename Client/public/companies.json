@@ -1,0 +1,54 @@
+{
+  "_embedded": {
+    "companies": [ {
+      "id": 1,
+      "name": "ECMA",
+      "city": "Lisbon",
+      "zipCode": "1000-261",
+      "address": "Long Street",
+      "phone": 212121212,
+      "email": "info@ecma.com",
+      "fax": 211212121,
+      "_links": {
+        "self": {
+          "href": "http://localhost:8080/companies/1"
+        },
+        "companies": {
+          "href": "http://localhost:8080/companies?search="
+        },
+        "employees": {
+          "href": "http://localhost:8080/companies/1/employees?search="
+        }
+      }
+    },
+      {
+        "id": 2,
+        "name": "FCT",
+        "city": "Almada",
+        "zipCode": "2014-312",
+        "address": "FCT street",
+        "phone": 232323232,
+        "email": "info@fct.com",
+        "fax": 233333333,
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/companies/2"
+          },
+          "companies": {
+            "href": "http://localhost:8080/companies?search="
+          },
+          "employees": {
+            "href": "http://localhost:8080/companies/2/employees?search="
+          }
+        }
+      }],
+    "_links": {
+      "self": {
+        "href": "http://localhost:8080/companies?search="
+      },
+      "root": {
+        "href": "http://localhost:8080/"
+      }
+    }
+  }
+}
