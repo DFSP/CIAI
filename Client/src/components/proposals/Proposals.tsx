@@ -3,18 +3,11 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
 import { modalStatusChanged } from '../../actions/modals';
+import { IProposal } from '../../reducers/proposals'
 
 import { Button, Modal, DropdownButton, MenuItem } from 'react-bootstrap';
 import './proposals.css'
 
-export interface IProposal {
-  id: number;
-  title: string;
-  description: string;
-  state: string;
-  creationDate: string;
-  _links: any;
-}
 
 export interface IProposalProps {
   proposals: IProposal[];

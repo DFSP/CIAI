@@ -1,5 +1,5 @@
 import * as halfred from 'halfred';
-import  { IProposal } from '../components/proposals/Proposals'
+import  { IProposal } from '../reducers/proposals'
 
 export function proposalsHasErrored(boolState: boolean) {
   return {
