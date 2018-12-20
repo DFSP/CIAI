@@ -40,6 +40,8 @@ import java.util.*;
 	MemberResourceAssembler.class})
 public class ProposalsControllerTest {
 
+	//TODO acabar testes
+
 	@Autowired
 	private MockMvc mvc;
 	@MockBean
@@ -250,7 +252,7 @@ public class ProposalsControllerTest {
 		p1.setId(0);
 		Resource<Proposal> p1Resource = proposalAssembler.toResource(p1);
 
-		given(proposalsService.addProposal(p1)).willReturn(p1);
+		given(proposalsService.addProposal(p1, null)).willReturn(p1);
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
 		String json = "{\"title\":\"Proposal 1\",\"description\":\"Proposal 1 - Description\"}";
@@ -268,7 +270,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.self.href", is(ROOT + p1Resource.getLink("self").getHref())))
 				.andExpect(jsonPath("$._links.proposals.href", is(ROOT + p1Resource.getLink("proposals").getHref())));
 
-		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(1)).addProposal(p1, null);
 
 		performGetProposal(p1);
 
@@ -300,7 +302,7 @@ public class ProposalsControllerTest {
 
 		verify(proposalsService, times(1)).getProposal(p1.getId());
 
-		given(proposalsService.addProposal(p1)).willReturn(p1);
+		given(proposalsService.addProposal(p1, null)).willReturn(p1);
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 
 		mvc.perform(put(p1Resource.getLink("self").getHref())
@@ -410,7 +412,7 @@ public class ProposalsControllerTest {
 
 		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsService.addProposal(p1)).thenReturn(p1);
+		when(proposalsService.addProposal(p1, null)).thenReturn(p1);
 		when(proposalsService.addSection(s1.getId(), s1)).thenReturn(s1);
 
 		String json = objectMapper.writeValueAsString(s1);
@@ -431,7 +433,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.sections.href", is(ROOT + href)));
 
 		verify(proposalsService, times(2)).getProposal(p1.getId());
-		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(1)).addProposal(p1, null);
 		verify(proposalsService, times(1)).addSection(s1.getId(), s1);
 
 		mvc.perform(get(href))
@@ -614,8 +616,8 @@ public class ProposalsControllerTest {
 
 		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsService.addProposal(p1)).thenReturn(p1);
-		when(proposalsService.addReview(p1.getId(), r1)).thenReturn(r1);
+		when(proposalsService.addProposal(p1, null)).thenReturn(p1);
+		when(proposalsService.addReview(p1.getId(), r1, null)).thenReturn(r1);
 
 		String json = objectMapper.writeValueAsString(r1);
 		mvc.perform(post(href)
@@ -634,8 +636,8 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.reviews.href", is(ROOT + href)));
 
 		verify(proposalsService, times(2)).getProposal(p1.getId());
-		verify(proposalsService, times(1)).addProposal(p1);
-		verify(proposalsService, times(1)).addReview(p1.getId(), r1);
+		verify(proposalsService, times(1)).addProposal(p1, null);
+		verify(proposalsService, times(1)).addReview(p1.getId(), r1, null);
 
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
@@ -683,7 +685,7 @@ public class ProposalsControllerTest {
 		verify(proposalsService, times(1)).getProposal(p1.getId());
 		verify(proposalsService, times(1)).getReview(p1.getId(), r1.getId());
 
-		given(proposalsService.addReview(p1.getId(), r1)).willReturn(r1);
+		given(proposalsService.addReview(p1.getId(), r1, null)).willReturn(r1);
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 		given(proposalsService.getReview(p1.getId(), r1.getId())).willReturn(Optional.of(r1));
 
@@ -695,7 +697,7 @@ public class ProposalsControllerTest {
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(proposalsService, times(1)).addReview(p1.getId(), r1);
+		verify(proposalsService, times(1)).addReview(p1.getId(), r1, null);
 		verify(proposalsService, times(2)).getProposal(p1.getId());
 		verify(proposalsService, times(2)).getReview(p1.getId(), r1.getId());
 
@@ -798,8 +800,8 @@ public class ProposalsControllerTest {
 
 		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsService.addProposal(p1)).thenReturn(p1);
-		when(proposalsService.addComment(p1.getId(), c1)).thenReturn(c1);
+		when(proposalsService.addProposal(p1, null)).thenReturn(p1);
+		when(proposalsService.addComment(p1.getId(), c1, null)).thenReturn(c1);
 
 		String json = objectMapper.writeValueAsString(c1);
 		mvc.perform(post(href)
@@ -816,8 +818,8 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.comments.href", is(ROOT + href)));
 
 		verify(proposalsService, times(2)).getProposal(p1.getId());
-		verify(proposalsService, times(1)).addProposal(p1);
-		verify(proposalsService, times(1)).addComment(p1.getId(), c1);
+		verify(proposalsService, times(1)).addProposal(p1, null);
+		verify(proposalsService, times(1)).addComment(p1.getId(), c1, null);
 
 		mvc.perform(get(href))
 				.andExpect(status().isOk())
@@ -865,7 +867,7 @@ public class ProposalsControllerTest {
 		verify(proposalsService, times(1)).getProposal(p1.getId());
 		verify(proposalsService, times(1)).getComment(p1.getId(), c1.getId());
 
-		given(proposalsService.addComment(p1.getId(), c1)).willReturn(c1);
+		given(proposalsService.addComment(p1.getId(), c1, null)).willReturn(c1);
 		given(proposalsService.getProposal(p1.getId())).willReturn(Optional.of(p1));
 		given(proposalsService.getComment(p1.getId(), c1.getId())).willReturn(Optional.of(c1));
 
@@ -877,7 +879,7 @@ public class ProposalsControllerTest {
 				.content(json))
 				.andExpect(status().isNoContent());
 
-		verify(proposalsService, times(1)).addComment(p1.getId(), c1);
+		verify(proposalsService, times(1)).addComment(p1.getId(), c1, null);
 		verify(proposalsService, times(2)).getProposal(p1.getId());
 		verify(proposalsService, times(2)).getComment(p1.getId(), c1.getId());
 
@@ -984,7 +986,7 @@ public class ProposalsControllerTest {
 
 		given(proposalsService.getProposal(p1.getId()))
 				.willReturn(Optional.of(p1));
-		when(proposalsService.addProposal(p1)).thenReturn(p1);
+		when(proposalsService.addProposal(p1, null)).thenReturn(p1);
 		when(usersService.addUser(bid1)).thenReturn(bid1);
 
 		String json = objectMapper.writeValueAsString(bid1);
@@ -1004,7 +1006,7 @@ public class ProposalsControllerTest {
 				.andExpect(jsonPath("$._links.bids.href", is(ROOT + href)));
 
 		verify(proposalsService, times(2)).getProposal(p1.getId());
-		verify(proposalsService, times(1)).addProposal(p1);
+		verify(proposalsService, times(1)).addProposal(p1, null);
 		verify(usersService, times(1)).addUser(bid1);
 
 		mvc.perform(get(href))
