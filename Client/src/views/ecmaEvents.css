@@ -27,7 +27,7 @@
   to { transform: rotate(360deg); }
 }
 
-/*.ContainerFluid {
+/*.containerFluid {
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -35,7 +35,7 @@
   width: 100%;
 }*/
 
-.Container {
+.container {
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -44,7 +44,7 @@
 }
 
 @media (min-width: 576px) {
-  .Container {
+  .container {
     max-width: 540px;
     padding-right: 15px;
     padding-left: 15px;
@@ -55,7 +55,7 @@
 }
 
 @media (min-width: 768px) {
-  .Container {
+  .container {
     max-width: 720px;
     padding-right: 15px;
     padding-left: 15px;
@@ -65,7 +65,7 @@
   }
 }
 @media (min-width: 992px) {
-  .Container {
+  .container {
     max-width: 960px;
     padding-right: 15px;
     padding-left: 15px;
@@ -76,7 +76,7 @@
 }
 
 @media (min-width: 1200px) {
-  .Container {
+  .container {
     max-width: 1140px;
     padding-right: 15px;
     padding-left: 15px;
@@ -85,8 +85,6 @@
     width: 100%;
   }
 }
-
-
 
 .ct-grid {
   stroke: rgba(255, 255, 255, 0.2);

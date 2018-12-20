@@ -6,7 +6,7 @@ import {Redirect, Route, Switch} from 'react-router-dom';
 
 import routes from "../routes/ecmaEvents.jsx";
 
-import classes from "./ecmaEvents.css"
+import "./ecmaEvents.css"
 
 const switchRoutes = (
     <Switch>
@@ -22,17 +22,17 @@ const switchRoutes = (
 
 function EcmaEvents(props) { //TODO props type
     return (
-        <div className={classes.wrapper}>
+        <div className="wrapper">
             <Sidebar
                 routes={routes}
                 location={props.location}
             />
-            <div className={classes.mainPanel}>
+            <div className="mainPanel">
                 <Header
                     routes={switchRoutes}
                 />
-                <div className={classes.content}>
-                    <div className={classes.container}>{switchRoutes}</div>
+                <div className="content">
+                    <div className="container">{switchRoutes}</div>
                 </div>
                 <Footer/>
             </div>
