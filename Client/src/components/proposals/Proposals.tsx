@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
-import { itemsFetchData, modalStatusChanged, proposalSelected } from '../../actions/items';
+import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
+import { modalStatusChanged } from '../../actions/modals';
+
 import { Button, Modal, DropdownButton, MenuItem } from 'react-bootstrap';
 import './proposals.css'
 
@@ -134,9 +136,9 @@ class ProposalList extends React.Component<IProposalProps,{}> {
 const mapStateToProps = (state: any) => {
   console.log(state);
     return {
-        proposals: state.items,
-        hasErrored: state.itemsHasErrored,
-        isLoading: state.itemsIsLoading,
+        proposals: state.proposals,
+        hasErrored: state.proposalsHasErrored,
+        isLoading: state.proposalsIsLoading,
         modalOpen: state.modalStatusChanged,
         proposalSelected: state.proposalSelected
     };
@@ -144,7 +146,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        fetchData: () => dispatch(itemsFetchData()),
+        fetchData: () => dispatch(proposalsFetchData()),
         changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
         selectProposal: (proposal: IProposal) => dispatch(proposalSelected(proposal))
     };

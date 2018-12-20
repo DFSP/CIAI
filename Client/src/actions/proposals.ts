@@ -1,30 +1,30 @@
 import * as halfred from 'halfred';
 import  { IProposal } from '../components/proposals/Proposals'
 
-export function itemsHasErrored(boolState: boolean) {
+export function proposalsHasErrored(boolState: boolean) {
   return {
-    type: 'ITEM_HAS_ERRORED',
+    type: 'PROPOSALS_HAS_ERRORED',
     hasErrored: boolState
   };
 }
 
-export function itemsIsLoading(boolState: boolean) {
+export function proposalsIsLoading(boolState: boolean) {
   return {
-    type: 'ITEM_IS_LOADING',
+    type: 'PROPOSALS_IS_LOADING',
     isLoading: boolState
   };
 }
 
-export function itemsFetchDataSuccess(items: any) {
+export function proposalsFetchDataSuccess(proposals: IProposal[]) {
   return {
-    type: 'ITEMS_FETCH_DATA_SUCCESS',
-    proposals: items
+    type: 'PROPOSALS_FETCH_DATA_SUCCESS',
+    proposals
   };
 }
 
-export function itemsFetchData() {
+export function proposalsFetchData() {
   return (dispatch: any) => {
-    dispatch(itemsIsLoading(true));
+    dispatch(proposalsIsLoading(true));
 
     fetch('/proposals.json', {
       method: 'GET',
@@ -41,17 +41,10 @@ export function itemsFetchData() {
       const proposals = halfred.parse(json)
         .embeddedResourceArray("proposals")
         .map(resource => resource.original());
-      dispatch(itemsIsLoading(false));
-      dispatch(itemsFetchDataSuccess(proposals));
-    }).catch(() => dispatch(itemsHasErrored(true)));
+      dispatch(proposalsIsLoading(false));
+      dispatch(proposalsFetchDataSuccess(proposals));
+    }).catch(() => dispatch(proposalsHasErrored(true)));
   }
-}
-
-export function modalStatusChanged(boolState: boolean) {
-  return {
-    type: 'MODAL_STATUS_CHANGED',
-    modalStatus: boolState
-  };
 }
 
 export function proposalSelected(proposal: IProposal) {
