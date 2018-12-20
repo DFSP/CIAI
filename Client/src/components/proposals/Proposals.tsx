@@ -6,7 +6,6 @@ import { modalStatusChanged } from '../../actions/modals';
 import { IProposal } from '../../reducers/proposals'
 
 import { Button, Modal, DropdownButton, MenuItem, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
-import './proposals.css'
 
 export interface IProposalProps {
   proposals: IProposal[];
@@ -24,7 +23,11 @@ class ProposalList extends React.Component<IProposalProps,any> {
   constructor(props: IProposalProps) {
     super(props);
     this.state = { title: "", description: "" }
+
+    this.handleSave = this.handleSave.bind(this);
+    this.createProposal = this.createProposal.bind(this);
     this.updateProposal = this.updateProposal.bind(this);
+    this.deleteProposal = this.deleteProposal.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onDropdownChange = this.onDropdownChange.bind(this);
   }
@@ -32,7 +35,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
   public componentWillReceiveProps(nextProps: IProposalProps) {
     if (nextProps.proposalSelected) {
       const { title, description, state } = nextProps.proposalSelected;
-      this.setState({ title, description, state })
+      this.setState({ title, description, state });
     }
   }
 
@@ -40,15 +43,37 @@ class ProposalList extends React.Component<IProposalProps,any> {
     this.props.fetchData();
   }
 
-  public componentDidUpdate() {
-    console.log("did uupdate", this.state);
-  }
-
   public handleModal(status: boolean, proposal?: IProposal) {
-    this.props.changeModalStatus(status);
     if (status && proposal) {
       this.props.selectProposal(proposal);
+    } else {
+      this.props.selectProposal({
+        id: -1,
+        title: "",
+        description: "",
+        state: "PENDING_APPROVAL",
+        creationDate: "",
+        _links: ""
+      })
     }
+    this.props.changeModalStatus(status);
+  }
+
+  public handleSave() {
+    if (this.props.proposalSelected.id) {
+      this.updateProposal()
+    } else {
+      this.createProposal()
+    }
+  }
+
+  public createProposal() {
+    const formData = new FormData();
+    const { title, description, state } = this.state;
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('state', state);
+    this.fetchUrl('./proposals.json', 'POST', formData, 'Created with success!');
   }
 
   public updateProposal() {
@@ -58,10 +83,17 @@ class ProposalList extends React.Component<IProposalProps,any> {
     formData.append('title', title);
     formData.append('description', description);
     formData.append('state', state);
+    this.fetchUrl('./proposals.json', 'PUT', formData, 'Updated with success!');
+  }
 
-    fetch('/proposals.json', {
-      method: 'PUT',
-      body: formData,
+  public deleteProposal(id: number) {
+    this.fetchUrl('./proposals.json', 'DELETE', new FormData(), 'Deleted with success!');
+  }
+
+  public fetchUrl(url: string, method: string, body: any, successMessage: string) {
+    fetch(url, {
+      method,
+      body,
       headers: new Headers({
          'Authorization': 'Basic '+btoa('admin:password'),
        }),
@@ -69,27 +101,11 @@ class ProposalList extends React.Component<IProposalProps,any> {
     .then(response => {
       if (response.ok) {
         this.props.changeModalStatus(false);
-        alert('Updated with success!');
+        alert(successMessage);
       } else {
         throw new Error(response.statusText);
       }
-    }).catch((e: string) => alert(e))
-  }
-
-  public deleteProposal(id: number) {
-    fetch('/proposals.json', {
-      method: 'DELETE',
-      headers: new Headers({
-         'Authorization': 'Basic '+btoa('admin:password'),
-       }),
-    })
-    .then(response => {
-      if (response.ok) {
-        alert('Deleted with success!');
-      } else {
-        throw new Error(response.statusText);
-      }
-    }).catch((e: string) => alert(e))
+    }).catch((e: string) => alert(e));
   }
 
   public onChange(e: any) {
@@ -112,6 +128,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
 
     return (
       <Fragment>
+        <Button onClick={() => this.handleModal(true)}>Add new</Button>
         <ul>
           {
             this.props.proposals && this.props.proposals.map(p => (
@@ -148,7 +165,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
                   onChange={this.onChange}
                 />
                 <DropdownButton
-                  id="dropdown-basic-0" 
+                  id="dropdown-basic-0"
                   name="state"
                   onSelect={this.onDropdownChange}
                   title={getStateValue(this.state.state)}>
@@ -168,7 +185,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
 
             <Modal.Footer>
               <Button onClick={() => this.handleModal(false)}>Close</Button>
-              <Button onClick={this.updateProposal} bsStyle="primary">Save changes</Button>
+              <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
             </Modal.Footer>
           </Modal.Dialog>
         }
@@ -178,7 +195,6 @@ class ProposalList extends React.Component<IProposalProps,any> {
 }
 
 const mapStateToProps = (state: any) => {
-  console.log(state);
     return {
         proposals: state.proposals,
         hasErrored: state.proposalsHasErrored,
