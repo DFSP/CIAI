@@ -5,9 +5,8 @@ import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
 import { modalStatusChanged } from '../../actions/modals';
 import { IProposal } from '../../reducers/proposals'
 
-import { Button, Modal, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, Modal, DropdownButton, MenuItem, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import './proposals.css'
-
 
 export interface IProposalProps {
   proposals: IProposal[];
@@ -20,15 +19,29 @@ export interface IProposalProps {
   proposalSelected: IProposal;
 }
 
-class ProposalList extends React.Component<IProposalProps,{}> {
+class ProposalList extends React.Component<IProposalProps,any> {
 
   constructor(props: IProposalProps) {
     super(props);
+    this.state = { title: "", description: "" }
     this.updateProposal = this.updateProposal.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onDropdownChange = this.onDropdownChange.bind(this);
+  }
+
+  public componentWillReceiveProps(nextProps: IProposalProps) {
+    if (nextProps.proposalSelected) {
+      const { title, description, state } = nextProps.proposalSelected;
+      this.setState({ title, description, state })
+    }
   }
 
   public componentDidMount() {
     this.props.fetchData();
+  }
+
+  public componentDidUpdate() {
+    console.log("did uupdate", this.state);
   }
 
   public handleModal(status: boolean, proposal?: IProposal) {
@@ -39,11 +52,12 @@ class ProposalList extends React.Component<IProposalProps,{}> {
   }
 
   public updateProposal() {
-    const proposal = this.props.proposalSelected;
+    // const proposal = this.props.proposalSelected;
     const formData = new FormData();
-    formData.append('title', proposal.title);
-    formData.append('description', proposal.description);
-    formData.append('state', proposal.state);
+    const { title, description, state } = this.state;
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('state', state);
 
     fetch('/proposals.json', {
       method: 'PUT',
@@ -78,6 +92,14 @@ class ProposalList extends React.Component<IProposalProps,{}> {
     }).catch((e: string) => alert(e))
   }
 
+  public onChange(e: any) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+
+  public onDropdownChange(e: any) {
+    this.setState({ state: e });
+  }
+
   public render() {
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the items.</p>;
@@ -85,6 +107,8 @@ class ProposalList extends React.Component<IProposalProps,{}> {
     if (this.props.isLoading) {
       return <p>Loading...</p>;
     }
+
+    const getStateValue = (state: string) => state === "PENDING_APPROVAL" ? "Pending approval" : "Approved";
 
     return (
       <Fragment>
@@ -107,12 +131,39 @@ class ProposalList extends React.Component<IProposalProps,{}> {
             </Modal.Header>
 
             <Modal.Body>
-              <p>Title: <input type="text" /></p>
-              <p>Description: <input type="text" /></p>
-              <p><DropdownButton id="dropdown-basic-0" title="State">
-                <MenuItem eventKey="1" active>Pending</MenuItem>
-                <MenuItem eventKey="2">Approved</MenuItem>
-              </DropdownButton></p>
+              <FormGroup>
+                <ControlLabel>Title</ControlLabel>
+                <FormControl
+                  name="title"
+                  type="text"
+                  label="Title"
+                  value={this.state.title}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>Description</ControlLabel>
+                <FormControl
+                  componentClass="textarea"
+                  name="description"
+                  value={this.state.description}
+                  onChange={this.onChange}
+                />
+                <DropdownButton
+                  id="dropdown-basic-0" 
+                  name="state"
+                  onSelect={this.onDropdownChange}
+                  title={getStateValue(this.state.state)}>
+                    <MenuItem
+                      eventKey="PENDING_APPROVAL"
+                      active={this.state.state === "PENDING_APPROVAL"}>
+                        Pending approval
+                    </MenuItem>
+                    <MenuItem
+                      eventKey="APPROVED"
+                      active={this.state.state === "APPROVED"}>
+                        Approved
+                    </MenuItem>
+                </DropdownButton>
+              </FormGroup>
             </Modal.Body>
 
             <Modal.Footer>
@@ -133,7 +184,7 @@ const mapStateToProps = (state: any) => {
         hasErrored: state.proposalsHasErrored,
         isLoading: state.proposalsIsLoading,
         modalOpen: state.modalStatusChanged,
-        proposalSelected: state.proposalSelected
+        proposalSelected: state.proposalSelected,
     };
 };
 

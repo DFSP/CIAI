@@ -21,6 +21,7 @@ export function proposalsHasErrored(state = false,
             return state;
     }
 }
+
 export function proposalsIsLoading(state = false,
   action: IProposalsIsLoadingAction) {
     switch (action.type) {
@@ -30,6 +31,7 @@ export function proposalsIsLoading(state = false,
             return state;
     }
 }
+
 export function proposals(state = [],
   action: IProposalsAction) {
     switch (action.type) {
@@ -39,6 +41,7 @@ export function proposals(state = [],
             return state;
     }
 }
+
 export function proposalSelected(state = {},
   action: IProposalSelectedAction) {
     switch (action.type) {
