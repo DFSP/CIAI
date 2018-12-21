@@ -134,9 +134,9 @@ class ProposalList extends React.Component<IProposalProps,any> {
           {
             this.props.proposals && this.props.proposals.map(p => (
               <li key={p.id}>
-                <Link to={`/proposalDetails/${p.id}`}>{p.title}</Link>
-                <button key={p.id} onClick={() => this.handleModal(true, p)}>Update</button>
-                <button key={p.title} onClick={() => this.deleteProposal(p.id)}>Delete</button>
+                <Link key={`${p.id}_link`} to={`/proposals/proposalDetails/${p.id}`}>{p.title}</Link>
+                <button key={`${p.id}_updateBtn`} onClick={() => this.handleModal(true, p)}>Update</button>
+                <button key={`${p.id}_deleteBtn`} onClick={() => this.deleteProposal(p.id)}>Delete</button>
               </li>
             ))
           }

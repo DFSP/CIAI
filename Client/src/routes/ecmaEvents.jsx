@@ -19,7 +19,7 @@ const routes = [
     {
         component: ProposalDetails,
         name: "Detalhes da Proposta",
-        path: "/proposalDetails/:proposalId",
+        path: "/proposals/proposalDetails/:proposalId",
     },
     {
         component: Users,
