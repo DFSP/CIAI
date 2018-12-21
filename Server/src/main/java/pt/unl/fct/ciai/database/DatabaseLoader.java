@@ -2,7 +2,6 @@ package pt.unl.fct.ciai.database;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.ciai.model.*;
 import pt.unl.fct.ciai.repository.*;
@@ -19,7 +18,7 @@ public class DatabaseLoader {
     CommandLineRunner initDatabase(UsersRepository users, CompaniesRepository companies,
                                    EmployeesRepository employees, ProposalsRepository proposals,
                                    SectionsRepository sections, ReviewsRepository reviews,
-                                   CommentsRepository comments, PasswordEncoder encoder) {
+                                   CommentsRepository comments) {
 
         return args -> {
 
@@ -30,7 +29,7 @@ public class DatabaseLoader {
                     .firstName("admin")
                     .lastName("admin")
                     .username("admin")
-                    .password(encoder.encode("password"))
+                    .password("password")
                     .email("admin@admin.pt")
                     .role(User.Role.ROLE_SYS_ADMIN);
             sysAdmin = users.save(sysAdmin);
@@ -41,7 +40,7 @@ public class DatabaseLoader {
                     .lastName("Coelho")
                     .username("mcoelho")
                     .email("mcoelho@email.com")
-                    .password(encoder.encode("password"))
+                    .password("password")
                     .role(User.Role.ROLE_PROPOSAL_APPROVER);
             manuel = users.save(manuel);
 
@@ -50,7 +49,7 @@ public class DatabaseLoader {
                     .lastName("Oliveira")
                     .username("aoliveira")
                     .email("aoliveira@email.com")
-                    .password(encoder.encode("password"))
+                    .password("password")
                     .role(User.Role.ROLE_PROPOSAL_APPROVER);
             andre = users.save(andre);
 
@@ -106,7 +105,7 @@ public class DatabaseLoader {
                     .firstName("Daniel")
                     .lastName("Pimenta")
                     .username("dpimenta")
-                    .password(encoder.encode("password"))
+                    .password("password")
                     .email("dpimenta@email.com")
                     .role(User.Role.ROLE_COMPANY_ADMIN);
             daniel = employees.save(daniel);
@@ -125,7 +124,7 @@ public class DatabaseLoader {
                     .firstName("João")
                     .lastName("Reis")
                     .username("jreis")
-                    .password(encoder.encode("password"))
+                    .password("password")
                     .email("jreis@email.com");
             joao = employees.save(joao);
 
@@ -143,7 +142,7 @@ public class DatabaseLoader {
                     .firstName("Luis")
                     .lastName("Martins")
                     .username("lmartins")
-                    .password(encoder.encode("password"))
+                    .password("password")
                     .email("lmartins@email.com")
                     .role(User.Role.ROLE_COMPANY_ADMIN);
             luis = employees.save(luis);
@@ -156,6 +155,7 @@ public class DatabaseLoader {
                     .staff(Collections.singleton(manuel))
                     .members(Collections.singleton(joao))
                     .reviewBid(Collections.singleton(luis))
+                    .approved()
                     .proposer(joao);
             manuel.addProposal(proposal1);
             luis.addBid(proposal1);
@@ -171,6 +171,7 @@ public class DatabaseLoader {
                     .staff(Collections.singleton(andre))
                     .members(new HashSet<Employee>(Collections.singleton(joao)))
                     .reviewBid(new HashSet<User>(Arrays.asList(joao, daniel)))
+                    .approved()
                     .proposer(luis);
             andre.addProposal(proposal2);
             joao.addProposal(proposal2);
@@ -189,6 +190,7 @@ public class DatabaseLoader {
                     .staff(new HashSet<User>(Arrays.asList(manuel, andre)))
                     .members(new HashSet<Employee>(Arrays.asList(daniel, joao)))
                     .reviewBid(Collections.singleton(luis))
+                    .approved()
                     .proposer(daniel);
             manuel.addProposal(proposal3);
             andre.addProposal(proposal3);
