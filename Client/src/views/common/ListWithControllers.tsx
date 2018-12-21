@@ -2,19 +2,18 @@ import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
-import { IProposal } from '../../reducers/proposals';
+import { itemsFetchData, itemSelected } from '../../actions/items';
 import SimpleList from '../common/SimpleList';
 
 import { Button } from 'react-bootstrap';
 
-export interface IProposalProps {
-  proposals: IProposal[];
+export interface IItemProps {
+  items: any[];
   isLoading: boolean;
   hasErrored: boolean;
   fetchData: (url: string, embeddedArray: string) => void;
-  selectProposal: (proposal: IProposal) => void;
-  proposalSelected: IProposal;
+  selectItem: (item: any) => void;
+  itemSelected: any;
   handleAdd: () => void;
   handleUpdate: () => void;
   handleDelete: () => void;
@@ -24,7 +23,7 @@ export interface IProposalProps {
   embeddedArray: string;
 }
 
-class ListWithControllers extends React.Component<IProposalProps,any> {
+class ListWithControllers extends React.Component<IItemProps,any> {
 
   public componentDidMount() {
     this.props.fetchData(this.props.fetchFrom, this.props.embeddedArray);
@@ -38,26 +37,26 @@ class ListWithControllers extends React.Component<IProposalProps,any> {
       return <p>Loading...</p>;
     }
 
-    const proposal = this.props.proposalSelected;
+    const item = this.props.itemSelected;
 
     return (
       <Fragment>
         <Button onClick={this.props.handleAdd}>Add new</Button>
         {
-          proposal && proposal.id >= 0 &&
+          item && item.id >= 0 &&
           <Fragment>
             <Button onClick={this.props.handleUpdate}>Update</Button>
             <Button onClick={this.props.handleDelete}>Delete</Button>
             <Button>
-              <Link to={`/proposals/proposalDetails/${proposal.id}`}>View details</Link>
+              <Link to={`/proposals/proposalDetails/${item.id}`}>View details</Link>
             </Button>
           </Fragment>
         }
-        <SimpleList<IProposal>
+        <SimpleList<any>
           title={this.props.title}
-          list={this.props.proposals}
+          list={this.props.items}
           show={this.props.show}
-          select={this.props.selectProposal}
+          select={this.props.selectItem}
         />
       </Fragment>
     );
@@ -66,17 +65,17 @@ class ListWithControllers extends React.Component<IProposalProps,any> {
 
 const mapStateToProps = (state: any) => {
     return {
-        proposals: state.proposals,
-        hasErrored: state.proposalsHasErrored,
-        isLoading: state.proposalsIsLoading,
-        proposalSelected: state.proposalSelected,
+        items: state.items,
+        hasErrored: state.itemsHasErrored,
+        isLoading: state.itemsIsLoading,
+        itemSelected: state.itemSelected,
     };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        fetchData: (url: string, embeddedArray: string) => dispatch(proposalsFetchData(url, embeddedArray)),
-        selectProposal: (proposal: IProposal) => dispatch(proposalSelected(proposal))
+        fetchData: (url: string, embeddedArray: string) => dispatch(itemsFetchData(url, embeddedArray)),
+        selectItem: (item: any) => dispatch(itemSelected(item))
     };
 };
 

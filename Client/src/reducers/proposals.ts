@@ -1,7 +1,7 @@
-interface IProposalsHasErroredAction { type: string, hasErrored: boolean }
-interface IProposalsIsLoadingAction { type: string, isLoading: boolean }
-interface IProposalsAction { type: string, proposals: IProposal[] }
-interface IProposalSelectedAction { type: string, proposalSelected: IProposal }
+interface IItemsHasErroredAction { type: string, hasErrored: boolean }
+interface IItemsIsLoadingAction { type: string, isLoading: boolean }
+interface IItemsAction { type: string, items: any[] }
+interface IItemSelectedAction { type: string, itemSelected: any }
 
 export interface IComment {
   id: number;
@@ -19,41 +19,41 @@ export interface IProposal {
   comments?: IComment[];
 }
 
-export function proposalsHasErrored(state = false,
-  action: IProposalsHasErroredAction) {
+export function itemsHasErrored(state = false,
+  action: IItemsHasErroredAction) {
     switch (action.type) {
-        case 'PROPOSALS_HAS_ERRORED':
+        case 'ITEMS_HAS_ERRORED':
             return action.hasErrored;
         default:
             return state;
     }
 }
 
-export function proposalsIsLoading(state = false,
-  action: IProposalsIsLoadingAction) {
+export function itemsIsLoading(state = false,
+  action: IItemsIsLoadingAction) {
     switch (action.type) {
-        case 'PROPOSALS_IS_LOADING':
+        case 'ITEMS_IS_LOADING':
             return action.isLoading;
         default:
             return state;
     }
 }
 
-export function proposals(state = [],
-  action: IProposalsAction) {
+export function items(state = [],
+  action: IItemsAction) {
     switch (action.type) {
-        case 'PROPOSALS_FETCH_DATA_SUCCESS':
-            return action.proposals;
+        case 'ITEMS_FETCH_DATA_SUCCESS':
+            return action.items;
         default:
             return state;
     }
 }
 
-export function proposalSelected(state = {},
-  action: IProposalSelectedAction) {
+export function itemSelected(state = {},
+  action: IItemSelectedAction) {
     switch (action.type) {
-        case 'PROPOSAL_SELECTED':
-            return action.proposalSelected;
+        case 'ITEM_SELECTED':
+            return action.itemSelected;
         default:
             return state;
     }

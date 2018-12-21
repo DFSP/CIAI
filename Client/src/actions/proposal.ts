@@ -1,10 +1,10 @@
 import * as halfred from 'halfred';
-import { proposalsHasErrored, proposalsIsLoading } from './proposals'
+import { itemsHasErrored, itemsIsLoading } from './items'
 
 export function proposalFetchData() {
   let proposal = {};
   return (dispatch: any) => {
-    dispatch(proposalsIsLoading(true));
+    dispatch(itemsIsLoading(true));
 
     fetch('/proposal.json', {
       method: 'GET',
@@ -35,10 +35,10 @@ export function proposalFetchData() {
             .embeddedResourceArray("comments")
             .map(resource => resource.original());
         const finalProposal = Object.assign({ comments }, proposal)
-        dispatch(proposalsIsLoading(false));
+        dispatch(itemsIsLoading(false));
         dispatch(proposalFetchDataSuccess(finalProposal));
-      }).catch(() => dispatch(proposalsHasErrored(true)))
-    }).catch(() => dispatch(proposalsHasErrored(true)));
+      }).catch(() => dispatch(itemsHasErrored(true)))
+    }).catch(() => dispatch(itemsHasErrored(true)));
   }
 }
 

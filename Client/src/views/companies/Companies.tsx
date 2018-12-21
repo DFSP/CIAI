@@ -2,8 +2,7 @@ import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { modalStatusChanged } from '../../actions/modals';
-import { proposalSelected } from '../../actions/proposals';
-import { IProposal } from '../../reducers/proposals';
+import { itemSelected } from '../../actions/items';
 import ListWithControllers from '../common/ListWithControllers';
 
 import { Modal, FormGroup } from 'react-bootstrap';
@@ -11,8 +10,8 @@ import { Modal, FormGroup } from 'react-bootstrap';
 export interface ICompanyProps {
   changeModalStatus: (status: boolean) => void;
   modalOpen: boolean;
-  proposalSelected: IProposal;
-  selectProposal: (proposal: IProposal) => void;
+  itemSelected: any;
+  selectItem: (item: any) => void;
 }
 
 class CompaniesList extends React.Component<ICompanyProps,any> {
@@ -30,15 +29,15 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
   }
 
   public componentWillReceiveProps(nextProps: ICompanyProps) {
-    if (nextProps.proposalSelected) {
-      const { title, description, state } = nextProps.proposalSelected;
+    if (nextProps.itemSelected) {
+      const { title, description, state } = nextProps.itemSelected;
       this.setState({ title, description, state });
     }
   }
 
   public handleModal(openModal: boolean, toCreate: boolean) {
     if (toCreate) {
-      this.props.selectProposal({
+      this.props.selectItem({
         id: -1,
         title: "",
         description: "",
@@ -51,7 +50,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
   }
 
   public handleSave() {
-    if (this.props.proposalSelected.id) {
+    if (this.props.itemSelected.id) {
       this.updateCompany()
     } else {
       this.createCompany()
@@ -148,14 +147,14 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
 const mapStateToProps = (state: any) => {
     return {
         modalOpen: state.modalStatusChanged,
-        proposalSelected: state.proposalSelected,
+        itemSelected: state.itemSelected,
     };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
         changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
-        selectProposal: (proposal: any) => dispatch(proposalSelected(proposal))
+        selectItem: (item: any) => dispatch(itemSelected(item))
     };
 };
 
