@@ -1,22 +1,18 @@
 import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
-import { Link } from "react-router-dom";
-import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
 import { modalStatusChanged } from '../../actions/modals';
+import { proposalSelected } from '../../actions/proposals';
 import { IProposal } from '../../reducers/proposals';
+import ListWithControllers from '../common/ListWithControllers';
 
 import { Button, Modal, DropdownButton, MenuItem, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
 export interface IProposalProps {
-  proposals: IProposal[];
-  isLoading: boolean;
-  hasErrored: boolean;
-  fetchData: () => void;
   changeModalStatus: (status: boolean) => void;
   modalOpen: boolean;
-  selectProposal: (proposal: IProposal) => void;
   proposalSelected: IProposal;
+  selectProposal: (proposal: IProposal) => void;
 }
 
 class ProposalList extends React.Component<IProposalProps,any> {
@@ -40,14 +36,8 @@ class ProposalList extends React.Component<IProposalProps,any> {
     }
   }
 
-  public componentDidMount() {
-    this.props.fetchData();
-  }
-
-  public handleModal(status: boolean, proposal?: IProposal) {
-    if (status && proposal) {
-      this.props.selectProposal(proposal);
-    } else {
+  public handleModal(openModal: boolean, toCreate: boolean) {
+    if (toCreate) {
       this.props.selectProposal({
         id: -1,
         title: "",
@@ -55,9 +45,9 @@ class ProposalList extends React.Component<IProposalProps,any> {
         state: "PENDING_APPROVAL",
         creationDate: "",
         _links: ""
-      })
+      });
     }
-    this.props.changeModalStatus(status);
+    this.props.changeModalStatus(openModal);
   }
 
   public handleSave() {
@@ -87,7 +77,8 @@ class ProposalList extends React.Component<IProposalProps,any> {
     this.fetchUrl('./proposals.json', 'PUT', formData, 'Updated with success!');
   }
 
-  public deleteProposal(id: number) {
+  public deleteProposal() {
+    // const { id } = this.props.proposalSelected;
     this.fetchUrl('./proposals.json', 'DELETE', new FormData(), 'Deleted with success!');
   }
 
@@ -118,29 +109,17 @@ class ProposalList extends React.Component<IProposalProps,any> {
   }
 
   public render() {
-    if (this.props.hasErrored) {
-      return <p>Sorry! There was an error loading the items.</p>;
-    }
-    if (this.props.isLoading) {
-      return <p>Loading...</p>;
-    }
-
     const getStateValue = (state: string) => state === "PENDING_APPROVAL" ? "Pending approval" : "Approved";
 
     return (
       <Fragment>
-        <Button onClick={() => this.handleModal(true)}>Add new</Button>
-        <ul>
-          {
-            this.props.proposals && this.props.proposals.map(p => (
-              <li key={p.id}>
-                <Link key={`${p.id}_link`} to={`/proposals/proposalDetails/${p.id}`}>{p.title}</Link>
-                <button key={`${p.id}_updateBtn`} onClick={() => this.handleModal(true, p)}>Update</button>
-                <button key={`${p.id}_deleteBtn`} onClick={() => this.deleteProposal(p.id)}>Delete</button>
-              </li>
-            ))
-          }
-        </ul>
+        <ListWithControllers
+          title="Proposals"
+          show={this.show}
+          handleAdd={() => this.handleModal(true,true)}
+          handleUpdate={() => this.handleModal(true,false)}
+          handleDelete={this.deleteProposal}
+        />
         {
           this.props.modalOpen &&
           <Modal.Dialog>
@@ -185,7 +164,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button onClick={() => this.handleModal(false)}>Close</Button>
+              <Button onClick={() => this.handleModal(false,false)}>Close</Button>
               <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
             </Modal.Footer>
           </Modal.Dialog>
@@ -193,13 +172,12 @@ class ProposalList extends React.Component<IProposalProps,any> {
       </Fragment>
     );
   }
+
+  private show = (p: IProposal) => `${p.title}: (${p.description})`;
 }
 
 const mapStateToProps = (state: any) => {
     return {
-        proposals: state.proposals,
-        hasErrored: state.proposalsHasErrored,
-        isLoading: state.proposalsIsLoading,
         modalOpen: state.modalStatusChanged,
         proposalSelected: state.proposalSelected,
     };
@@ -207,7 +185,6 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        fetchData: () => dispatch(proposalsFetchData()),
         changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
         selectProposal: (proposal: IProposal) => dispatch(proposalSelected(proposal))
     };

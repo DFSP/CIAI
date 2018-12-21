@@ -2,7 +2,9 @@ import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { proposalFetchData } from '../../actions/proposal';
-import { IProposal, IComment } from '../../reducers/proposals';
+import { IProposal } from '../../reducers/proposals';
+import Comment from './comments/Comment'
+import { IComment } from '../../reducers/proposals';
 
 interface IRouteInfo { proposalId: string; }
 
@@ -42,13 +44,7 @@ class ProposalDetails extends React.Component<IProposalDetailsProps,{}> {
       <ul>
       {
         proposal.comments && proposal.comments.map((c: IComment) => (
-          <div>
-          <li key={c.id}>
-            <p><b>Title:</b> {c.title}</p>
-            <p><b>Text:</b> {c.text}</p>
-          </li>
-          <br />
-          </div>
+          <Comment {...c} />
         ))
       }
       </ul>
