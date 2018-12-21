@@ -10,7 +10,7 @@
     position: relative;
     float: right;
     max-height: 100%;
-    overflow-scrolling: touch
+    overflow-scrolling: touch;
 }
 
 .content {

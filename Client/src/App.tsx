@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import './ecmaEvents.css';
+import './App.css';
 
-import routes from "../routes/index.jsx";
+import routes from "./routes/index.jsx";
 
 const switchRoutes = (
     <Switch>
@@ -12,16 +12,14 @@ const switchRoutes = (
     </Switch>
 );
 
-class EcmaEvents extends React.Component {
+class App extends React.Component {
     public render() {
         return (
-            <div className="App">
-                <BrowserRouter basename={"/ecmaEvents"}>
-                    {switchRoutes}
-                </BrowserRouter>
-            </div>
+            <BrowserRouter basename={"/ecmaEvents"}>
+                {switchRoutes}
+            </BrowserRouter>
         );
     }
 }
 
-export default EcmaEvents;
+export default App;

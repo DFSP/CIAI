@@ -4,6 +4,7 @@ import Footer from "../components/footer/footer.jsx";
 import Sidebar from "../components/sidebar/sidebar.jsx";
 import {Redirect, Route, Switch} from 'react-router-dom';
 
+import sidebarRoutes from "../routes/sidebar.jsx";
 import routes from "../routes/ecmaEvents.jsx";
 
 import "./ecmaEvents.css"
@@ -24,12 +25,13 @@ function EcmaEvents(props) { //TODO props type
     return (
         <div className="wrapper">
             <Sidebar
-                routes={routes}
+                routes={sidebarRoutes}
                 location={props.location}
             />
             <div className="mainPanel">
                 <Header
-                    routes={switchRoutes}
+                    routes={sidebarRoutes}
+                    location={props.location}
                 />
                 <div className="content">
                     <div className="container">{switchRoutes}</div>

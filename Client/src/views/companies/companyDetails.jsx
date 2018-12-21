@@ -1,9 +1,9 @@
 import React from "react";
 
-const profile = (props) => (
+const companyDetails = (props) => (
     <div>
         TODO
     </div>
 );
 
-export default profile
+export default companyDetails

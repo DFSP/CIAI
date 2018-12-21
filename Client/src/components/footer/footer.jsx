@@ -2,38 +2,39 @@ import React from "react";
 import "./footer.css"
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 
+const links = [
+    {
+        href: "https://bitbucket.org/dpimenta/ciai/src/master/Client",
+        name: "Repositório Cliente"
+    },
+    {
+        href: "https://bitbucket.org/dpimenta/ciai/src/master/Server",
+        name: "Repositório Servidor"
+    },
+    {
+        href: "",
+        name: "Servidor"
+    },
+];
+
 const Footer = () => (
     <footer className="footer">
         <div className="container">
             <div className="left">
-                <ListGroup className="right">
-                    <ListGroupItem className="inlineBlock">
-                        <a
-                            href="https://bitbucket.org/dpimenta/ciai/src/master/Client"
-                            target="_blank"
-                            className="block"
-                        >
-                            Repositório Cliente
-                        </a>
-                    </ListGroupItem>
-                    <ListGroupItem className="inlineBlock">
-                        <a
-                            href="https://bitbucket.org/dpimenta/ciai/src/master/Server"
-                            target="_blank"
-                            className="block"
-                        >
-                            Repositório Servidor
-                        </a>
-                    </ListGroupItem>
-                    <ListGroupItem className="inlineBlock">
-                        <a
-                            href="" //TODO
-                            target="_blank"
-                            className="block"
-                        >
-                            Servidor
-                        </a>
-                    </ListGroupItem>
+                <ListGroup className="listGroup">
+                    {links.map((link, key) => {
+                        return (
+                            <ListGroupItem className={key === 0 || key === links.length-1 ? "listGroupItem" : "middleListGroupItem"}>
+                                <a
+                                    href={link.href}
+                                    target="_blank"
+                                    className="block"
+                                >
+                                    {link.name}
+                                </a>
+                            </ListGroupItem>
+                        )
+                    })}
                 </ListGroup>
             </div>
             <p className="right">
