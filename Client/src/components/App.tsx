@@ -1,9 +1,10 @@
 import * as React from 'react';
-import Proposals from './proposals/Proposals';
-import Companies from './companies/Companies';
+import Proposals from "../views/proposals/Proposals";
+import Companies from '../views/companies/Companies';
 import { Route } from 'react-router-dom';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import './App.css';
+
 
 class App extends React.Component {
   public render() {

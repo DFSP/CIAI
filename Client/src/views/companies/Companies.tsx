@@ -1,16 +1,14 @@
 import * as React from 'react';
-import {modalStatusChanged} from "../../actions/modals";
 import {connect} from "react-redux";
 import {companiesFetchData} from "../../actions/companiesActions";
 import {ICompany} from "../../reducers/company";
 import {Fragment} from "react";
 
 export interface ICompanyProps {
-    fetchData: () => void,
     companies: ICompany[],
+    fetchData: () => void,
     hasErrored: boolean,
     isLoading: boolean,
-    // modalOpen: state.modalStatusChange;
 }
 class Companies extends React.Component<ICompanyProps,{}> {
 
@@ -24,7 +22,6 @@ class Companies extends React.Component<ICompanyProps,{}> {
     }
 
     public render(){
-
         if (this.props.hasErrored) {
             return <p>Sorry! There was an error loading the items.</p>;
         }
@@ -61,15 +58,12 @@ const mapStateToProps = (state: any) => {
         hasErrored: state.companiesHasErrored,
         isLoading: state.companiesIsLoading,
         modalOpen: state.modalStatusChanged,
-        // proposalSelected: state.proposalSelected
     };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
         fetchData: () => dispatch(companiesFetchData()),
-        changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
-        // selectProposal: (proposal: IProposal) => dispatch(proposalSelected(proposal))
     };
 };
 
