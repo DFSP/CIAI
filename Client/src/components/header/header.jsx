@@ -9,14 +9,18 @@ import MenuItem from "react-bootstrap/lib/MenuItem";
 import { Link } from 'react-router-dom';
 
 import avatar from "../../resources/images/avatar.jpg";
-import logout from "../../resources/icons/person.svg" //TODO change to logout
+import signOut from "../../resources/icons/signOut.svg";
 
 function Header(props) {
 
     function makeBrand() {
         let name;
-        props.routes.map((route, key) => {
+        props.routes.map((route, key) => { //TODO interface
             if (route.path === props.location.pathname) {
+                name = route.name;
+            }
+            if (route.path.indexOf("/proposals/proposalDetails/") > -1 &&
+                props.location.pathname.indexOf("/proposals/proposalDetails/") > -1) {
                 name = route.name;
             }
             return null;
@@ -52,7 +56,7 @@ function Header(props) {
                             </MenuItem>
                         <MenuItem divider />
                         <MenuItem eventKey={3.3}>
-                            <img src={logout} className="icon" alt="logo"/> Sair
+                            <img src={signOut} className="icon" alt="logo"/> Sair
                         </MenuItem>
                     </NavDropdown>
                 </Nav>
@@ -60,15 +64,5 @@ function Header(props) {
         </Navbar>
     );
 }
-{/*<Navbar className={"appbar" + "primary"}>
-            <Toolbar className={classes.container}>
-                <div className={classes.flex}>
-                    <Button color="transparent" href="#" className={classes.title}>
-                        {makeBrand()}
-                    </Button>
-                </div>
-            </Toolbar>
-        </Navbar>*/}
-
 
 export default Header
