@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
 import { modalStatusChanged } from '../../actions/modals';
-import { IProposal } from '../../reducers/proposals'
+import { IProposal } from '../../reducers/proposals';
 
 import { Button, Modal, DropdownButton, MenuItem, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
