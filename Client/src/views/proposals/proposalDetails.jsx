@@ -1,9 +1,9 @@
 import React from "react";
 
-const proposals = () => (
+const proposalDetails = () => (
     <div>
-        TODO
+        TODO proposalDetails
     </div>
 );
 
-export default proposals
+export default proposalDetails

@@ -2,7 +2,7 @@ import React from "react";
 
 const proposals = () => (
     <div>
-        TODO
+        TODO proposals
     </div>
 );
 

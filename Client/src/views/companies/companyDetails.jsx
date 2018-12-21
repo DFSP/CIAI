@@ -2,7 +2,7 @@ import React from "react";
 
 const companyDetails = (props) => (
     <div>
-        TODO
+        TODO companyDetails
     </div>
 );
 

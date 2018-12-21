@@ -49,7 +49,7 @@ const routes = [
     {
         component: MyActivity,
         name: "A minha atividade",
-        path: "/activity",
+        path: "/myActivity",
     },
     { redirect: true, path: "/", to: "/proposals", name: "Redirect" }
 ];

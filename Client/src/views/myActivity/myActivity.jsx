@@ -2,7 +2,7 @@ import React from "react";
 
 const myActivity = (props) => (
     <div>
-        TODO
+        TODO myActivity
     </div>
 );
 

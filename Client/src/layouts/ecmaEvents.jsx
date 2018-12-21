@@ -30,7 +30,7 @@ function EcmaEvents(props) { //TODO props type
             />
             <div className="mainPanel">
                 <Header
-                    routes={sidebarRoutes}
+                    routes={routes}
                     location={props.location}
                 />
                 <div className="content">

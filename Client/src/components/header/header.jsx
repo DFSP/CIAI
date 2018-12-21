@@ -6,12 +6,13 @@ import Nav from "react-bootstrap/lib/Nav";
 import NavItem from "react-bootstrap/lib/NavItem";
 import NavDropdown from "react-bootstrap/lib/NavDropdown";
 import MenuItem from "react-bootstrap/lib/MenuItem";
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router-dom';
 
 import avatar from "../../resources/images/avatar.jpg";
 import logout from "../../resources/icons/person.svg" //TODO change to logout
 
 function Header(props) {
+
     function makeBrand() {
         let name;
         props.routes.map((route, key) => {
@@ -22,6 +23,7 @@ function Header(props) {
         });
         return name;
     }
+
     return (
         <Navbar collapseOnSelect center>
             <Navbar.Header>
@@ -41,13 +43,13 @@ function Header(props) {
                                  }
                                  id="basic-nav-dropdown"
                                  noCaret>
-                        <LinkContainer to="/myActivity">
-                            <MenuItem eventKey={3.1}>A minha atividade</MenuItem>
-                        </LinkContainer>
+                            <MenuItem componentClass={Link} href="/myActivity" to="/myActivity" eventKey={3.1}>
+                                A minha atividade
+                            </MenuItem>
                         <MenuItem divider />
-                        <LinkContainer to="/profile">
-                            <MenuItem eventKey={3.2}>Perfil</MenuItem>
-                        </LinkContainer>
+                            <MenuItem componentClass={Link} href="/profile" to="/profile" eventKey={3.2}>
+                                Perfil
+                            </MenuItem>
                         <MenuItem divider />
                         <MenuItem eventKey={3.3}>
                             <img src={logout} className="icon" alt="logo"/> Sair
