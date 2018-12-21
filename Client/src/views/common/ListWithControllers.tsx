@@ -12,20 +12,22 @@ export interface IProposalProps {
   proposals: IProposal[];
   isLoading: boolean;
   hasErrored: boolean;
-  fetchData: () => void;
+  fetchData: (url: string, embeddedArray: string) => void;
   selectProposal: (proposal: IProposal) => void;
   proposalSelected: IProposal;
   handleAdd: () => void;
   handleUpdate: () => void;
   handleDelete: () => void;
-  show: (s: IProposal) => string;
+  show: (s: any) => string;
   title: string;
+  fetchFrom: string;
+  embeddedArray: string;
 }
 
 class ListWithControllers extends React.Component<IProposalProps,any> {
 
   public componentDidMount() {
-    this.props.fetchData();
+    this.props.fetchData(this.props.fetchFrom, this.props.embeddedArray);
   }
 
   public render() {
@@ -73,7 +75,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        fetchData: () => dispatch(proposalsFetchData()),
+        fetchData: (url: string, embeddedArray: string) => dispatch(proposalsFetchData(url, embeddedArray)),
         selectProposal: (proposal: IProposal) => dispatch(proposalSelected(proposal))
     };
 };

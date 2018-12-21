@@ -1,5 +1,4 @@
 import * as halfred from 'halfred';
-import  { IProposal } from '../reducers/proposals'
 
 export function proposalsHasErrored(boolState: boolean) {
   return {
@@ -15,18 +14,18 @@ export function proposalsIsLoading(boolState: boolean) {
   };
 }
 
-export function proposalsFetchDataSuccess(proposals: IProposal[]) {
+export function proposalsFetchDataSuccess(proposals: any[]) {
   return {
     type: 'PROPOSALS_FETCH_DATA_SUCCESS',
     proposals
   };
 }
 
-export function proposalsFetchData() {
+export function proposalsFetchData(url: string, embeddedArray: string) {
   return (dispatch: any) => {
     dispatch(proposalsIsLoading(true));
 
-    fetch('/proposals.json', {
+    fetch(url, {
       method: 'GET',
       headers: new Headers({
          'Authorization': 'Basic '+btoa('admin:password'),
@@ -39,7 +38,7 @@ export function proposalsFetchData() {
       throw new Error(response.statusText);
     }).then(json => {
       const proposals = halfred.parse(json)
-        .embeddedResourceArray("proposals")
+        .embeddedResourceArray(embeddedArray)
         .map(resource => resource.original());
       dispatch(proposalsIsLoading(false));
       dispatch(proposalsFetchDataSuccess(proposals));
@@ -47,7 +46,7 @@ export function proposalsFetchData() {
   }
 }
 
-export function proposalSelected(proposal: IProposal) {
+export function proposalSelected(proposal: any) {
   return {
     type: 'PROPOSAL_SELECTED',
     proposalSelected: proposal

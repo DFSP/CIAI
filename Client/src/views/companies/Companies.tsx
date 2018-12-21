@@ -6,30 +6,30 @@ import { proposalSelected } from '../../actions/proposals';
 import { IProposal } from '../../reducers/proposals';
 import ListWithControllers from '../common/ListWithControllers';
 
-import { Button, Modal, DropdownButton, MenuItem, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { Modal, FormGroup } from 'react-bootstrap';
 
-export interface IProposalProps {
+export interface ICompanyProps {
   changeModalStatus: (status: boolean) => void;
   modalOpen: boolean;
   proposalSelected: IProposal;
   selectProposal: (proposal: IProposal) => void;
 }
 
-class ProposalList extends React.Component<IProposalProps,any> {
+class CompaniesList extends React.Component<ICompanyProps,any> {
 
-  constructor(props: IProposalProps) {
+  constructor(props: ICompanyProps) {
     super(props);
     this.state = { title: "", description: "" }
 
     this.handleSave = this.handleSave.bind(this);
-    this.createProposal = this.createProposal.bind(this);
-    this.updateProposal = this.updateProposal.bind(this);
-    this.deleteProposal = this.deleteProposal.bind(this);
+    this.createCompany = this.createCompany.bind(this);
+    this.updateCompany = this.updateCompany.bind(this);
+    this.deleteCompany = this.deleteCompany.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onDropdownChange = this.onDropdownChange.bind(this);
   }
 
-  public componentWillReceiveProps(nextProps: IProposalProps) {
+  public componentWillReceiveProps(nextProps: ICompanyProps) {
     if (nextProps.proposalSelected) {
       const { title, description, state } = nextProps.proposalSelected;
       this.setState({ title, description, state });
@@ -52,34 +52,34 @@ class ProposalList extends React.Component<IProposalProps,any> {
 
   public handleSave() {
     if (this.props.proposalSelected.id) {
-      this.updateProposal()
+      this.updateCompany()
     } else {
-      this.createProposal()
+      this.createCompany()
     }
   }
 
-  public createProposal() {
+  public createCompany() {
     const formData = new FormData();
     const { title, description, state } = this.state;
     formData.append('title', title);
     formData.append('description', description);
     formData.append('state', state);
-    this.fetchUrl('./proposals.json', 'POST', formData, 'Created with success!');
+    this.fetchUrl('./companies.json', 'POST', formData, 'Created with success!');
   }
 
-  public updateProposal() {
+  public updateCompany() {
     // const proposal = this.props.proposalSelected;
     const formData = new FormData();
     const { title, description, state } = this.state;
     formData.append('title', title);
     formData.append('description', description);
     formData.append('state', state);
-    this.fetchUrl('./proposals.json', 'PUT', formData, 'Updated with success!');
+    this.fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!');
   }
 
-  public deleteProposal() {
+  public deleteCompany() {
     // const { id } = this.props.proposalSelected;
-    this.fetchUrl('./proposals.json', 'DELETE', new FormData(), 'Deleted with success!');
+    this.fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!');
   }
 
   public fetchUrl(url: string, method: string, body: any, successMessage: string) {
@@ -109,65 +109,32 @@ class ProposalList extends React.Component<IProposalProps,any> {
   }
 
   public render() {
-    const getStateValue = (state: string) => state === "PENDING_APPROVAL" ? "Pending approval" : "Approved";
-
     return (
       <Fragment>
         <ListWithControllers
-          title="Proposals"
-          fetchFrom="/proposals.json"
-          embeddedArray="proposals"
+          title="Companies"
+          fetchFrom="/companies.json"
+          embeddedArray="companies"
           show={this.show}
           handleAdd={() => this.handleModal(true,true)}
           handleUpdate={() => this.handleModal(true,false)}
-          handleDelete={this.deleteProposal}
+          handleDelete={this.deleteCompany}
         />
         {
           this.props.modalOpen &&
           <Modal.Dialog>
             <Modal.Header>
-              <Modal.Title>Update proposal</Modal.Title>
+              <Modal.Title>Update company</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
               <FormGroup>
-                <ControlLabel>Title</ControlLabel>
-                <FormControl
-                  name="title"
-                  type="text"
-                  label="Title"
-                  value={this.state.title}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>Description</ControlLabel>
-                <FormControl
-                  componentClass="textarea"
-                  name="description"
-                  value={this.state.description}
-                  onChange={this.onChange}
-                />
-                <DropdownButton
-                  id="dropdown-basic-0"
-                  name="state"
-                  onSelect={this.onDropdownChange}
-                  title={getStateValue(this.state.state)}>
-                    <MenuItem
-                      eventKey="PENDING_APPROVAL"
-                      active={this.state.state === "PENDING_APPROVAL"}>
-                        Pending approval
-                    </MenuItem>
-                    <MenuItem
-                      eventKey="APPROVED"
-                      active={this.state.state === "APPROVED"}>
-                        Approved
-                    </MenuItem>
-                </DropdownButton>
+                Companies Form Group
               </FormGroup>
             </Modal.Body>
 
             <Modal.Footer>
-              <Button onClick={() => this.handleModal(false,false)}>Close</Button>
-              <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
+              Footer here
             </Modal.Footer>
           </Modal.Dialog>
         }
@@ -175,7 +142,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
     );
   }
 
-  private show = (p: IProposal) => `${p.title}: (${p.description})`;
+  private show = (p: any) => `${p.name}: (${p.city})`;
 }
 
 const mapStateToProps = (state: any) => {
@@ -188,8 +155,8 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: any) => {
     return {
         changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
-        selectProposal: (proposal: IProposal) => dispatch(proposalSelected(proposal))
+        selectProposal: (proposal: any) => dispatch(proposalSelected(proposal))
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProposalList);
+export default connect(mapStateToProps, mapDispatchToProps)(CompaniesList);
