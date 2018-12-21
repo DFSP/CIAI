@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
+import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
 
 import { Button, Modal, DropdownButton, MenuItem, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
@@ -63,7 +64,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
     formData.append('title', title);
     formData.append('description', description);
     formData.append('state', state);
-    this.fetchUrl('./proposals.json', 'POST', formData, 'Created with success!');
+    fetchUrl('./proposals.json', 'POST', formData, 'Created with success!', this.handleModal);
   }
 
   public updateProposal() {
@@ -73,12 +74,12 @@ class ProposalList extends React.Component<IProposalProps,any> {
     formData.append('title', title);
     formData.append('description', description);
     formData.append('state', state);
-    this.fetchUrl('./proposals.json', 'PUT', formData, 'Updated with success!');
+    fetchUrl('./proposals.json', 'PUT', formData, 'Updated with success!', this.handleModal);
   }
 
   public deleteProposal() {
     // const { id } = this.props.proposalSelected;
-    this.fetchUrl('./proposals.json', 'DELETE', new FormData(), 'Deleted with success!');
+    fetchUrl('./proposals.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
   }
 
   public fetchUrl(url: string, method: string, body: any, successMessage: string) {

@@ -3,9 +3,10 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
+import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
 
-import { Modal, FormGroup } from 'react-bootstrap';
+import { Modal, FormGroup, ControlLabel, FormControl, Button } from 'react-bootstrap';
 
 export interface ICompanyProps {
   changeModalStatus: (status: boolean) => void;
@@ -18,7 +19,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
 
   constructor(props: ICompanyProps) {
     super(props);
-    this.state = { title: "", description: "" }
+    this.state = { name: "", city: "", zipCode: "", address: "", phone: "", email: "", fax: "" }
 
     this.handleSave = this.handleSave.bind(this);
     this.createCompany = this.createCompany.bind(this);
@@ -30,8 +31,8 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
 
   public componentWillReceiveProps(nextProps: ICompanyProps) {
     if (nextProps.itemSelected) {
-      const { title, description, state } = nextProps.itemSelected;
-      this.setState({ title, description, state });
+      const { name, city, zipCode, address, phone, email, fax } = nextProps.itemSelected;
+      this.setState({ name, city, zipCode, address, phone, email, fax });
     }
   }
 
@@ -39,11 +40,13 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     if (toCreate) {
       this.props.selectItem({
         id: -1,
-        title: "",
-        description: "",
-        state: "PENDING_APPROVAL",
-        creationDate: "",
-        _links: ""
+        name: "",
+        city: "",
+        zipCode: "",
+        address: "",
+        phone: "",
+        email: "",
+        fax: ""
       });
     }
     this.props.changeModalStatus(openModal);
@@ -59,44 +62,34 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
 
   public createCompany() {
     const formData = new FormData();
-    const { title, description, state } = this.state;
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('state', state);
-    this.fetchUrl('./companies.json', 'POST', formData, 'Created with success!');
+    const { name, city, zipCode, address, phone, email, fax }  = this.state;
+    formData.append('name', name);
+    formData.append('city', city);
+    formData.append('zipCode', zipCode);
+    formData.append('address', address);
+    formData.append('phone', phone);
+    formData.append('email', email);
+    formData.append('fax', fax);
+    fetchUrl('./companies.json', 'POST', formData, 'Created with success!', this.handleModal);
   }
 
   public updateCompany() {
     // const proposal = this.props.proposalSelected;
     const formData = new FormData();
-    const { title, description, state } = this.state;
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('state', state);
-    this.fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!');
+    const { name, city, zipCode, address, phone, email, fax }  = this.state;
+    formData.append('name', name);
+    formData.append('city', city);
+    formData.append('zipCode', zipCode);
+    formData.append('address', address);
+    formData.append('phone', phone);
+    formData.append('email', email);
+    formData.append('fax', fax);
+    fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!', this.handleModal);
   }
 
   public deleteCompany() {
     // const { id } = this.props.proposalSelected;
-    this.fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!');
-  }
-
-  public fetchUrl(url: string, method: string, body: any, successMessage: string) {
-    fetch(url, {
-      method,
-      body,
-      headers: new Headers({
-         'Authorization': 'Basic '+btoa('admin:password'),
-       }),
-    })
-    .then(response => {
-      if (response.ok) {
-        this.props.changeModalStatus(false);
-        alert(successMessage);
-      } else {
-        throw new Error(response.statusText);
-      }
-    }).catch((e: string) => alert(e));
+    fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
   }
 
   public onChange(e: any) {
@@ -128,12 +121,68 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
 
             <Modal.Body>
               <FormGroup>
-                Companies Form Group
+                <ControlLabel>Name</ControlLabel>
+                <FormControl
+                  name="name"
+                  type="text"
+                  label="Name"
+                  value={this.state.name}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>City</ControlLabel>
+                <FormControl
+                  name="city"
+                  type="text"
+                  label="City"
+                  value={this.state.city}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>Zipcode</ControlLabel>
+                <FormControl
+                  name="zipcode"
+                  type="text"
+                  label="Zipcode"
+                  value={this.state.zipCode}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>Address</ControlLabel>
+                <FormControl
+                  name="address"
+                  type="text"
+                  label="Address"
+                  value={this.state.address}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>Phone</ControlLabel>
+                <FormControl
+                  name="phone"
+                  type="text"
+                  label="Phone"
+                  value={this.state.phone}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>Email</ControlLabel>
+                <FormControl
+                  name="email"
+                  type="text"
+                  label="Email"
+                  value={this.state.email}
+                  onChange={this.onChange}
+                />
+                <ControlLabel>fax</ControlLabel>
+                <FormControl
+                  name="fax"
+                  type="text"
+                  label="Fax"
+                  value={this.state.fax}
+                  onChange={this.onChange}
+                />
               </FormGroup>
             </Modal.Body>
 
             <Modal.Footer>
-              Footer here
+            <Button onClick={() => this.handleModal(false,false)}>Close</Button>
+            <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
             </Modal.Footer>
           </Modal.Dialog>
         }
