@@ -4,8 +4,6 @@ import { proposal } from './proposal'
 import { modalStatusChanged } from './modals';
 import {companies, companiesHasErrored, companiesIsLoading} from "./company";
 
-
-
 export default combineReducers({
     proposals,
     proposalsHasErrored,
@@ -15,5 +13,5 @@ export default combineReducers({
     companies,
     companiesHasErrored,
     companiesIsLoading,
-    proposal
+    proposal,
 });
