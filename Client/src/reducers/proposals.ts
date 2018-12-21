@@ -3,6 +3,12 @@ interface IProposalsIsLoadingAction { type: string, isLoading: boolean }
 interface IProposalsAction { type: string, proposals: IProposal[] }
 interface IProposalSelectedAction { type: string, proposalSelected: IProposal }
 
+export interface IComment {
+  id: number;
+  title: string;
+  text: string;
+}
+
 export interface IProposal {
   id: number;
   title: string;
@@ -10,6 +16,7 @@ export interface IProposal {
   state: string;
   creationDate: string;
   _links: any;
+  comments?: IComment[];
 }
 
 export function proposalsHasErrored(state = false,

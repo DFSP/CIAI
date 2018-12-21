@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { proposals, proposalsHasErrored, proposalsIsLoading, proposalSelected } from './proposals';
+import { proposal } from './proposal'
 import { modalStatusChanged } from './modals';
 import {companies, companiesHasErrored, companiesIsLoading} from "./company";
 
@@ -13,5 +14,6 @@ export default combineReducers({
     proposalSelected,
     companies,
     companiesHasErrored,
-    companiesIsLoading
+    companiesIsLoading,
+    proposal
 });

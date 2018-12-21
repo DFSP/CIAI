@@ -13,10 +13,6 @@ import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.Proposal;
 import pt.unl.fct.ciai.model.User;
-import pt.unl.fct.ciai.security.CanDeleteUser;
-import pt.unl.fct.ciai.security.CanModifyUser;
-import pt.unl.fct.ciai.security.CanReadOneProposal;
-import pt.unl.fct.ciai.security.CanReadUserProposal;
 import pt.unl.fct.ciai.service.UsersService;
 
 import javax.validation.Valid;
@@ -44,7 +40,6 @@ public class UsersController{
     }
 
     @GetMapping
-    @CanReadUserProposal
     public ResponseEntity<Resources<Resource<User>>> getUsers(@RequestParam(required = false) String search) {
         Iterable<User> users = usersService.getUsers(search);
         Resources<Resource<User>> resources = userAssembler.toResources(users);
@@ -71,7 +66,6 @@ public class UsersController{
     }
 
     @PutMapping("/{id}")
-    @CanModifyUser
     public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user) {
         if (id != user.getId()) {
             throw new BadRequestException(String.format("Path id %d and user id %d don't match.", id, user.getId()));
@@ -81,14 +75,12 @@ public class UsersController{
     }
 
     @DeleteMapping("/{id}")
-    @CanDeleteUser
     public ResponseEntity<?> deleteUser(@PathVariable("id") long id) {
         usersService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/proposals")
-    @CanReadUserProposal
     public ResponseEntity<Resources<Resource<Proposal>>> getProposals(
             @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         User user = getUserIfPresent(id);
@@ -98,7 +90,6 @@ public class UsersController{
     }
 
     @GetMapping("/{uid}/proposals/{pid}")
-    @CanReadOneProposal
     public ResponseEntity<Resource<Proposal>> getProposal(
             @PathVariable("uid") long uid, @PathVariable("pid") long pid) {
         User user = getUserIfPresent(uid);

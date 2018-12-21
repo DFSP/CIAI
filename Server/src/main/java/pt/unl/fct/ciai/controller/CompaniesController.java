@@ -15,7 +15,6 @@ import pt.unl.fct.ciai.model.Employee;
 import pt.unl.fct.ciai.assembler.CompanyResourceAssembler;
 import pt.unl.fct.ciai.assembler.EmployeeResourcesAssembler;
 import pt.unl.fct.ciai.exception.NotFoundException;
-import pt.unl.fct.ciai.security.*;
 import pt.unl.fct.ciai.service.CompaniesService;
 
 import javax.validation.Valid;
@@ -44,7 +43,6 @@ public class CompaniesController {
 	}
 
 	@PostMapping
-	@CanAddCompany
 	public ResponseEntity<Resource<Company>> addCompany(@Valid @RequestBody Company company) throws URISyntaxException {
 		if (company.getId() > 0) {
             throw new BadRequestException(String.format("Expected non negative company id, instead got %d", company.getId()));
@@ -64,7 +62,6 @@ public class CompaniesController {
 	}
 
 	@PutMapping(value = "/{id}")
-	@CanModifyCompany
 	public ResponseEntity<?> updateCompany(@PathVariable("id") long id, @RequestBody Company company) {
 		if (id != company.getId()) {
 			throw new BadRequestException(String.format("Path id %d and company id %d don't match.", id, company.getId()));
@@ -74,7 +71,6 @@ public class CompaniesController {
 	}
 
 	@DeleteMapping(value = "/{id}")
-	@CanDeleteCompany
 	public ResponseEntity<?> deleteCompany(@PathVariable("id") long id) {
 		companiesService.deleteCompany(id);
 		return ResponseEntity.noContent().build();
@@ -88,9 +84,8 @@ public class CompaniesController {
 		Resources<Resource<Employee>> resources = employeeAssembler.toResources(employees, company);
 		return ResponseEntity.ok(resources);
 	}
-	
+
 	@PostMapping(value = "/{id}/employees")
-	@CanAddEmployee
 	public ResponseEntity<Resource<Employee>> addEmployee(
 			@PathVariable("id") long id, @Valid @RequestBody Employee employee) throws URISyntaxException {
 		if (employee.getId() > 0) {
@@ -112,7 +107,6 @@ public class CompaniesController {
 	}
 
 	@PutMapping(value = "/{cid}/employees/{eid}")
-	@CanModifyEmployee
 	public ResponseEntity<?> updateEmployee(
 			@PathVariable("cid") long cid, @PathVariable("eid") long eid, @RequestBody Employee employee) {
 		if (eid != employee.getId()) {
@@ -123,7 +117,6 @@ public class CompaniesController {
 	}
 
 	@DeleteMapping(value = "/{cid}/employees/{eid}")
-	@CanDeleteEmployee
 	public ResponseEntity<?> deleteEmployee(@PathVariable("cid") long cid, @PathVariable("eid") long eid) {
 		companiesService.deleteEmployee(cid, eid);
 		return ResponseEntity.noContent().build();

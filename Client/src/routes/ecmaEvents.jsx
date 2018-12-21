@@ -2,7 +2,7 @@ import Clippy from "../resources/icons/clippy.svg"
 import Person from "../resources/icons/person.svg"
 import Organization from "../resources/icons/organization.svg"
 import Proposals from "../views/proposals/Proposals.tsx"
-import ProposalDetails from "../views/proposals/proposalDetails.jsx"
+import ProposalDetails from "../views/proposals/ProposalDetails.tsx"
 import Users from "../views/users/users.jsx"
 import UserDetails from "../views/users/userDetails.jsx"
 import Companies from "../views/companies/Companies.tsx"
@@ -19,7 +19,7 @@ const routes = [
     {
         component: ProposalDetails,
         name: "Detalhes da Proposta",
-        path: "/proposals/proposalDetails",
+        path: "/proposals/proposalDetails/:proposalId",
     },
     {
         component: Users,

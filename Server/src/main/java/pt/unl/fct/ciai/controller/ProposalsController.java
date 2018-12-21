@@ -9,7 +9,6 @@ import pt.unl.fct.ciai.assembler.*;
 import pt.unl.fct.ciai.exception.BadRequestException;
 import pt.unl.fct.ciai.exception.NotFoundException;
 import pt.unl.fct.ciai.model.*;
-import pt.unl.fct.ciai.security.*;
 import pt.unl.fct.ciai.service.ProposalsService;
 
 
@@ -71,7 +70,6 @@ public class ProposalsController{
     }
 
     @GetMapping("/{id}")
-    @CanReadProposal
     public ResponseEntity<Resource<Proposal>> getProposal(@PathVariable("id") long id) {
         Proposal proposal = getProposalIfPresent(id);
         Resource<Proposal> resource = proposalAssembler.toResource(proposal);
@@ -79,7 +77,6 @@ public class ProposalsController{
     }
 
     @PutMapping("/{id}")
-    @CanModifyProposal
     public ResponseEntity<?> updateProposal(@PathVariable("id") long id, @RequestBody Proposal proposal) {
         if (id != proposal.getId()) {
             throw new BadRequestException(String.format("Path id %d and proposal id %d don't match.", id, proposal.getId()));
@@ -89,14 +86,12 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{id}")
-    @CanDeleteProposal
     public ResponseEntity<?> deleteProposal(@PathVariable("id") long id) {
         proposalsService.deleteProposal(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/sections")
-    @CanReadSection
     public ResponseEntity<Resources<Resource<Section>>> getSections(
             @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         Proposal proposal = getProposalIfPresent(id);
@@ -106,7 +101,6 @@ public class ProposalsController{
     }
 
     @PostMapping("/{id}/sections")
-    @CanAddSection
     public ResponseEntity<Resource<Section>> addSection(@PathVariable("id") long id, @Valid @RequestBody Section section)
             throws URISyntaxException {
         if (section.getId() > 0) {
@@ -120,7 +114,6 @@ public class ProposalsController{
     }
 
     @GetMapping("/{pid}/sections/{sid}")
-    @CanReadOneSection
     public ResponseEntity<Resource<Section>> getSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
         Section section = proposalsService.getSection(pid, sid).orElseThrow(() ->
                 new NotFoundException(String.format("Section id %d does not belong to proposal with id %d", sid, pid)));
@@ -129,7 +122,6 @@ public class ProposalsController{
     }
 
     @PutMapping("/{pid}/sections/{sid}")
-    @CanModifySection
     public ResponseEntity<?> updateSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid, @RequestBody Section section) {
         if (sid != section.getId()) {
             throw new BadRequestException(String.format("Path id %d and section id %d don't match.", sid, section.getId()));
@@ -139,7 +131,6 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{pid}/sections/{sid}")
-    @CanDeleteSection
     public ResponseEntity<?> deleteSection(@PathVariable("pid") long pid, @PathVariable("sid") long sid) {
         proposalsService.deleteSection(pid, sid);
         return ResponseEntity.noContent().build();
@@ -155,7 +146,6 @@ public class ProposalsController{
     }
 
     @PostMapping("/{id}/staff")
-    @CanAddStaff
     public ResponseEntity<Resource<User>> addStaff(@PathVariable("id") long id, @RequestBody User staff)
             throws URISyntaxException {
         Proposal proposal = getProposalIfPresent(id);
@@ -176,7 +166,6 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{pid}/staff/{uid}")
-    @CanDeleteStaff
     public ResponseEntity<?> removeStaff(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
         proposalsService.removeStaff(pid, uid);
         return ResponseEntity.noContent().build();
@@ -192,7 +181,6 @@ public class ProposalsController{
     }
 
     @PostMapping("/{id}/members")
-    @CanAddMember
     public ResponseEntity<Resource<Employee>> addMember(@PathVariable("id") long id, @RequestBody Employee member)
             throws URISyntaxException {
         Proposal proposal = getProposalIfPresent(id);
@@ -213,14 +201,12 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{pid}/members/{mid}")
-    @CanDeleteMember
     public ResponseEntity<?> removeMember(@PathVariable("pid") long pid, @PathVariable("mid") long mid) {
         proposalsService.removeMember(pid, mid);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/reviews")
-    @CanReadReview
     public ResponseEntity<Resources<Resource<Review>>> getReviews(
             @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         Proposal proposal = getProposalIfPresent(id);
@@ -230,7 +216,6 @@ public class ProposalsController{
     }
 
     @PostMapping("/{id}/reviews")
-    @CanAddReview
     public ResponseEntity<?> addReview(@PathVariable("id") long id, @Valid @RequestBody Review review)
             throws URISyntaxException {
         if (review.getId() > 0) {
@@ -244,7 +229,6 @@ public class ProposalsController{
     }
 
     @GetMapping("/{pid}/reviews/{rid}")
-    @CanReadOneReview
     public ResponseEntity<Resource<Review>> getReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
         Review review = proposalsService.getReview(pid, rid).orElseThrow(() ->
                 new NotFoundException(String.format("Review id %d does not belong to proposal with id %d", rid, pid)));
@@ -253,7 +237,6 @@ public class ProposalsController{
     }
 
     @PutMapping("/{pid}/reviews/{rid}")
-    @CanModifyReview
     public ResponseEntity<?> updateReview(
             @PathVariable("pid") long pid, @PathVariable("rid") long rid, @RequestBody Review review) {
         if (rid != review.getId()) {
@@ -264,14 +247,12 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{pid}/reviews/{rid}")
-    @CanDeleteReview
     public ResponseEntity<?> deleteReview(@PathVariable("pid") long pid, @PathVariable("rid") long rid) {
         proposalsService.deleteReview(pid, rid);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/comments")
-    @CanReadComment
     public ResponseEntity<Resources<Resource<Comment>>> getComments(
             @PathVariable("id") long id, @RequestParam(value = "search", required = false) String search) {
         Proposal proposal = getProposalIfPresent(id);
@@ -281,7 +262,6 @@ public class ProposalsController{
     }
 
     @PostMapping("/{id}/comments")
-    @CanAddComment
     public ResponseEntity<Resource<Comment>> addComment(@PathVariable("id") long id, @Valid @RequestBody Comment comment)
             throws URISyntaxException {
         if (comment.getId() > 0) {
@@ -295,7 +275,6 @@ public class ProposalsController{
     }
 
     @GetMapping("/{pid}/comments/{cid}")
-    @CanReadOneComment
     public ResponseEntity<Resource<Comment>> getComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
         Comment comment = proposalsService.getComment(pid, cid).orElseThrow(() ->
                 new NotFoundException(String.format("Comment id %d does not belong to proposal with id %d", cid, pid)));
@@ -304,7 +283,6 @@ public class ProposalsController{
     }
 
     @PutMapping("/{pid}/comments/{cid}")
-    @CanModifyComment
     public ResponseEntity<?> updateComment(
             @PathVariable("pid") long pid, @PathVariable("cid") long cid, @RequestBody Comment comment) {
         if (cid != comment.getId()) {
@@ -315,7 +293,6 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{pid}/comments/{cid}")
-    @CanDeleteComment
     public ResponseEntity<?> deleteComment(@PathVariable("pid") long pid, @PathVariable("cid") long cid) {
         proposalsService.deleteComment(pid, cid);
         return ResponseEntity.noContent().build();
@@ -349,7 +326,6 @@ public class ProposalsController{
     }
 
     @DeleteMapping("/{pid}/bids/{uid}")
-    @CanDeleteBid
     public ResponseEntity<?> deleteReviewBid(@PathVariable("pid") long pid, @PathVariable("uid") long uid) {
         proposalsService.deleteReviewBid(pid, uid);
         return ResponseEntity.noContent().build();
