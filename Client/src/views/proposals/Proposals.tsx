@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
+import { Link } from "react-router-dom";
 import { proposalsFetchData, proposalSelected } from '../../actions/proposals';
 import { modalStatusChanged } from '../../actions/modals';
 import { IProposal } from '../../reducers/proposals';
@@ -133,7 +134,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
           {
             this.props.proposals && this.props.proposals.map(p => (
               <li key={p.id}>
-                {p.title}
+                <Link to={`/proposalDetails/${p.id}`}>{p.title}</Link>
                 <button key={p.id} onClick={() => this.handleModal(true, p)}>Update</button>
                 <button key={p.title} onClick={() => this.deleteProposal(p.id)}>Delete</button>
               </li>
