@@ -4,6 +4,7 @@ import { proposal } from './proposal';
 import { user } from './user';
 import { review } from './review';
 import { comment } from './comment';
+import { company } from './company';
 import { modalStatusChanged } from './modals';
 
 export default combineReducers({
@@ -15,5 +16,6 @@ export default combineReducers({
     proposal,
     user,
     review,
-    comment
+    comment,
+    company
 });
