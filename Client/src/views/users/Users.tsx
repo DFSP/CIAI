@@ -103,7 +103,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                   <DropdownButton
                       id="dropdown-basic-0"
                       name="state"
-                      onSelect={this.onDropdownChange}
+                      onSelect={this.onRoleChange}
                       title={this.state.role}>
                     <MenuItem
                         eventKey="ROLE_COMPANY_ADMIN"
@@ -165,7 +165,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                   <DropdownButton
                       id="dropdown-basic-0"
                       name="state"
-                      onSelect={this.onDropdownChange}
+                      onSelect={this.onGenderChange}
                       title={this.state.gender}>
                     <MenuItem
                         eventKey="MALE"
@@ -287,7 +287,11 @@ class UsersList extends React.Component<IUsersProps,any> {
     this.setState({ [e.target.name]: e.target.value });
   };
 
-  private onDropdownChange = (e: any) => {
+  private onGenderChange = (e: any) => {
+    this.setState({ gender: e });
+  }
+
+  private onRoleChange = (e: any) => {
     this.setState({ role: e });
   };
 
