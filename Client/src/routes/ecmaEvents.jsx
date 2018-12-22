@@ -9,8 +9,14 @@ import Companies from "../views/companies/Companies.tsx"
 import CompanyDetails from "../views/companies/companyDetails.tsx"
 import Profile from "../views/profile/profile.jsx"
 import MyActivity from "../views/myActivity/myActivity.jsx"
+import Login from "../views/login/login.tsx"
 
 const routes = [
+    {
+        component: Login,
+        name: "Login",
+        path: "/login",
+    },
     {
         component: Proposals,
         name: "Propostas",
