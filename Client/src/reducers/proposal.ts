@@ -1,4 +1,4 @@
-import { IProposal } from './proposals'
+import { IProposal } from './items'
 
 interface IProposalAction { type: string, proposal: IProposal }
 

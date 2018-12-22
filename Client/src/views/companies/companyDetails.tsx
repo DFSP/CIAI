@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Panel, Label } from 'react-bootstrap';
 import { companyFetchData } from '../../actions/company';
-import { ICompany } from '../../reducers/proposals';
+import { ICompany } from '../../reducers/items';
 import Users from '../users/Users';
 
 // interface IRouteInfo { proposalId: string; }

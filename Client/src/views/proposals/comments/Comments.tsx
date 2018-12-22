@@ -5,7 +5,7 @@ import { modalStatusChanged } from '../../../actions/modals';
 import { itemSelected } from '../../../actions/items';
 import { fetchUrl } from '../../../utils/utils';
 import ListWithControllers from '../../common/ListWithControllers';
-import { IComment } from '../../../reducers/proposals'
+import { IComment } from '../../../reducers/items'
 
 import {
   Modal,

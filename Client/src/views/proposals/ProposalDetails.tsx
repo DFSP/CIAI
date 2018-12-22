@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Panel, Tabs, Tab, Label } from 'react-bootstrap';
 import { proposalFetchData } from '../../actions/proposal';
-import { IProposal } from '../../reducers/proposals';
+import { IProposal } from '../../reducers/items';
 import Reviews from '../reviews/Reviews';
 import Users from '../users/Users';
 import Comments from './comments/Comments';
