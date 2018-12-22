@@ -21,6 +21,7 @@ export interface IUser {
   email: string;
   role: string;
   job?: string;
+  password?: string
 }
 
 export interface ICompany {

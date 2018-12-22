@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Fragment } from "react";
 import {IUser} from "../../reducers/items";
 import {userFetchData} from "../../actions/user";
 import {connect} from "react-redux";
@@ -27,16 +28,18 @@ class Profile extends React.Component<IProfileProps,any> {
     }
 
     public componentDidMount() {
-        this.props.fetchData("7"); //TODO
+        this.props.fetchData("7"); // TODO
     }
 
     public componentWillReceiveProps(nextProps: IProfileProps) {
-        const { username, email, firstName, lastName} = nextProps.user;
+      if (nextProps.user) {
+        const { username, password, email, firstName, lastName} = nextProps.user;
 /*        console.log(username)
         console.log(email)
         console.log(firstName)
         console.log(lastName)*/
-        this.setState({ username, email, firstName, lastName });
+        this.setState({ username, password, email, firstName, lastName });
+      }
     }
 
     public render() {
@@ -47,8 +50,12 @@ class Profile extends React.Component<IProfileProps,any> {
             return <ClipLoader/>;
         }
 
+        const { user } = this.props;
+
         return (
-            {user &&
+          <Fragment>
+          {
+            user &&
             <div className="Profile">
                 <form onSubmit={this.handleSubmit}>
                     <FormGroup controlId="username">
@@ -108,12 +115,15 @@ class Profile extends React.Component<IProfileProps,any> {
                         </Link>
                     </ButtonGroup>
                 </form>
-            </div>}
+            </div>
+          }
+          </Fragment>
         );
     }
 
     private validateForm() {
-        return this.state.username.length > 0 && this.state.password.length > 0;
+        return this.state.username && this.state.username.length > 0 &&
+        this.state.password && this.state.password.length > 0;
     }
 
     private handleChange = (event: any) => {
