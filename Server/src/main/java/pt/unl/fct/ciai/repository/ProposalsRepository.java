@@ -11,13 +11,20 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
 
     @Query("SELECT DISTINCT p "
             + "FROM Proposal p JOIN p.staff s JOIN p.members m "
-            + "WHERE p.state = 'APPROVED'")
+            + "WHERE p.state = 'APPROVED' "
+            + "OR s.username = ?#{principal.username} "
+            + "OR m.username = ?#{principal.username} "
+            + "OR p.proposer.username = ?#{principal.username} "
+            + "OR 1=?#{hasRole('ROLE_SYS_ADMIN') ? 1 : 0}")
     Iterable<Proposal> getPublicProposals();
-
 
     @Query("SELECT DISTINCT p "
             + "FROM Proposal p JOIN p.staff s JOIN p.members m "
-            + "WHERE (p.state = 'APPROVED')"
+            + "WHERE (p.state = 'APPROVED' "
+            + "OR s.username = ?#{principal.username} "
+            + "OR m.username = ?#{principal.username} "
+            + "OR p.proposer.username = ?#{principal.username} "
+            + "OR 1=?#{hasRole('ROLE_SYS_ADMIN') ? 1 : 0})"
             + "AND "
             + "(p.id LIKE CONCAT('%',:search,'%') "
             + "OR p.title LIKE CONCAT('%',:search,'%') "
