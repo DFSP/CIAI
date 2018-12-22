@@ -23,6 +23,18 @@ export interface IUser {
   job?: string;
 }
 
+export interface ICompany {
+  id: number;
+  name: string;
+  city: string;
+  zipCode: string;
+  address: string;
+  phone: string;
+  email: string;
+  fax: string;
+  employees?: string;
+}
+
 export function itemsHasErrored(state = false,
   action: IItemsHasErroredAction) {
     switch (action.type) {
