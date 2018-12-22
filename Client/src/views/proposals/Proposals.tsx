@@ -49,6 +49,8 @@ class ProposalList extends React.Component<IProposalProps,any> {
                     embeddedArray="proposals"
                     show={this.show}
                     handleAdd={() => this.handleModal(true,true)}
+                    handleUpdate={() => this.handleModal(true,false)}
+                    handleDelete={this.deleteProposal}
                 />
                 {
                     this.props.modalOpen &&

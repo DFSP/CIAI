@@ -52,6 +52,8 @@ class UsersList extends React.Component<IUsersProps,any> {
               embeddedArray="employees"
               show={this.show}
               handleAdd={() => this.handleModal(true,true)}
+              handleUpdate={() => this.handleModal(true,false)}
+              handleDelete={this.deleteUser}
           />
           {
             this.props.modalOpen &&

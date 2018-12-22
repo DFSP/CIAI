@@ -13,7 +13,10 @@ export interface IItemProps {
     hasErrored: boolean;
     fetchData: (url: string, embeddedArray: string) => void;
     selectItem: (item: any) => void;
+    itemSelected: any;
     handleAdd: () => void;
+    handleUpdate: () => void;
+    handleDelete: () => void;
     show: (s: any) => JSX.Element;
     fetchFrom: string;
     embeddedArray: string;
@@ -39,6 +42,7 @@ class ListWithControllers extends React.Component<IItemProps,any> {
                 <SimpleList<any>
                     list={this.props.items}
                     show={this.props.show}
+                    select={this.props.selectItem}
                 />
             </Fragment>
         );

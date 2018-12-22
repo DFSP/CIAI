@@ -47,6 +47,8 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
               embeddedArray="companies"
               show={this.show}
               handleAdd={() => this.handleModal(true,true)}
+              handleUpdate={() => this.handleModal(true,false)}
+              handleDelete={this.deleteCompany}
           />
           {
             this.props.modalOpen &&
