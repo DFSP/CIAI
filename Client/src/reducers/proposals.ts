@@ -3,12 +3,6 @@ interface IItemsIsLoadingAction { type: string, isLoading: boolean }
 interface IItemsAction { type: string, items: any[] }
 interface IItemSelectedAction { type: string, itemSelected: any }
 
-export interface IComment {
-  id: number;
-  title: string;
-  text: string;
-}
-
 export interface IProposal {
   id: number;
   title: string;
@@ -16,7 +10,7 @@ export interface IProposal {
   state: string;
   creationDate: string;
   _links: any;
-  comments?: IComment[];
+  proposer?: string;
 }
 
 export function itemsHasErrored(state = false,
