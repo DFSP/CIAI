@@ -7,7 +7,7 @@ export function companyFetchData(id: string) {
   return (dispatch: any) => {
     dispatch(itemsIsLoading(true));
 
-    fetch(`http://localhost:8080/companies/${id}`, {
+    fetch('/company.json', {
       method: 'GET',
       headers: new Headers({
          'Authorization': 'Basic '+btoa('admin:password'),
@@ -21,7 +21,7 @@ export function companyFetchData(id: string) {
       throw new Error(response.statusText);
     }).then(json => {
       company = halfred.parse(json).original();
-      fetch(`http://localhost:8080/companies/${id}/employees`, {
+      fetch('/company-employees.json', {
         method: 'GET',
         headers: new Headers({
            'Authorization': 'Basic '+btoa('admin:password'),
@@ -32,9 +32,11 @@ export function companyFetchData(id: string) {
         }
         throw new Error(response.statusText);
       }).then(json2 => {
-        const employees = halfred.parse(json2).original();
-        alert(employees);
-        const companyWithEmployees = Object.assign({ company }, employees);
+        const companyEmployees = halfred.parse(json2)
+          .embeddedResourceArray("employees")
+          .map(resource => resource.original());
+        alert(JSON.stringify(companyEmployees));
+        const companyWithEmployees = Object.assign({ employees: companyEmployees }, company);
         dispatch(itemsIsLoading(false));
         dispatch(companyFetchDataSuccess(companyWithEmployees));
       }).catch(() => {

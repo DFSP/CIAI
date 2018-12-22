@@ -32,7 +32,7 @@ export interface ICompany {
   phone: string;
   email: string;
   fax: string;
-  employees?: string;
+  employees: IUser[];
 }
 
 export interface IReview {

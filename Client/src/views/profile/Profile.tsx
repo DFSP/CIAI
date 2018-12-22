@@ -135,7 +135,6 @@ class Profile extends React.Component<IProfileProps,any> {
         fetchUrl('http://localhost:8080/users/'+this.props.user.id, 'PUT', formData, 'Updated with success!', this.updateSuccess);
     };
 
-
     private updateSuccess = () => {
         console.log("Ok, updated user");
     }
