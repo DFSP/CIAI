@@ -6,7 +6,7 @@ import ProposalDetails from "../views/proposals/ProposalDetails.tsx"
 import Users from "../views/users/Users.tsx"
 import UserDetails from "../views/users/userDetails.tsx"
 import Companies from "../views/companies/Companies.tsx"
-import CompanyDetails from "../views/companies/companyDetails.jsx"
+import CompanyDetails from "../views/companies/companyDetails.tsx"
 import Profile from "../views/profile/profile.jsx"
 import MyActivity from "../views/myActivity/myActivity.jsx"
 
