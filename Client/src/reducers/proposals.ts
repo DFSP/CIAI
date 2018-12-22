@@ -13,6 +13,16 @@ export interface IProposal {
   proposer?: string;
 }
 
+export interface IUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string;
+  role: string;
+  job?: string;
+}
+
 export function itemsHasErrored(state = false,
   action: IItemsHasErroredAction) {
     switch (action.type) {
