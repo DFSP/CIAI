@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { items, itemsHasErrored, itemsIsLoading, itemSelected } from './proposals';
 import { proposal } from './proposal'
+import { user } from './user'
 import { modalStatusChanged } from './modals';
 
 export default combineReducers({
@@ -9,5 +10,6 @@ export default combineReducers({
     itemsIsLoading,
     modalStatusChanged,
     itemSelected,
-    proposal
+    proposal,
+    user
 });

@@ -17,7 +17,7 @@ export interface IUser {
   id: number;
   firstName: string;
   lastName: string;
-  userName: string;
+  username: string;
   email: string;
   role: string;
   job?: string;

@@ -22,7 +22,7 @@ export function proposalFetchData() {
       proposal = resource.original();
       // const proposer = halfred.parse(resource.link("proposer")).original();
       const proposer = "Jerúcildio Gomes";
-      const proposalWithProposer = Object.assign({ proposer }, proposal)
+      const proposalWithProposer = Object.assign({ proposer }, proposal);
       dispatch(itemsIsLoading(false));
       dispatch(proposalFetchDataSuccess(proposalWithProposer));
     }).catch(() => dispatch(itemsHasErrored(true)));
