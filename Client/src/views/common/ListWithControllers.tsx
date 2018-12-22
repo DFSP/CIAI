@@ -17,7 +17,7 @@ export interface IItemProps {
   handleAdd: () => void;
   handleUpdate: () => void;
   handleDelete: () => void;
-  show: (s: any) => string;
+  show: (s: any) => JSX.Element;
   title: string;
   fetchFrom: string;
   embeddedArray: string;

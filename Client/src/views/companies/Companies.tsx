@@ -6,7 +6,7 @@ import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
 
-import { Modal, FormGroup, ControlLabel, FormControl, Button } from 'react-bootstrap';
+import {Modal, FormGroup, ControlLabel, FormControl, Button, ListGroupItem} from 'react-bootstrap';
 
 export interface ICompanyProps {
   changeModalStatus: (status: boolean) => void;
@@ -20,13 +20,6 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
   constructor(props: ICompanyProps) {
     super(props);
     this.state = { name: "", city: "", zipCode: "", address: "", phone: "", email: "", fax: "" }
-
-    this.handleSave = this.handleSave.bind(this);
-    this.createCompany = this.createCompany.bind(this);
-    this.updateCompany = this.updateCompany.bind(this);
-    this.deleteCompany = this.deleteCompany.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.onDropdownChange = this.onDropdownChange.bind(this);
   }
 
   public componentWillReceiveProps(nextProps: ICompanyProps) {
@@ -36,7 +29,97 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     }
   }
 
-  public handleModal(openModal: boolean, toCreate: boolean) {
+  public render() {
+    return (
+        <Fragment>
+          <ListWithControllers
+              title="Companies"
+              fetchFrom="/companies.json"
+              embeddedArray="companies"
+              show={this.show}
+              handleAdd={() => this.handleModal(true,true)}
+              handleUpdate={() => this.handleModal(true,false)}
+              handleDelete={this.deleteCompany}
+          />
+          {
+            this.props.modalOpen &&
+            <Modal.Dialog>
+              <Modal.Header>
+                <Modal.Title>Update company</Modal.Title>
+              </Modal.Header>
+
+              <Modal.Body>
+                <FormGroup>
+                  <ControlLabel>Name</ControlLabel>
+                  <FormControl
+                      name="name"
+                      type="text"
+                      label="Name"
+                      value={this.state.name}
+                      onChange={this.onChange}
+                  />
+                  <ControlLabel>City</ControlLabel>
+                  <FormControl
+                      name="city"
+                      type="text"
+                      label="City"
+                      value={this.state.city}
+                      onChange={this.onChange}
+                  />
+                  <ControlLabel>Zipcode</ControlLabel>
+                  <FormControl
+                      name="zipcode"
+                      type="text"
+                      label="Zipcode"
+                      value={this.state.zipCode}
+                      onChange={this.onChange}
+                  />
+                  <ControlLabel>Address</ControlLabel>
+                  <FormControl
+                      name="address"
+                      type="text"
+                      label="Address"
+                      value={this.state.address}
+                      onChange={this.onChange}
+                  />
+                  <ControlLabel>Phone</ControlLabel>
+                  <FormControl
+                      name="phone"
+                      type="text"
+                      label="Phone"
+                      value={this.state.phone}
+                      onChange={this.onChange}
+                  />
+                  <ControlLabel>Email</ControlLabel>
+                  <FormControl
+                      name="email"
+                      type="text"
+                      label="Email"
+                      value={this.state.email}
+                      onChange={this.onChange}
+                  />
+                  <ControlLabel>fax</ControlLabel>
+                  <FormControl
+                      name="fax"
+                      type="text"
+                      label="Fax"
+                      value={this.state.fax}
+                      onChange={this.onChange}
+                  />
+                </FormGroup>
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Button onClick={() => this.handleModal(false,false)}>Close</Button>
+                <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          }
+        </Fragment>
+    );
+  }
+
+  private handleModal = (openModal: boolean, toCreate: boolean) => {
     if (toCreate) {
       this.props.selectItem({
         id: -1,
@@ -50,17 +133,17 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
       });
     }
     this.props.changeModalStatus(openModal);
-  }
+  };
 
-  public handleSave() {
+  private handleSave = () => {
     if (this.props.itemSelected.id) {
       this.updateCompany()
     } else {
       this.createCompany()
     }
-  }
+  };
 
-  public createCompany() {
+  private createCompany = () => {
     const formData = new FormData();
     const { name, city, zipCode, address, phone, email, fax }  = this.state;
     formData.append('name', name);
@@ -71,9 +154,9 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     formData.append('email', email);
     formData.append('fax', fax);
     fetchUrl('./companies.json', 'POST', formData, 'Created with success!', this.handleModal);
-  }
+  };
 
-  public updateCompany() {
+  private updateCompany = () => {
     // const proposal = this.props.proposalSelected;
     const formData = new FormData();
     const { name, city, zipCode, address, phone, email, fax }  = this.state;
@@ -85,112 +168,21 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     formData.append('email', email);
     formData.append('fax', fax);
     fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!', this.handleModal);
-  }
+  };
 
-  public deleteCompany() {
+  private deleteCompany = () => {
     // const { id } = this.props.proposalSelected;
     fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
-  }
+  };
 
-  public onChange(e: any) {
+  private onChange = (e: any) => {
     this.setState({ [e.target.name]: e.target.value });
-  }
+  };
 
-  public onDropdownChange(e: any) {
-    this.setState({ state: e });
-  }
-
-  public render() {
-    return (
-      <Fragment>
-        <ListWithControllers
-          title="Companies"
-          fetchFrom="/companies.json"
-          embeddedArray="companies"
-          show={this.show}
-          handleAdd={() => this.handleModal(true,true)}
-          handleUpdate={() => this.handleModal(true,false)}
-          handleDelete={this.deleteCompany}
-        />
-        {
-          this.props.modalOpen &&
-          <Modal.Dialog>
-            <Modal.Header>
-              <Modal.Title>Update company</Modal.Title>
-            </Modal.Header>
-
-            <Modal.Body>
-              <FormGroup>
-                <ControlLabel>Name</ControlLabel>
-                <FormControl
-                  name="name"
-                  type="text"
-                  label="Name"
-                  value={this.state.name}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>City</ControlLabel>
-                <FormControl
-                  name="city"
-                  type="text"
-                  label="City"
-                  value={this.state.city}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>Zipcode</ControlLabel>
-                <FormControl
-                  name="zipcode"
-                  type="text"
-                  label="Zipcode"
-                  value={this.state.zipCode}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>Address</ControlLabel>
-                <FormControl
-                  name="address"
-                  type="text"
-                  label="Address"
-                  value={this.state.address}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>Phone</ControlLabel>
-                <FormControl
-                  name="phone"
-                  type="text"
-                  label="Phone"
-                  value={this.state.phone}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>Email</ControlLabel>
-                <FormControl
-                  name="email"
-                  type="text"
-                  label="Email"
-                  value={this.state.email}
-                  onChange={this.onChange}
-                />
-                <ControlLabel>fax</ControlLabel>
-                <FormControl
-                  name="fax"
-                  type="text"
-                  label="Fax"
-                  value={this.state.fax}
-                  onChange={this.onChange}
-                />
-              </FormGroup>
-            </Modal.Body>
-
-            <Modal.Footer>
-            <Button onClick={() => this.handleModal(false,false)}>Close</Button>
-            <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        }
-      </Fragment>
-    );
-  }
-
-  private show = (p: any) => `${p.name}: (${p.city})`;
+  private show = (s: any) =>
+      <ListGroupItem header={s.name}>
+        {s.city}
+      </ListGroupItem>
 }
 
 const mapStateToProps = (state: any) => {
