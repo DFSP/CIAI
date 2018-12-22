@@ -5,6 +5,7 @@ import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
+import { ICompany } from '../../reducers/company';
 
 import {
   Modal,
@@ -46,6 +47,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
               fetchFrom="/companies.json"
               embeddedArray="companies"
               show={this.show}
+              predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
               handleUpdate={() => this.handleModal(true,false)}
               handleDelete={this.deleteCompany}
@@ -187,6 +189,8 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
   private onChange = (e: any) => {
     this.setState({ [e.target.name]: e.target.value });
   };
+
+  private predicate = (c:ICompany,s:string) => (String(c.name)+String(c.email)).indexOf(s) !== -1;
 
   private show = (p: any) =>
       <div>

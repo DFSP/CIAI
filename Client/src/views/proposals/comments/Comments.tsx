@@ -5,6 +5,7 @@ import { modalStatusChanged } from '../../../actions/modals';
 import { itemSelected } from '../../../actions/items';
 import { fetchUrl } from '../../../utils/utils';
 import ListWithControllers from '../../common/ListWithControllers';
+import { IComment } from '../../../reducers/proposals'
 
 import {
   Modal,
@@ -41,6 +42,7 @@ class CommentsList extends React.Component<ICommentProps,any> {
               fetchFrom="/companies.json"
               embeddedArray="companies"
               show={this.show}
+              predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
               handleUpdate={() => this.handleModal(true,false)}
               handleDelete={this.deleteComment}
@@ -125,6 +127,8 @@ class CommentsList extends React.Component<ICommentProps,any> {
   /* private onChange = (e: any) => {
     this.setState({ [e.target.name]: e.target.value });
   }; */
+
+  private predicate = (c:IComment,s:string) => (String(c.title)+String(c.text)).indexOf(s) !== -1;
 
   private show = (p: any) =>
       <div>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { itemsFetchData, itemSelected } from '../../actions/items';
-import SimpleList from '../common/SimpleList';
+import { FilteredList } from './FilteredList';
 
 import {Button} from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
@@ -18,6 +18,7 @@ export interface IItemProps {
     handleUpdate: () => void;
     handleDelete: () => void;
     show: (s: any) => JSX.Element;
+    predicate: (x:any,s:string) => boolean
     fetchFrom: string;
     embeddedArray: string;
 }
@@ -39,10 +40,11 @@ class ListWithControllers extends React.Component<IItemProps,any> {
         return (
             <Fragment>
                 <Button onClick={this.props.handleAdd}>Adicionar</Button>
-                <SimpleList<any>
+                <FilteredList<any>
                     list={this.props.items}
                     show={this.props.show}
                     select={this.props.selectItem}
+                    predicate={this.props.predicate}
                 />
             </Fragment>
         );

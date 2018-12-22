@@ -35,6 +35,24 @@ export interface ICompany {
   employees?: string;
 }
 
+export interface IReview {
+  id: number;
+  title: string;
+  text: string;
+  summary: string;
+  classification: string;
+  creationDate: string;
+  author: string;
+}
+
+export interface IComment {
+  id: number;
+  title: string;
+  text: string;
+  creationDate: string;
+  author: string;
+}
+
 export function itemsHasErrored(state = false,
   action: IItemsHasErroredAction) {
     switch (action.type) {

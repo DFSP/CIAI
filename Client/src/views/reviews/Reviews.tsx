@@ -5,6 +5,7 @@ import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
+import { IReview } from '../../reducers/proposals';
 
 import {
   Modal,
@@ -41,6 +42,7 @@ class ReviewsList extends React.Component<IReviewProps,any> {
               fetchFrom="/companies.json"
               embeddedArray="companies"
               show={this.show}
+              predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
               handleUpdate={() => this.handleModal(true,false)}
               handleDelete={this.deleteReview}
@@ -126,13 +128,15 @@ class ReviewsList extends React.Component<IReviewProps,any> {
     this.setState({ [e.target.name]: e.target.value });
   }; */
 
-  private show = (p: any) =>
+  private predicate = (c:IReview,s:string) => (String(c.title)+String(c.text)).indexOf(s) !== -1;
+
+  private show = (p: IReview) =>
       <div>
         <Panel.Heading>
-          <Panel.Title toggle>{p.name}</Panel.Title>
+          <Panel.Title toggle>{p.title}</Panel.Title>
         </Panel.Heading>
         <Panel.Body>
-          {p.city}
+          {p.text}
         </Panel.Body>
         <Panel.Body collapsible>
           <ButtonToolbar>
