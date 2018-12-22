@@ -10,7 +10,7 @@ export interface IList<T> {
 const SimpleList = function <T>({list, show, select}: IList<T>) { // tslint:disable-line
     return (
         <div>
-            <PanelGroup accordion>
+            <PanelGroup accordion id="listWrapper">
                 {
                     list.map((c, i) => (
                         <Panel key={i} eventKey={i} onClick={() => select(c)}>

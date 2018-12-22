@@ -24,7 +24,9 @@ const Footer = () => (
                 <ListGroup className="listGroup">
                     {links.map((link, key) => {
                         return (
-                            <ListGroupItem className={key === 0 || key === links.length-1 ? "listGroupItem" : "middleListGroupItem"}>
+                            <ListGroupItem key={key}
+                                           className={key === 0 || key === links.length-1 ? "listGroupItem" :
+                                               "middleListGroupItem"}>
                                 <a
                                     href={link.href}
                                     target="_blank"

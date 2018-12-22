@@ -26,7 +26,7 @@ class UserDetails extends React.Component<IUserDetailsProps,any> {
 
   public render() {
     if (this.props.hasErrored) {
-      return <p>Sorry! There was an error loading the items.</p>;
+      return <p>Oops! Houve um erro ao carregar os dados.</p>;
     }
     if (this.props.isLoading) {
       return <p>Loading...</p>;

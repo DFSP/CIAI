@@ -61,12 +61,13 @@ class UsersList extends React.Component<IUsersProps,any> {
             this.props.modalOpen &&
             <Modal.Dialog>
               <Modal.Header>
-                <Modal.Title>Update User</Modal.Title>
+                <Modal.Title>{(this.props.itemSelected.id === -1 ? "Adicionar" : "Atualizar") + " Utilizador"}
+                </Modal.Title>
               </Modal.Header>
 
               <Modal.Body style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
                 <FormGroup>
-                  <ControlLabel>First name</ControlLabel>
+                  <ControlLabel>Primeiro nome</ControlLabel>
                   <FormControl
                       name="firstName"
                       type="text"
@@ -74,7 +75,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.firstName}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Last name</ControlLabel>
+                  <ControlLabel>Último nome</ControlLabel>
                   <FormControl
                       name="lastName"
                       type="text"
@@ -90,7 +91,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.username}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Email</ControlLabel>
+                  <ControlLabel>Endereço email</ControlLabel>
                   <FormControl
                       name="email"
                       type="text"
@@ -98,6 +99,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.email}
                       onChange={this.onChange}
                   />
+                  <ControlLabel>Permissões</ControlLabel>
                   <DropdownButton
                       id="dropdown-basic-0"
                       name="state"
@@ -119,7 +121,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       STANDARD
                     </MenuItem>
                   </DropdownButton><br />
-                  <ControlLabel>City</ControlLabel>
+                  <ControlLabel>Cidade</ControlLabel>
                   <FormControl
                       name="city"
                       type="text"
@@ -127,7 +129,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.city}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Address</ControlLabel>
+                  <ControlLabel>Morada</ControlLabel>
                   <FormControl
                       name="address"
                       type="text"
@@ -135,7 +137,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.address}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Zipcode</ControlLabel>
+                  <ControlLabel>Código postal</ControlLabel>
                   <FormControl
                       name="zipCode"
                       type="text"
@@ -143,7 +145,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.zipCode}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Cellphone</ControlLabel>
+                  <ControlLabel>Telemóvel</ControlLabel>
                   <FormControl
                       name="cellPhone"
                       type="text"
@@ -151,7 +153,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.cellPhone}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Homephone</ControlLabel>
+                  <ControlLabel>Telefone</ControlLabel>
                   <FormControl
                       name="homePhone"
                       type="text"
@@ -159,6 +161,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.homePhone}
                       onChange={this.onChange}
                   />
+                  <ControlLabel>Género</ControlLabel>
                   <DropdownButton
                       id="dropdown-basic-0"
                       name="state"
@@ -175,7 +178,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       FEMALE
                     </MenuItem>
                   </DropdownButton><br />
-                  <ControlLabel>Salary</ControlLabel>
+                  <ControlLabel>Salário</ControlLabel>
                   <FormControl
                       name="salary"
                       type="text"
@@ -183,7 +186,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                       value={this.state.salary}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Birthday</ControlLabel>
+                  <ControlLabel>Data de nascimento</ControlLabel>
                   <FormControl
                       name="birthday"
                       type="text"
@@ -195,8 +198,8 @@ class UsersList extends React.Component<IUsersProps,any> {
               </Modal.Body>
 
               <Modal.Footer>
-                <Button onClick={() => this.handleModal(false,false)}>Close</Button>
-                <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
+                <Button onClick={() => this.handleModal(false,false)}>Cancelar</Button>
+                <Button onClick={this.handleSave} bsStyle="primary">Confirmar</Button>
               </Modal.Footer>
             </Modal.Dialog>
           }

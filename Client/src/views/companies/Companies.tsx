@@ -56,12 +56,12 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
             this.props.modalOpen &&
             <Modal.Dialog>
               <Modal.Header>
-                <Modal.Title>Update company</Modal.Title>
+                <Modal.Title>{(this.props.itemSelected.id === -1 ? "Adicionar" : "Atualizar") + " Companhia"}</Modal.Title>
               </Modal.Header>
 
               <Modal.Body>
                 <FormGroup>
-                  <ControlLabel>Name</ControlLabel>
+                  <ControlLabel>Nome</ControlLabel>
                   <FormControl
                       name="name"
                       type="text"
@@ -69,7 +69,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                       value={this.state.name}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>City</ControlLabel>
+                  <ControlLabel>Cidade</ControlLabel>
                   <FormControl
                       name="city"
                       type="text"
@@ -77,7 +77,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                       value={this.state.city}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Zipcode</ControlLabel>
+                  <ControlLabel>Código postal</ControlLabel>
                   <FormControl
                       name="zipcode"
                       type="text"
@@ -85,7 +85,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                       value={this.state.zipCode}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Address</ControlLabel>
+                  <ControlLabel>Morada</ControlLabel>
                   <FormControl
                       name="address"
                       type="text"
@@ -93,7 +93,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                       value={this.state.address}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Phone</ControlLabel>
+                  <ControlLabel>Telefone</ControlLabel>
                   <FormControl
                       name="phone"
                       type="text"
@@ -101,7 +101,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                       value={this.state.phone}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>Email</ControlLabel>
+                  <ControlLabel>Endereço email</ControlLabel>
                   <FormControl
                       name="email"
                       type="text"
@@ -109,7 +109,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                       value={this.state.email}
                       onChange={this.onChange}
                   />
-                  <ControlLabel>fax</ControlLabel>
+                  <ControlLabel>Fax</ControlLabel>
                   <FormControl
                       name="fax"
                       type="text"
@@ -121,8 +121,8 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
               </Modal.Body>
 
               <Modal.Footer>
-                <Button onClick={() => this.handleModal(false,false)}>Close</Button>
-                <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
+                <Button onClick={() => this.handleModal(false,false)}>Cancelar</Button>
+                <Button onClick={this.handleSave} bsStyle="primary">Confirmar</Button>
               </Modal.Footer>
             </Modal.Dialog>
           }

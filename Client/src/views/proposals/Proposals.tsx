@@ -9,9 +9,9 @@ import { IProposal } from '../../reducers/proposals';
 
 import {
     Button,
-    Modal,
+    Modal,/*
     DropdownButton,
-    MenuItem,
+    MenuItem,*/
     FormGroup,
     FormControl,
     ControlLabel,
@@ -41,7 +41,14 @@ class ProposalList extends React.Component<IProposalProps,any> {
     };
 
     public render() {
-        const getStateValue = (state: string) => state === "PENDING_APPROVAL" ? "Pending approval" : "Approved";
+        /*const getStateValue = (state: string) => state === "PENDING_APPROVAL" ? "Pending approval" : "Approved";*/
+
+        fetch('http://localhost:8080/users', {
+            method: 'GET',
+            headers: new Headers({
+                'Authorization': 'Basic '+btoa('admin:password'),
+            }),
+        }).then(r => console.log(r));
 
         return (
             <Fragment>
@@ -58,12 +65,13 @@ class ProposalList extends React.Component<IProposalProps,any> {
                     this.props.modalOpen &&
                     <Modal.Dialog>
                         <Modal.Header>
-                            <Modal.Title>Update proposal</Modal.Title>
+                            <Modal.Title>{(this.props.itemSelected.id === -1 ? "Adicionar" : "Atualizar") + " Proposta"}
+                            </Modal.Title>
                         </Modal.Header>
 
                         <Modal.Body>
                             <FormGroup>
-                                <ControlLabel>Title</ControlLabel>
+                                <ControlLabel>Titulo</ControlLabel>
                                 <FormControl
                                     name="title"
                                     type="text"
@@ -71,14 +79,14 @@ class ProposalList extends React.Component<IProposalProps,any> {
                                     value={this.state.title}
                                     onChange={this.onChange}
                                 />
-                                <ControlLabel>Description</ControlLabel>
+                                <ControlLabel>Descrição</ControlLabel>
                                 <FormControl
                                     componentClass="textarea"
                                     name="description"
                                     value={this.state.description}
                                     onChange={this.onChange}
                                 />
-                                <DropdownButton
+                                {/* <DropdownButton
                                     id="dropdown-basic-0"
                                     name="state"
                                     onSelect={this.onDropdownChange}
@@ -93,13 +101,13 @@ class ProposalList extends React.Component<IProposalProps,any> {
                                         active={this.state.state === "APPROVED"}>
                                         Approved
                                     </MenuItem>
-                                </DropdownButton>
+                                </DropdownButton>*/}
                             </FormGroup>
                         </Modal.Body>
 
                         <Modal.Footer>
-                            <Button onClick={() => this.handleModal(false,false)}>Close</Button>
-                            <Button onClick={this.handleSave} bsStyle="primary">Save changes</Button>
+                            <Button onClick={() => this.handleModal(false,false)}>Cancelar</Button>
+                            <Button onClick={this.handleSave} bsStyle="primary">Confirmar</Button>
                         </Modal.Footer>
                     </Modal.Dialog>
                 }
@@ -157,9 +165,9 @@ class ProposalList extends React.Component<IProposalProps,any> {
         this.setState({ [e.target.name]: e.target.value });
     };
 
-    private onDropdownChange = (e: any) => {
-        this.setState({ state: e });
-    };
+    /*    private onDropdownChange = (e: any) => {
+            this.setState({ state: e });
+        };*/
 
     private predicate = (c:IProposal,s:string) => (String(c.title)+String(c.description)).indexOf(s) !== -1;
 

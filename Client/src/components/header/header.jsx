@@ -15,7 +15,7 @@ function Header(props) {
 
     function makeBrand() {
         let name;
-        props.routes.map((route, key) => { //TODO interface
+        props.routes.map((route, key) => {
             if (route.path === props.location.pathname ||
                 route.path.indexOf("proposals/:id/details") > -1 && props.location.pathname.indexOf("/proposals/") > -1 ||
                 route.path.indexOf("users/:id/details") > -1 && props.location.pathname.indexOf("/users/") > -1 ||
@@ -28,7 +28,7 @@ function Header(props) {
     }
 
     return (
-        <Navbar collapseOnSelect center>
+        <Navbar collapseOnSelect center="true">
             <Navbar.Header>
                 <Navbar.Brand>
                     <a>{makeBrand()}</a>

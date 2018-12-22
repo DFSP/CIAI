@@ -25,7 +25,6 @@ public class DatabaseLoader {
 
             //	-	-	-	-	-	-	-	USERS	-	-	-	-	-	-	-
 
-            // SYS ADMIN
             User sysAdmin = new User()
                     .firstName("admin")
                     .lastName("admin")
@@ -35,7 +34,6 @@ public class DatabaseLoader {
                     .role(User.Role.ROLE_SYS_ADMIN);
             sysAdmin = users.save(sysAdmin);
 
-            // ECMA
             User manuel = new User()
                     .firstName("Manuel")
                     .lastName("Coelho")
