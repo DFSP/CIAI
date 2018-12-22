@@ -4,7 +4,6 @@ import {IUser} from "../../reducers/items";
 import {userFetchData} from "../../actions/user";
 import {connect} from "react-redux";
 import {Button, ButtonGroup, ControlLabel, FormControl, FormGroup} from "react-bootstrap";
-import {Link} from "react-router-dom";
 import {fetchUrl} from "../../utils/Utils";
 import {ClipLoader} from "react-spinners";
 
