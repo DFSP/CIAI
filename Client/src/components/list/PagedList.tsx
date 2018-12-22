@@ -34,13 +34,13 @@ export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number
                 {<SimpleList {...{list, show, select}} />}
                 <Pager>
                     <Pager.Item previous={true} href="#" onClick={this.prevPage}>
-                        &larr; Previous Page
+                        &larr; Página anterior
                     </Pager.Item>
 
                     <span>{page + 1}</span>
 
                     <Pager.Item next={true} href="#" onClick={this.nextPage}>
-                        Next Page &rarr;
+                        Página seguinte &rarr;
                     </Pager.Item>
                 </Pager>
             </div>

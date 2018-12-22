@@ -7,6 +7,8 @@ import { FilteredList } from './FilteredList';
 import {Button} from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 
+import "./ListWithControllers.css"
+
 export interface IItemProps {
     items: any[];
     isLoading: boolean;
@@ -39,7 +41,7 @@ class ListWithControllers extends React.Component<IItemProps,any> {
 
         return (
             <Fragment>
-                <Button onClick={this.props.handleAdd}>Adicionar</Button>
+                <Button className="addButton" onClick={this.props.handleAdd}>Adicionar</Button>
                 <FilteredList<any>
                     list={this.props.items}
                     show={this.props.show}

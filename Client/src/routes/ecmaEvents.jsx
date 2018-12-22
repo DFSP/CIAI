@@ -5,7 +5,7 @@ import UserDetails from "../views/users/UserDetails"
 import Companies from "../views/companies/Companies"
 import CompanyDetails from "../views/companies/CompanyDetails"
 import Profile from "../views/profile/Profile.tsx"
-import MyActivity from "../views/myActivity/myActivity.tsx"
+import MyActivity from "../views/myActivity/MyActivity.tsx"
 
 const routes = [
     {
