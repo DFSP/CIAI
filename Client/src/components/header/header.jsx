@@ -16,11 +16,10 @@ function Header(props) {
     function makeBrand() {
         let name;
         props.routes.map((route, key) => { //TODO interface
-            if (route.path === props.location.pathname) {
-                name = route.name;
-            }
-            if (route.path.indexOf("/proposals/proposalDetails/") > -1 &&
-                props.location.pathname.indexOf("/proposals/proposalDetails/") > -1) {
+            if (route.path === props.location.pathname ||
+                route.path.indexOf("proposals/:id/details") > -1 && props.location.pathname.indexOf("/proposals/") > -1 ||
+                route.path.indexOf("users/:id/details") > -1 && props.location.pathname.indexOf("/users/") > -1 ||
+                route.path.indexOf("companies/:id/details") > -1 && props.location.pathname.indexOf("/companies/") > -1) {
                 name = route.name;
             }
             return null;
@@ -47,13 +46,13 @@ function Header(props) {
                                  }
                                  id="basic-nav-dropdown"
                                  noCaret>
-                            <MenuItem componentClass={Link} href="/myActivity" to="/myActivity" eventKey={3.1}>
-                                A minha atividade
-                            </MenuItem>
+                        <MenuItem componentClass={Link} href="/myActivity" to="/myActivity" eventKey={3.1}>
+                            A minha atividade
+                        </MenuItem>
                         <MenuItem divider />
-                            <MenuItem componentClass={Link} href="/profile" to="/profile" eventKey={3.2}>
-                                Perfil
-                            </MenuItem>
+                        <MenuItem componentClass={Link} href="/profile" to="/profile" eventKey={3.2}>
+                            Perfil
+                        </MenuItem>
                         <MenuItem divider />
                         <MenuItem eventKey={3.3}>
                             <img src={signOut} className="icon" alt="logo"/> Sair

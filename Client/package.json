@@ -18,7 +18,8 @@
     "react-scripts-ts": "^4.0.8",
     "redux": "^4.0.1",
     "redux-form-reducer": "^1.0.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "react-spinners": "latest"
   },
   "scripts": {
     "start": "react-scripts-ts start",

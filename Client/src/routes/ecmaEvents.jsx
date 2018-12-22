@@ -19,7 +19,7 @@ const routes = [
     {
         component: ProposalDetails,
         name: "Detalhes da Proposta",
-        path: "/proposals/proposalDetails/:proposalId",
+        path: "/proposals/:id/details",
     },
     {
         component: Users,
@@ -29,7 +29,7 @@ const routes = [
     {
         component: UserDetails,
         name: "Detalhes do Utilizador",
-        path: "/users/userDetails",
+        path: "/users/:id/details",
     },
     {
         component: Companies,
@@ -39,7 +39,7 @@ const routes = [
     {
         component: CompanyDetails,
         name: "Detalhes da Companhia",
-        path: "/companies/companyDetails",
+        path: "/companies/:id/details",
     },
     {
         component: Profile,

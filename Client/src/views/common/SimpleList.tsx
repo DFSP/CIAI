@@ -1,25 +1,23 @@
 import * as React from "react";
-import {ListGroup} from "react-bootstrap";
+import {Panel, PanelGroup} from "react-bootstrap";
 
 export interface IList<T> {
-    title: string;
     list: T[];
-    select: (x: T) => void;
     show: (x: T) => JSX.Element;
 }
 
-const SimpleList = function <T>({title, list, show, select}: IList<T>) { // tslint:disable-line
+const SimpleList = function <T>({list, show}: IList<T>) { // tslint:disable-line
     return (
         <div>
-            <ListGroup>
+            <PanelGroup accordion>
                 {
                     list.map((c, i) => (
-                        <div key={i} onClick={() => select(c)}>
+                        <Panel key={i} eventKey={i}>
                             {show(c)}
-                        </div>
+                        </Panel>
                     ))
                 }
-            </ListGroup>
+            </PanelGroup>
         </div>);
 };
 

@@ -14,8 +14,9 @@ import {
   DropdownButton,
   MenuItem,
   Button,
-  ListGroupItem
+  Panel, ButtonToolbar, ButtonGroup
 } from 'react-bootstrap';
+import {Link} from "react-router-dom";
 
 export interface IUsersProps {
   changeModalStatus: (status: boolean) => void;
@@ -47,13 +48,10 @@ class UsersList extends React.Component<IUsersProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              title="Users"
               fetchFrom="/users.json"
               embeddedArray="employees"
               show={this.show}
               handleAdd={() => this.handleModal(true,true)}
-              handleUpdate={() => this.handleModal(true,false)}
-              handleDelete={this.deleteUser}
           />
           {
             this.props.modalOpen &&
@@ -287,9 +285,27 @@ class UsersList extends React.Component<IUsersProps,any> {
   };
 
   private show = (p: any) =>
-      <ListGroupItem header={p.firstName + " " + p.lastName}>
-        {p.email + " (" + p.username + ")"}
-      </ListGroupItem>
+      <div>
+        <Panel.Heading>
+          <Panel.Title toggle>{p.firstName + " " + p.lastName}</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body>
+          {p.email + " (" + p.username + ")"}
+        </Panel.Body>
+        <Panel.Body collapsible>
+          <ButtonToolbar>
+            <Button onClick={() => this.handleModal(true,false)}>Atualizar</Button>
+            <Button onClick={this.deleteUser}>Apagar</Button>
+            <ButtonGroup>
+              <Link to={`/users/${p.id}/details`}>
+                <Button>
+                  Ver detalhes
+                </Button>
+              </Link>
+            </ButtonGroup>
+          </ButtonToolbar>
+        </Panel.Body>
+      </div>
 }
 
 const mapStateToProps = (state: any) => {

@@ -6,7 +6,17 @@ import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
 
-import {Modal, FormGroup, ControlLabel, FormControl, Button, ListGroupItem} from 'react-bootstrap';
+import {
+  Modal,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  Button,
+  Panel,
+  ButtonToolbar,
+  ButtonGroup
+} from 'react-bootstrap';
+import {Link} from "react-router-dom";
 
 export interface ICompanyProps {
   changeModalStatus: (status: boolean) => void;
@@ -33,13 +43,10 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              title="Companies"
               fetchFrom="/companies.json"
               embeddedArray="companies"
               show={this.show}
               handleAdd={() => this.handleModal(true,true)}
-              handleUpdate={() => this.handleModal(true,false)}
-              handleDelete={this.deleteCompany}
           />
           {
             this.props.modalOpen &&
@@ -179,24 +186,42 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     this.setState({ [e.target.name]: e.target.value });
   };
 
-  private show = (s: any) =>
-      <ListGroupItem header={s.name}>
-        {s.city}
-      </ListGroupItem>
+  private show = (p: any) =>
+      <div>
+        <Panel.Heading>
+          <Panel.Title toggle>{p.name}</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body>
+          {p.city}
+        </Panel.Body>
+        <Panel.Body collapsible>
+          <ButtonToolbar>
+            <Button onClick={() => this.handleModal(true,false)}>Atualizar</Button>
+            <Button onClick={this.deleteCompany}>Apagar</Button>
+            <ButtonGroup>
+              <Link to={`/companies/${p.id}/details`}>
+                <Button>
+                  Ver detalhes
+                </Button>
+              </Link>
+            </ButtonGroup>
+          </ButtonToolbar>
+        </Panel.Body>
+      </div>
 }
 
 const mapStateToProps = (state: any) => {
-    return {
-        modalOpen: state.modalStatusChanged,
-        itemSelected: state.itemSelected,
-    };
+  return {
+    modalOpen: state.modalStatusChanged,
+    itemSelected: state.itemSelected,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
-    return {
-        changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
-        selectItem: (item: any) => dispatch(itemSelected(item))
-    };
+  return {
+    changeModalStatus: (status: boolean) => dispatch(modalStatusChanged(status)),
+    selectItem: (item: any) => dispatch(itemSelected(item))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompaniesList);
