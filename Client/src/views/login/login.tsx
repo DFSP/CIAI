@@ -45,6 +45,7 @@ export default class Login extends React.Component<{},any> {
             bsStyle="success"
             disabled={!this.validateForm()}
             type="submit"
+       /*     onClick={this.login}*/
           >
             Entrar
           </Button>
@@ -52,6 +53,9 @@ export default class Login extends React.Component<{},any> {
       </div>
     );
   }
+
+/*  private login() {
+  }*/
 
   private validateForm() {
     return this.state.username.length > 0 && this.state.password.length > 0;

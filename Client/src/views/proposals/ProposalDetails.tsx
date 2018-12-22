@@ -21,6 +21,7 @@ interface IProposalDetailsProps {
 class ProposalDetails extends React.Component<IProposalDetailsProps,any> {
   constructor(props: IProposalDetailsProps) {
       super(props);
+      this.state = { renderTab: "reviews" }
   }
 
   public componentDidMount() {
@@ -46,19 +47,21 @@ class ProposalDetails extends React.Component<IProposalDetailsProps,any> {
           <Label>Proposer:</Label> {proposal.proposer} <br/>
         </Panel.Body>
       </Panel>
-      <Tabs defaultActiveKey="2" name="tabController">
-        <Tab eventKey="1" title="Comments">
-          <Comments />
+      <Tabs defaultActiveKey={this.state.renderTab} id="proposals-tab" name="tabController" onSelect={this.onSelect}>
+        <Tab eventKey="comments" title="Comments">
+          {this.state.renderTab === "comments" && <Comments />}
         </Tab>
-        <Tab eventKey="2" title="Reviews">
-          <Reviews />
+        <Tab eventKey="reviews" title="Reviews">
+          {this.state.renderTab === "reviews" && <Reviews />}
         </Tab>
-        <Tab eventKey="3" title="Members">
-          <Users />
+        <Tab eventKey="members" title="Members">
+          {this.state.renderTab === "members" && <Users />}
         </Tab>
       </Tabs>
     </Fragment>);
   }
+
+  private onSelect = (renderTab: any) => this.setState({ renderTab });
 }
 
 const mapStateToProps = (state: any) => {

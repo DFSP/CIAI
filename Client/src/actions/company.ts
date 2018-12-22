@@ -14,7 +14,6 @@ export function companyFetchData(id: string) {
        }),
     })
     .then(response => {
-      alert("1" + response.ok);
       if (response.ok) {
         status = true;
         return response.json();
@@ -28,7 +27,6 @@ export function companyFetchData(id: string) {
            'Authorization': 'Basic '+btoa('admin:password'),
          }),
       }).then(response => {
-        alert(response.ok);
         if (response.ok) {
           return response.json();
         }
