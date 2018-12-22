@@ -3,6 +3,7 @@ import {ICompany} from "./company";
 interface ICompanyHasErroredAction { type: string, hasErrored: boolean }
 interface ICompanyIsLoadingAction { type: string, isLoading: boolean }
 interface ICompanyAction { type: string, companies: ICompany[] }
+interface ICompanyOneAction { type: string, company: ICompany }
  // interface ICompanySelectedAction { type: string, proposalSelected: IProposal }
 
 export interface ICompany {
@@ -40,6 +41,16 @@ export function companies(state = [],
     switch (action.type) {
         case 'COMPANIES_FETCH_DATA_SUCCESS':
             return action.companies;
+        default:
+            return state;
+    }
+}
+
+export function company(state = {},
+                          action: ICompanyOneAction) {
+    switch (action.type) {
+        case 'COMPANY_FETCH_DATA_SUCCESS':
+            return action.company;
         default:
             return state;
     }

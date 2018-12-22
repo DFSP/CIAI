@@ -3,10 +3,10 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Panel, Label } from 'react-bootstrap';
 import { companyFetchData } from '../../actions/company';
-import { ICompany } from '../../reducers/items';
-import Users from '../users/Users';
+import { ICompany, IUser } from '../../reducers/items';
+import { FilteredList } from '../common/FilteredList';
 
-// interface IRouteInfo { proposalId: string; }
+// interface IRouteInfo { id: string; }
 
 interface ICompanyDetailsProps {
   match: any;
@@ -14,15 +14,16 @@ interface ICompanyDetailsProps {
   isLoading: boolean;
   hasErrored: boolean;
   fetchData: (id: string) => void;
+  name: string;
 }
 
-class ProposalDetails extends React.Component<ICompanyDetailsProps,any> {
+class CompanyDetails extends React.Component<ICompanyDetailsProps,any> {
   constructor(props: ICompanyDetailsProps) {
       super(props);
   }
 
   public componentDidMount() {
-    this.props.fetchData(this.props.match.id);
+    this.props.fetchData(this.props.match.params.id);
   }
 
   public render() {
@@ -37,28 +38,48 @@ class ProposalDetails extends React.Component<ICompanyDetailsProps,any> {
 
     return (<Fragment>
       <Panel>
+
       {
         company &&
         <Fragment>
           <Panel.Body>
-            <Label>Personal details</Label>
-            <Label>Name:</Label> {company.name} <br />
-            <Label>City:</Label> {company.city} <br />
-            <Label>ZipCode:</Label> {company.zipCode} <br />
-            <Label>Address:</Label> {company.address} <br />
-            <Label>Phone:</Label> {company.phone} <br />
-            <Label>Email:</Label> {company.email} <br />
-            <Label>Fax:</Label> {company.fax} <br />
+            <Label>Company details</Label><br /><br />
+            <Label>Name:</Label> { company.name } <br />
+            <Label>City:</Label> { company.city } <br />
+            <Label>Address:</Label> { company.address } <br />
+            <Label>Zipcode:</Label> { company.zipCode } <br />
+            <Label>Phone:</Label> { company.phone } <br />
+            <Label>Email:</Label> { company.email } <br />
+            <Label>Fax:</Label> { company.fax } <br /><br />
+            <Label>Employees details</Label><br /><br />
+              {
+                company.employees &&
+                <FilteredList<IUser>
+                  list={company.employees}
+                  show={this.show}
+                  select={() => alert('Employee selected!')}
+                  predicate={this.predicate}
+                />
+              }
           </Panel.Body>
-          {
-            company.employees &&
-            <Users />
-          }
           </Fragment>
       }
+
       </Panel>
     </Fragment>);
   }
+
+  private predicate = (c:any,s:string) => (String(c.firstName)+String(c.lastName)).indexOf(s) !== -1;
+
+  private show = (p: any) =>
+      <div>
+          <Panel.Heading>
+              <Panel.Title toggle>{p.firstName}</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+              {p.email}
+          </Panel.Body>
+      </div>
 }
 
 const mapStateToProps = (state: any) => {
@@ -75,4 +96,4 @@ const mapDispatchToProps = (dispatch: any) => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProposalDetails);
+export default connect(mapStateToProps, mapDispatchToProps)(CompanyDetails);
