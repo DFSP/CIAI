@@ -54,10 +54,8 @@ function Header(props) {
                             Perfil
                         </MenuItem>
                         <MenuItem divider />
-                        <MenuItem eventKey={3.3}>
-                            <Link to={`/login`}>
+                        <MenuItem componentClass={Link} href="/login" to="/login" eventKey={3.3}>
                             <img src={signOut} className="icon" alt="logo"/> Sair
-                            </Link>
                         </MenuItem>
                     </NavDropdown>
                 </Nav>

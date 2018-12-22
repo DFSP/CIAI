@@ -48,7 +48,7 @@ const routes = [
         name: "A minha atividade",
         path: "/myActivity",
     },
-    { redirect: true, path: "/", to: "/proposals", name: "Redirect" }
+    { redirect: true, path: "/", to: "/login", name: "Redirect" }
 ];
 
 export default routes;
