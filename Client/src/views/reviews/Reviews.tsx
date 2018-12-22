@@ -11,7 +11,9 @@ import {
   Modal,
   Button,
   Panel,
-  ButtonToolbar
+  ButtonToolbar,
+  ControlLabel,
+  FormControl
 } from 'react-bootstrap';
 
 export interface IReviewProps {
@@ -25,13 +27,13 @@ class ReviewsList extends React.Component<IReviewProps,any> {
 
   constructor(props: IReviewProps) {
     super(props);
-    this.state = { name: "", city: "", zipCode: "", address: "", phone: "", email: "", fax: "" }
+    this.state = { title: "", text: "", summary: "", classification: "", creationDate: "" }
   }
 
   public componentWillReceiveProps(nextProps: IReviewProps) {
     if (nextProps.itemSelected) {
-      const { name, city, zipCode, address, phone, email, fax } = nextProps.itemSelected;
-      this.setState({ name, city, zipCode, address, phone, email, fax });
+      const { title, text, summary, classification, creationDate } = nextProps.itemSelected;
+      this.setState({ title, text, summary, classification, creationDate });
     }
   }
 
@@ -39,8 +41,8 @@ class ReviewsList extends React.Component<IReviewProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              fetchFrom="/companies.json"
-              embeddedArray="companies"
+              fetchFrom="/reviews.json"
+              embeddedArray="reviews"
               show={this.show}
               predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
@@ -53,9 +55,29 @@ class ReviewsList extends React.Component<IReviewProps,any> {
               <Modal.Header>
                 <Modal.Title>Update review</Modal.Title>
               </Modal.Header>
-
               <Modal.Body>
-                Reviews modal body
+                <ControlLabel>Title</ControlLabel>
+                <FormControl
+                    name="title"
+                    type="text"
+                    label="Title"
+                    value={this.state.title}
+                    onChange={this.onChange}
+                />
+                <ControlLabel>Text</ControlLabel>
+                <FormControl
+                    componentClass="textarea"
+                    name="text"
+                    value={this.state.text}
+                    onChange={this.onChange}
+                />
+                <ControlLabel>Summary</ControlLabel>
+                <FormControl
+                    componentClass="textarea"
+                    name="summary"
+                    value={this.state.summary}
+                    onChange={this.onChange}
+                />
               </Modal.Body>
 
               <Modal.Footer>
@@ -72,13 +94,11 @@ class ReviewsList extends React.Component<IReviewProps,any> {
     if (toCreate) {
       this.props.selectItem({
         id: -1,
-        name: "",
-        city: "",
-        zipCode: "",
-        address: "",
-        phone: "",
-        email: "",
-        fax: ""
+        title: "",
+        text: "",
+        summary: "",
+        classification: "",
+        creationDate: ""
       });
     }
     this.props.changeModalStatus(openModal);
@@ -94,39 +114,34 @@ class ReviewsList extends React.Component<IReviewProps,any> {
 
   private createReview = () => {
     const formData = new FormData();
-    const { name, city, zipCode, address, phone, email, fax }  = this.state;
-    formData.append('name', name);
-    formData.append('city', city);
-    formData.append('zipCode', zipCode);
-    formData.append('address', address);
-    formData.append('phone', phone);
-    formData.append('email', email);
-    formData.append('fax', fax);
-    fetchUrl('./companies.json', 'POST', formData, 'Created with success!', this.handleModal);
+    const { title, text, summary, classification, creationDate }  = this.state;
+    formData.append('title', title);
+    formData.append('text', text);
+    formData.append('summary', summary);
+    formData.append('classification', classification);
+    formData.append('creationDate', creationDate);
+    fetchUrl('./reviews.json', 'POST', formData, 'Created with success!', this.handleModal);
   };
 
   private updateReview = () => {
-    // const proposal = this.props.proposalSelected;
     const formData = new FormData();
-    const { name, city, zipCode, address, phone, email, fax }  = this.state;
-    formData.append('name', name);
-    formData.append('city', city);
-    formData.append('zipCode', zipCode);
-    formData.append('address', address);
-    formData.append('phone', phone);
-    formData.append('email', email);
-    formData.append('fax', fax);
-    fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!', this.handleModal);
+    const { title, text, summary, classification, creationDate }  = this.state;
+    formData.append('title', title);
+    formData.append('text', text);
+    formData.append('summary', summary);
+    formData.append('classification', classification);
+    formData.append('creationDate', creationDate);
+    fetchUrl('./reviews.json', 'PUT', formData, 'Updated with success!', this.handleModal);
   };
 
   private deleteReview = () => {
     // const { id } = this.props.proposalSelected;
-    fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
+    fetchUrl('./reviews.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
   };
 
-  /* private onChange = (e: any) => {
+  private onChange = (e: any) => {
     this.setState({ [e.target.name]: e.target.value });
-  }; */
+  };
 
   private predicate = (c:IReview,s:string) => (String(c.title)+String(c.text)).indexOf(s) !== -1;
 
@@ -148,6 +163,7 @@ class ReviewsList extends React.Component<IReviewProps,any> {
 }
 
 const mapStateToProps = (state: any) => {
+    console.log('reviews', state);
   return {
     modalOpen: state.modalStatusChanged,
     itemSelected: state.itemSelected,

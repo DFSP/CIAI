@@ -11,7 +11,9 @@ import {
   Modal,
   Button,
   Panel,
-  ButtonToolbar
+  ButtonToolbar,
+  ControlLabel,
+  FormControl
 } from 'react-bootstrap';
 
 export interface ICommentProps {
@@ -25,13 +27,13 @@ class CommentsList extends React.Component<ICommentProps,any> {
 
   constructor(props: ICommentProps) {
     super(props);
-    this.state = { name: "", city: "", zipCode: "", address: "", phone: "", email: "", fax: "" }
+    this.state = { title: "", text: "" }
   }
 
   public componentWillReceiveProps(nextProps: ICommentProps) {
     if (nextProps.itemSelected) {
-      const { name, city, zipCode, address, phone, email, fax } = nextProps.itemSelected;
-      this.setState({ name, city, zipCode, address, phone, email, fax });
+      const { title, text } = nextProps.itemSelected;
+      this.setState({ title, text });
     }
   }
 
@@ -39,8 +41,8 @@ class CommentsList extends React.Component<ICommentProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              fetchFrom="/companies.json"
-              embeddedArray="companies"
+              fetchFrom="/comments.json"
+              embeddedArray="comments"
               show={this.show}
               predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
@@ -55,7 +57,21 @@ class CommentsList extends React.Component<ICommentProps,any> {
               </Modal.Header>
 
               <Modal.Body>
-                Comments modal body
+                <ControlLabel>Title</ControlLabel>
+                <FormControl
+                    name="title"
+                    type="text"
+                    label="Title"
+                    value={this.state.title}
+                    onChange={this.onChange}
+                />
+                <ControlLabel>Text</ControlLabel>
+                <FormControl
+                    componentClass="textarea"
+                    name="text"
+                    value={this.state.text}
+                    onChange={this.onChange}
+                />
               </Modal.Body>
 
               <Modal.Footer>
@@ -72,13 +88,8 @@ class CommentsList extends React.Component<ICommentProps,any> {
     if (toCreate) {
       this.props.selectItem({
         id: -1,
-        name: "",
-        city: "",
-        zipCode: "",
-        address: "",
-        phone: "",
-        email: "",
-        fax: ""
+        title: "",
+        text: ""
       });
     }
     this.props.changeModalStatus(openModal);
@@ -94,49 +105,37 @@ class CommentsList extends React.Component<ICommentProps,any> {
 
   private createComment = () => {
     const formData = new FormData();
-    const { name, city, zipCode, address, phone, email, fax }  = this.state;
-    formData.append('name', name);
-    formData.append('city', city);
-    formData.append('zipCode', zipCode);
-    formData.append('address', address);
-    formData.append('phone', phone);
-    formData.append('email', email);
-    formData.append('fax', fax);
-    fetchUrl('./companies.json', 'POST', formData, 'Created with success!', this.handleModal);
+    const { title, text }  = this.state;
+    formData.append('title', title);
+    formData.append('text', text);
+    fetchUrl('./comments.json', 'POST', formData, 'Created with success!', this.handleModal);
   };
 
   private updateComment = () => {
-    // const proposal = this.props.proposalSelected;
     const formData = new FormData();
-    const { name, city, zipCode, address, phone, email, fax }  = this.state;
-    formData.append('name', name);
-    formData.append('city', city);
-    formData.append('zipCode', zipCode);
-    formData.append('address', address);
-    formData.append('phone', phone);
-    formData.append('email', email);
-    formData.append('fax', fax);
-    fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!', this.handleModal);
+    const { title, text }  = this.state;
+    formData.append('title', title);
+    formData.append('text', text);
+    fetchUrl('./comments.json', 'PUT', formData, 'Updated with success!', this.handleModal);
   };
 
   private deleteComment = () => {
-    // const { id } = this.props.proposalSelected;
-    fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
+    fetchUrl('./comments.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
   };
 
-  /* private onChange = (e: any) => {
+  private onChange = (e: any) => {
     this.setState({ [e.target.name]: e.target.value });
-  }; */
+  };
 
   private predicate = (c:IComment,s:string) => (String(c.title)+String(c.text)).indexOf(s) !== -1;
 
   private show = (p: any) =>
       <div>
         <Panel.Heading>
-          <Panel.Title toggle>{p.name}</Panel.Title>
+          <Panel.Title toggle>{p.title}</Panel.Title>
         </Panel.Heading>
         <Panel.Body>
-          {p.city}
+          {p.text}
         </Panel.Body>
         <Panel.Body collapsible>
           <ButtonToolbar>

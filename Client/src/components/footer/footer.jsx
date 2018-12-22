@@ -21,21 +21,23 @@ const Footer = () => (
     <footer className="footer">
         <div className="container">
             <div className="left">
-                <ListGroup className="listGroup">
-                    {links.map((link, key) => {
-                        return (
-                            <ListGroupItem key={key} className={key === 0 || key === links.length-1 ? "listGroupItem" : "middleListGroupItem"}>
-                                <a
-                                    href={link.href}
-                                    target="_blank"
-                                    className="block"
-                                >
-                                    {link.name}
-                                </a>
-                            </ListGroupItem>
-                        )
-                    })}
-                </ListGroup>
+            <ListGroup className="listGroup">
+                {links.map((link, key) => {
+                    return (
+                        <ListGroupItem key={key}
+                                       className={key === 0 || key === links.length-1 ? "listGroupItem" :
+                                           "middleListGroupItem"}>
+                            <a
+                                href={link.href}
+                                target="_blank"
+                                className="block"
+                            >
+                                {link.name}
+                            </a>
+                        </ListGroupItem>
+                    )
+                })}
+            </ListGroup>
             </div>
             <p className="right">
           <span>
