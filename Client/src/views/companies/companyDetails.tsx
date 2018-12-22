@@ -6,14 +6,14 @@ import { companyFetchData } from '../../actions/company';
 import { ICompany } from '../../reducers/proposals';
 import Users from '../users/Users';
 
-interface IRouteInfo { proposalId: string; }
+// interface IRouteInfo { proposalId: string; }
 
 interface ICompanyDetailsProps {
-  match: IRouteInfo;
+  match: any;
   company: ICompany;
   isLoading: boolean;
   hasErrored: boolean;
-  fetchData: () => void;
+  fetchData: (id: string) => void;
 }
 
 class ProposalDetails extends React.Component<ICompanyDetailsProps,any> {
@@ -22,7 +22,7 @@ class ProposalDetails extends React.Component<ICompanyDetailsProps,any> {
   }
 
   public componentDidMount() {
-    this.props.fetchData();
+    this.props.fetchData(this.props.match.id);
   }
 
   public render() {
@@ -71,7 +71,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
     return {
-        fetchData: () => dispatch(companyFetchData())
+        fetchData: (id: string) => dispatch(companyFetchData(id))
     };
 };
 

@@ -27,14 +27,12 @@ export function userFetchData(id: string) {
            'Authorization': 'Basic '+btoa('admin:password'),
          }),
       }).then(response => {
-        alert(response.ok);
         if (response.ok) {
           return response.json();
         }
         throw new Error(response.statusText);
       }).then(json2 => {
         const employee = halfred.parse(json2).original();
-        alert(employee);
         const userCompleteDetails = Object.assign({ user }, employee);
         dispatch(itemsIsLoading(false));
         dispatch(userFetchDataSuccess(userCompleteDetails));
