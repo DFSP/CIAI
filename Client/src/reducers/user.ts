@@ -1,4 +1,4 @@
-import { IUser } from "./proposals";
+import { IUser } from "./items";
 
 interface IUserAction { type: string, user: IUser }
 

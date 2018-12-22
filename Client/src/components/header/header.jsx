@@ -28,7 +28,7 @@ function Header(props) {
     }
 
     return (
-        <Navbar collapseOnSelect center>
+        <Navbar collapseOnSelect center="true">
             <Navbar.Header>
                 <Navbar.Brand>
                     <a>{makeBrand()}</a>

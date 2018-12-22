@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Panel, Label } from 'react-bootstrap';
 import { userFetchData } from '../../actions/user';
-import { IUser } from '../../reducers/proposals';
+import { IUser } from '../../reducers/items';
 
 // interface IRouteInfo { id: string; }
 

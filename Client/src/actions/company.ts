@@ -14,7 +14,7 @@ export function companyFetchData(id: string) {
        }),
     })
     .then(response => {
-      alert(response.ok);
+      alert("1" + response.ok);
       if (response.ok) {
         status = true;
         return response.json();

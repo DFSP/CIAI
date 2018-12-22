@@ -5,7 +5,7 @@ import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
-import { IProposal } from '../../reducers/proposals';
+import { IProposal } from '../../reducers/items';
 
 import {
     Button,
