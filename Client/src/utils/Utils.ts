@@ -22,9 +22,9 @@ export function fetchUrl(url: string, method: string, body: any,
             if (response.ok) {
                 // this.props.changeModalStatus(false);
                 callback(false, false);
-                alert(successMessage);
+              /*  alert(successMessage);*/
             } else {
                 throw new Error(response.statusText);
             }
-        }).catch((e: string) => alert(e));
+        }).catch((e: string) => console.log(e));
 }
