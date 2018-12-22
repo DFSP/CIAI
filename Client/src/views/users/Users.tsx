@@ -49,7 +49,7 @@ class UsersList extends React.Component<IUsersProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              fetchFrom="/users.json"
+              fetchFrom="http://localhost:8080/users"
               embeddedArray="employees"
               show={this.show}
               predicate={this.predicate}

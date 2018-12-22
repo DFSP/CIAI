@@ -44,7 +44,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              fetchFrom="/companies.json"
+              fetchFrom="http://localhost:8080/companies"
               embeddedArray="companies"
               show={this.show}
               predicate={this.predicate}

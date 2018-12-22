@@ -46,7 +46,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
         return (
             <Fragment>
                 <ListWithControllers
-                    fetchFrom="/proposals.json"
+                    fetchFrom="http://localhost:8080/proposals"
                     embeddedArray="proposals"
                     show={this.show}
                     predicate={this.predicate}
