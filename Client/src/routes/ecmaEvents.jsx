@@ -1,9 +1,9 @@
 import Proposals from "../views/proposals/Proposals"
 import ProposalDetails from "../views/proposals/ProposalDetails"
 import Users from "../views/users/Users"
-import UserDetails from "../views/users/userDetails"
+import UserDetails from "../views/users/UserDetails"
 import Companies from "../views/companies/Companies"
-import CompanyDetails from "../views/companies/companyDetails"
+import CompanyDetails from "../views/companies/CompanyDetails"
 import Profile from "../views/profile/Profile.tsx"
 import MyActivity from "../views/myActivity/myActivity.tsx"
 

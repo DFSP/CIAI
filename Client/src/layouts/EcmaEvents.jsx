@@ -7,7 +7,7 @@ import {Redirect, Route, Switch} from 'react-router-dom';
 import sidebarRoutes from "../routes/sidebar.jsx";
 import routes from "../routes/ecmaEvents.jsx";
 
-import "./ecmaEvents.css"
+import "./EcmaEvents.css"
 
 const switchRoutes = (
     <Switch>

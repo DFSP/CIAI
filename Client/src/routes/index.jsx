@@ -1,5 +1,5 @@
-import Login from "../views/login/login";
-import EcmaEvents from "../layouts/ecmaEvents.jsx";
+import Login from "../views/login/Login";
+import EcmaEvents from "../layouts/EcmaEvents.jsx";
 
 const routes = [
     {

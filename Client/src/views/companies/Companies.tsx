@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
-import { fetchUrl } from '../../utils/utils';
+import { fetchUrl } from '../../utils/Utils';
 import ListWithControllers from '../../components/list/ListWithControllers';
 import { ICompany } from '../../reducers/company';
 

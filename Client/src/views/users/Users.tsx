@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
-import { fetchUrl } from '../../utils/utils';
+import { fetchUrl } from '../../utils/Utils';
 import ListWithControllers from '../../components/list/ListWithControllers';
 import { IUser } from '../../reducers/items';
 
@@ -288,7 +288,7 @@ class UsersList extends React.Component<IUsersProps,any> {
   };
 
   private onDropdownChange = (e: any) => {
-    this.setState({ state: e });
+    this.setState({ role: e });
   };
 
   private predicate = (c:IUser,s:string) =>

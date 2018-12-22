@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Button, FormGroup, FormControl, ControlLabel, Jumbotron, ButtonGroup} from "react-bootstrap";
-import "./login.css";
+import "./Login.css";
 import {Cookies} from "react-cookie";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";

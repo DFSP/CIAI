@@ -4,7 +4,7 @@ import {userFetchData} from "../../actions/user";
 import {connect} from "react-redux";
 import {Button, ButtonGroup, ControlLabel, FormControl, FormGroup} from "react-bootstrap";
 import {Link} from "react-router-dom";
-import {fetchUrl} from "../../utils/utils";
+import {fetchUrl} from "../../utils/Utils";
 import {ClipLoader} from "react-spinners";
 
 interface IProfileProps {
@@ -32,10 +32,6 @@ class Profile extends React.Component<IProfileProps,any> {
 
     public componentWillReceiveProps(nextProps: IProfileProps) {
         const { username, email, firstName, lastName} = nextProps.user;
-/*        console.log(username)
-        console.log(email)
-        console.log(firstName)
-        console.log(lastName)*/
         this.setState({ username, email, firstName, lastName });
     }
 
@@ -48,7 +44,6 @@ class Profile extends React.Component<IProfileProps,any> {
         }
 
         return (
-            {user &&
             <div className="Profile">
                 <form onSubmit={this.handleSubmit}>
                     <FormGroup controlId="username">
@@ -108,7 +103,7 @@ class Profile extends React.Component<IProfileProps,any> {
                         </Link>
                     </ButtonGroup>
                 </form>
-            </div>}
+            </div>
         );
     }
 
