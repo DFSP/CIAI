@@ -4,8 +4,8 @@ import Users from "../views/users/Users"
 import UserDetails from "../views/users/userDetails"
 import Companies from "../views/companies/Companies"
 import CompanyDetails from "../views/companies/companyDetails"
-import Profile from "../views/profile/profile.jsx"
-import MyActivity from "../views/myActivity/myActivity.jsx"
+import Profile from "../views/profile/Profile.tsx"
+import MyActivity from "../views/myActivity/myActivity.tsx"
 
 const routes = [
     {

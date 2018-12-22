@@ -7,6 +7,7 @@ import { IProposal } from '../../reducers/items';
 import Reviews from '../reviews/Reviews';
 import Users from '../users/Users';
 import Comments from './comments/Comments';
+import {ClipLoader} from "react-spinners";
 
 interface IRouteInfo { proposalId: string; }
 
@@ -32,9 +33,9 @@ class ProposalDetails extends React.Component<IProposalDetailsProps,any> {
     if (this.props.hasErrored) {
       return <p>Oops! Houve um erro ao carregar os dados.</p>;
     }
-    if (this.props.isLoading) {
-      return <p>Loading...</p>;
-    }
+      if (this.props.isLoading) {
+          return <ClipLoader/>;
+      }
 
     const { proposal } = this.props;
 

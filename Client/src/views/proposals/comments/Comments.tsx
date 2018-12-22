@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { modalStatusChanged } from '../../../actions/modals';
 import { itemSelected } from '../../../actions/items';
 import { fetchUrl } from '../../../utils/utils';
-import ListWithControllers from '../../common/ListWithControllers';
+import ListWithControllers from '../../../components/list/ListWithControllers';
 import { IComment } from '../../../reducers/items'
 
 import {

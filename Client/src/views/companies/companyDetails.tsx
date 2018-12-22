@@ -5,6 +5,7 @@ import { Panel, Label } from 'react-bootstrap';
 import { companyFetchData } from '../../actions/company';
 import { ICompany } from '../../reducers/items';
 import Users from '../users/Users';
+import {ClipLoader} from "react-spinners";
 
 // interface IRouteInfo { proposalId: string; }
 
@@ -29,9 +30,9 @@ class ProposalDetails extends React.Component<ICompanyDetailsProps,any> {
     if (this.props.hasErrored) {
       return <p>Oops! Houve um erro ao carregar os dados.</p>;
     }
-    if (this.props.isLoading) {
-      return <p>Loading...</p>;
-    }
+      if (this.props.isLoading) {
+          return <ClipLoader/>;
+      }
 
     const { company } = this.props;
 

@@ -5,13 +5,16 @@ import configureStore from './store/configureStore';
 import App from './App';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
+import { CookiesProvider } from 'react-cookie';
 
 const store = configureStore({});
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root') as HTMLElement
+    <CookiesProvider>
+        <Provider store={store}>
+            <App/>
+        </Provider>
+    </CookiesProvider>,
+    document.getElementById('root') as HTMLElement
 );
 registerServiceWorker();

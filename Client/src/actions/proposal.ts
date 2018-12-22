@@ -20,7 +20,7 @@ export function proposalFetchData() {
     }).then(json => {
       const resource = halfred.parse(json);
       proposal = resource.original();
-      // const proposer = halfred.parse(resource.link("proposer")).original();
+      // const proposer = halfred.parse(resource.link("proposer")).original(); //TODO
       const proposer = "Jerúcildio Gomes";
       const proposalWithProposer = Object.assign({ proposer }, proposal);
       dispatch(itemsIsLoading(false));

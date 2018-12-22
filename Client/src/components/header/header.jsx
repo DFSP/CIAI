@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 
 import avatar from "../../resources/images/avatar.jpg";
 import signOut from "../../resources/icons/signOut.svg";
+import { withCookies, Cookies } from 'react-cookie';
 
 function Header(props) {
 
@@ -25,6 +26,11 @@ function Header(props) {
             return null;
         });
         return name;
+    }
+
+    function logout() {
+        const { cookies } = props;
+        cookies.set('session', null, { path: '/' });
     }
 
     return (
@@ -54,7 +60,7 @@ function Header(props) {
                             Perfil
                         </MenuItem>
                         <MenuItem divider />
-                        <MenuItem componentClass={Link} href="/login" to="/login" eventKey={3.3}>
+                        <MenuItem onClick={logout} componentClass={Link} href="/login" to="/login" eventKey={3.3}>
                             <img src={signOut} className="icon" alt="logo"/> Sair
                         </MenuItem>
                     </NavDropdown>
@@ -64,4 +70,4 @@ function Header(props) {
     );
 }
 
-export default Header
+export default withCookies(Header)
