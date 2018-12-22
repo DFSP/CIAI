@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import {Button, FormGroup, FormControl, ControlLabel, Jumbotron} from "react-bootstrap";
 import "./login.css";
 
 export default class Login extends React.Component<{},any> {
@@ -15,6 +15,12 @@ export default class Login extends React.Component<{},any> {
   public render() {
     return (
       <div className="Login">
+        <Jumbotron className="loginHeader">
+          <h2>Ecma Events</h2>
+          <p>
+           Plataforma para organização e gestão de eventos.
+          </p>
+        </Jumbotron>;
         <form onSubmit={this.handleSubmit}>
           <FormGroup controlId="username" bsSize="large">
             <ControlLabel>Username</ControlLabel>
@@ -36,10 +42,11 @@ export default class Login extends React.Component<{},any> {
           <Button
             block
             bsSize="large"
+            bsStyle="success"
             disabled={!this.validateForm()}
             type="submit"
           >
-            Login
+            Entrar
           </Button>
         </form>
       </div>
@@ -54,7 +61,7 @@ export default class Login extends React.Component<{},any> {
     this.setState({
       [event.target.id]: event.target.value
     });
-  }
+  };
 
   private handleSubmit = (event: any) => {
     event.preventDefault();

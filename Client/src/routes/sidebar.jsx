@@ -1,9 +1,9 @@
 import Clippy from "../resources/icons/clippy.svg"
 import Person from "../resources/icons/person.svg"
 import Organization from "../resources/icons/organization.svg"
-import Proposals from "../views/proposals/Proposals.tsx"
-import Users from "../views/users/Users.tsx"
-import Companies from "../views/companies/Companies.tsx"
+import Proposals from "../views/proposals/Proposals"
+import Users from "../views/users/Users"
+import Companies from "../views/companies/Companies"
 
 const routes = [
     {

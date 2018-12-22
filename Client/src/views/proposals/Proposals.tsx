@@ -46,7 +46,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
         fetch('http://localhost:8080/users', {
             method: 'GET',
             headers: new Headers({
-                'Authorization': 'Basic '+btoa('admin:password'),
+                'Authorization': 'Basic '+btoa('dpimenta:password'),
             }),
         }).then(r => console.log(r));
 
