@@ -5,6 +5,7 @@ import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
+import { IUser } from '../../reducers/proposals';
 
 import {
   Modal,
@@ -48,10 +49,13 @@ class UsersList extends React.Component<IUsersProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              fetchFrom="/users.json"
+              fetchFrom="http://localhost:8080/users"
               embeddedArray="employees"
               show={this.show}
+              predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
+              handleUpdate={() => this.handleModal(true,false)}
+              handleDelete={this.deleteUser}
           />
           {
             this.props.modalOpen &&
@@ -283,6 +287,9 @@ class UsersList extends React.Component<IUsersProps,any> {
   private onDropdownChange = (e: any) => {
     this.setState({ state: e });
   };
+
+  private predicate = (c:IUser,s:string) =>
+  (String(c.firstName)+String(c.lastName)+String(c.email)).indexOf(s) !== -1;
 
   private show = (p: any) =>
       <div>

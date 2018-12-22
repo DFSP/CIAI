@@ -3,12 +3,6 @@ interface IItemsIsLoadingAction { type: string, isLoading: boolean }
 interface IItemsAction { type: string, items: any[] }
 interface IItemSelectedAction { type: string, itemSelected: any }
 
-export interface IComment {
-  id: number;
-  title: string;
-  text: string;
-}
-
 export interface IProposal {
   id: number;
   title: string;
@@ -16,7 +10,47 @@ export interface IProposal {
   state: string;
   creationDate: string;
   _links: any;
-  comments?: IComment[];
+  proposer?: string;
+}
+
+export interface IUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  role: string;
+  job?: string;
+}
+
+export interface ICompany {
+  id: number;
+  name: string;
+  city: string;
+  zipCode: string;
+  address: string;
+  phone: string;
+  email: string;
+  fax: string;
+  employees?: string;
+}
+
+export interface IReview {
+  id: number;
+  title: string;
+  text: string;
+  summary: string;
+  classification: string;
+  creationDate: string;
+  author: string;
+}
+
+export interface IComment {
+  id: number;
+  title: string;
+  text: string;
+  creationDate: string;
+  author: string;
 }
 
 export function itemsHasErrored(state = false,

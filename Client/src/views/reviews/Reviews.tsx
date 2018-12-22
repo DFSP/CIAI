@@ -5,35 +5,30 @@ import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
-import { ICompany } from '../../reducers/company';
+import { IReview } from '../../reducers/proposals';
 
 import {
   Modal,
-  FormGroup,
-  ControlLabel,
-  FormControl,
   Button,
   Panel,
-  ButtonToolbar,
-  ButtonGroup
+  ButtonToolbar
 } from 'react-bootstrap';
-import {Link} from "react-router-dom";
 
-export interface ICompanyProps {
+export interface IReviewProps {
   changeModalStatus: (status: boolean) => void;
   modalOpen: boolean;
   itemSelected: any;
   selectItem: (item: any) => void;
 }
 
-class CompaniesList extends React.Component<ICompanyProps,any> {
+class ReviewsList extends React.Component<IReviewProps,any> {
 
-  constructor(props: ICompanyProps) {
+  constructor(props: IReviewProps) {
     super(props);
     this.state = { name: "", city: "", zipCode: "", address: "", phone: "", email: "", fax: "" }
   }
 
-  public componentWillReceiveProps(nextProps: ICompanyProps) {
+  public componentWillReceiveProps(nextProps: IReviewProps) {
     if (nextProps.itemSelected) {
       const { name, city, zipCode, address, phone, email, fax } = nextProps.itemSelected;
       this.setState({ name, city, zipCode, address, phone, email, fax });
@@ -44,80 +39,23 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     return (
         <Fragment>
           <ListWithControllers
-              fetchFrom="http://localhost:8080/companies"
+              fetchFrom="/companies.json"
               embeddedArray="companies"
               show={this.show}
               predicate={this.predicate}
               handleAdd={() => this.handleModal(true,true)}
               handleUpdate={() => this.handleModal(true,false)}
-              handleDelete={this.deleteCompany}
+              handleDelete={this.deleteReview}
           />
           {
             this.props.modalOpen &&
             <Modal.Dialog>
               <Modal.Header>
-                <Modal.Title>Update company</Modal.Title>
+                <Modal.Title>Update review</Modal.Title>
               </Modal.Header>
 
               <Modal.Body>
-                <FormGroup>
-                  <ControlLabel>Name</ControlLabel>
-                  <FormControl
-                      name="name"
-                      type="text"
-                      label="Name"
-                      value={this.state.name}
-                      onChange={this.onChange}
-                  />
-                  <ControlLabel>City</ControlLabel>
-                  <FormControl
-                      name="city"
-                      type="text"
-                      label="City"
-                      value={this.state.city}
-                      onChange={this.onChange}
-                  />
-                  <ControlLabel>Zipcode</ControlLabel>
-                  <FormControl
-                      name="zipcode"
-                      type="text"
-                      label="Zipcode"
-                      value={this.state.zipCode}
-                      onChange={this.onChange}
-                  />
-                  <ControlLabel>Address</ControlLabel>
-                  <FormControl
-                      name="address"
-                      type="text"
-                      label="Address"
-                      value={this.state.address}
-                      onChange={this.onChange}
-                  />
-                  <ControlLabel>Phone</ControlLabel>
-                  <FormControl
-                      name="phone"
-                      type="text"
-                      label="Phone"
-                      value={this.state.phone}
-                      onChange={this.onChange}
-                  />
-                  <ControlLabel>Email</ControlLabel>
-                  <FormControl
-                      name="email"
-                      type="text"
-                      label="Email"
-                      value={this.state.email}
-                      onChange={this.onChange}
-                  />
-                  <ControlLabel>fax</ControlLabel>
-                  <FormControl
-                      name="fax"
-                      type="text"
-                      label="Fax"
-                      value={this.state.fax}
-                      onChange={this.onChange}
-                  />
-                </FormGroup>
+                Reviews modal body
               </Modal.Body>
 
               <Modal.Footer>
@@ -148,13 +86,13 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
 
   private handleSave = () => {
     if (this.props.itemSelected.id) {
-      this.updateCompany()
+      this.updateReview()
     } else {
-      this.createCompany()
+      this.createReview()
     }
   };
 
-  private createCompany = () => {
+  private createReview = () => {
     const formData = new FormData();
     const { name, city, zipCode, address, phone, email, fax }  = this.state;
     formData.append('name', name);
@@ -167,7 +105,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     fetchUrl('./companies.json', 'POST', formData, 'Created with success!', this.handleModal);
   };
 
-  private updateCompany = () => {
+  private updateReview = () => {
     // const proposal = this.props.proposalSelected;
     const formData = new FormData();
     const { name, city, zipCode, address, phone, email, fax }  = this.state;
@@ -181,36 +119,29 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!', this.handleModal);
   };
 
-  private deleteCompany = () => {
+  private deleteReview = () => {
     // const { id } = this.props.proposalSelected;
     fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
   };
 
-  private onChange = (e: any) => {
+  /* private onChange = (e: any) => {
     this.setState({ [e.target.name]: e.target.value });
-  };
+  }; */
 
-  private predicate = (c:ICompany,s:string) => (String(c.name)+String(c.email)).indexOf(s) !== -1;
+  private predicate = (c:IReview,s:string) => (String(c.title)+String(c.text)).indexOf(s) !== -1;
 
-  private show = (p: any) =>
+  private show = (p: IReview) =>
       <div>
         <Panel.Heading>
-          <Panel.Title toggle>{p.name}</Panel.Title>
+          <Panel.Title toggle>{p.title}</Panel.Title>
         </Panel.Heading>
         <Panel.Body>
-          {p.city}
+          {p.text}
         </Panel.Body>
         <Panel.Body collapsible>
           <ButtonToolbar>
             <Button onClick={() => this.handleModal(true,false)}>Atualizar</Button>
-            <Button onClick={this.deleteCompany}>Apagar</Button>
-            <ButtonGroup>
-              <Link to={`/companies/${p.id}/details`}>
-                <Button>
-                  Ver detalhes
-                </Button>
-              </Link>
-            </ButtonGroup>
+            <Button onClick={this.deleteReview}>Apagar</Button>
           </ButtonToolbar>
         </Panel.Body>
       </div>
@@ -230,4 +161,4 @@ const mapDispatchToProps = (dispatch: any) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompaniesList);
+export default connect(mapStateToProps, mapDispatchToProps)(ReviewsList);

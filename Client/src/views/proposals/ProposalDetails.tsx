@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
+import { Panel, Tabs, Tab, Label } from 'react-bootstrap';
 import { proposalFetchData } from '../../actions/proposal';
 import { IProposal } from '../../reducers/proposals';
-import Comment from './comments/Comment'
-import { IComment } from '../../reducers/proposals';
+import Reviews from '../reviews/Reviews';
+import Users from '../users/Users';
+import Comments from './comments/Comments';
 
 interface IRouteInfo { proposalId: string; }
 
@@ -16,14 +18,13 @@ interface IProposalDetailsProps {
   fetchData: () => void;
 }
 
-class ProposalDetails extends React.Component<IProposalDetailsProps,{}> {
+class ProposalDetails extends React.Component<IProposalDetailsProps,any> {
+  constructor(props: IProposalDetailsProps) {
+      super(props);
+  }
 
   public componentDidMount() {
     this.props.fetchData();
-  }
-
-  public componentWillReceiveProps(nextProps: IProposalDetailsProps) {
-    console.log(nextProps);
   }
 
   public render() {
@@ -37,17 +38,25 @@ class ProposalDetails extends React.Component<IProposalDetailsProps,{}> {
     const { proposal } = this.props;
 
     return (<Fragment>
-      Title: {proposal.title} <br />
-      Description: {proposal.description} <br />
-      Creation date: {proposal.creationDate} <br /><br />
-      <b>Comments:</b><br />
-      <ul>
-      {
-        proposal.comments && proposal.comments.map((c: IComment) => (
-          <Comment {...c} />
-        ))
-      }
-      </ul>
+      <Panel>
+        <Panel.Body>
+          <Label>Title:</Label> {proposal.title} <br />
+          <Label>Description:</Label> {proposal.description} <br />
+          <Label>Creation date:</Label> {proposal.creationDate} <br/>
+          <Label>Proposer:</Label> {proposal.proposer} <br/>
+        </Panel.Body>
+      </Panel>
+      <Tabs defaultActiveKey="2" name="tabController">
+        <Tab eventKey="1" title="Comments">
+          <Comments />
+        </Tab>
+        <Tab eventKey="2" title="Reviews">
+          <Reviews />
+        </Tab>
+        <Tab eventKey="3" title="Members">
+          <Users />
+        </Tab>
+      </Tabs>
     </Fragment>);
   }
 }

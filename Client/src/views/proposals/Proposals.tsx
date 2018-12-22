@@ -5,6 +5,7 @@ import { modalStatusChanged } from '../../actions/modals';
 import { itemSelected } from '../../actions/items';
 import { fetchUrl } from '../../utils/utils';
 import ListWithControllers from '../common/ListWithControllers';
+import { IProposal } from '../../reducers/proposals';
 
 import {
     Button,
@@ -45,10 +46,13 @@ class ProposalList extends React.Component<IProposalProps,any> {
         return (
             <Fragment>
                 <ListWithControllers
-                    fetchFrom="/proposals.json"
+                    fetchFrom="http://localhost:8080/proposals"
                     embeddedArray="proposals"
                     show={this.show}
+                    predicate={this.predicate}
                     handleAdd={() => this.handleModal(true,true)}
+                    handleUpdate={() => this.handleModal(true,false)}
+                    handleDelete={this.deleteProposal}
                 />
                 {
                     this.props.modalOpen &&
@@ -156,6 +160,8 @@ class ProposalList extends React.Component<IProposalProps,any> {
     private onDropdownChange = (e: any) => {
         this.setState({ state: e });
     };
+
+    private predicate = (c:IProposal,s:string) => (String(c.title)+String(c.description)).indexOf(s) !== -1;
 
     private show = (p: any) =>
         <div>
