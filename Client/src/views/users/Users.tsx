@@ -101,6 +101,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                   />
                   <ControlLabel>Permissões</ControlLabel>
                   <DropdownButton
+                      className="dropdown"
                       id="dropdown-basic-0"
                       name="state"
                       onSelect={this.onRoleChange}
@@ -163,6 +164,7 @@ class UsersList extends React.Component<IUsersProps,any> {
                   />
                   <ControlLabel>Género</ControlLabel>
                   <DropdownButton
+                      className="dropdown"
                       id="dropdown-basic-0"
                       name="state"
                       onSelect={this.onGenderChange}

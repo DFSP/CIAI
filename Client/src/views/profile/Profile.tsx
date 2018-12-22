@@ -32,14 +32,10 @@ class Profile extends React.Component<IProfileProps,any> {
     }
 
     public componentWillReceiveProps(nextProps: IProfileProps) {
-      if (nextProps.user) {
-        const { username, password, email, firstName, lastName} = nextProps.user;
-/*        console.log(username)
-        console.log(email)
-        console.log(firstName)
-        console.log(lastName)*/
-        this.setState({ username, password, email, firstName, lastName });
-      }
+        if (nextProps.user) {
+            const { username, email, firstName, lastName} = nextProps.user;
+            this.setState({ username, email, firstName, lastName });
+        }
     }
 
     public render() {
@@ -53,77 +49,74 @@ class Profile extends React.Component<IProfileProps,any> {
         const { user } = this.props;
 
         return (
-          <Fragment>
-          {
-            user &&
-            <div className="Profile">
-                <form onSubmit={this.handleSubmit}>
-                    <FormGroup controlId="username">
-                        <ControlLabel>Username</ControlLabel>
-                        <FormControl
-                            autoFocus
-                            type="text"
-                            value={this.state.username}
-                            onChange={this.handleChange}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="password">
-                        <ControlLabel>Password</ControlLabel>
-                        <FormControl
-                            value={this.state.password}
-                            onChange={this.handleChange}
-                            type="password"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="email">
-                        <ControlLabel>Endereço email</ControlLabel>
-                        <FormControl
-                            autoFocus
-                            type="text"
-                            value={this.state.email}
-                            onChange={this.handleChange}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="firstName">
-                        <ControlLabel>Primeiro nome</ControlLabel>
-                        <FormControl
-                            autoFocus
-                            type="text"
-                            value={this.state.firstName}
-                            onChange={this.handleChange}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="lastName">
-                        <ControlLabel>Último nome</ControlLabel>
-                        <FormControl
-                            autoFocus
-                            type="text"
-                            value={this.state.lastName}
-                            onChange={this.handleChange}
-                        />
-                    </FormGroup>
-                    <ButtonGroup>
-                        <Link to="/proposals">
-                            <Button
-                                block
-                                bsStyle="success"
-                                disabled={!this.validateForm()}
-                                type="submit"
-                            >
-                                Atualizar
-                            </Button>
-                        </Link>
-                    </ButtonGroup>
-                </form>
-            </div>
-          }
-          </Fragment>
+            <Fragment>
+                {
+                    user &&
+                    <div className="Profile">
+                        <form onSubmit={this.handleSubmit}>
+                            <FormGroup controlId="username">
+                                <ControlLabel>Username</ControlLabel>
+                                <FormControl
+                                    autoFocus
+                                    type="text"
+                                    value={this.state.username}
+                                    onChange={this.handleChange}
+                                />
+                            </FormGroup>
+                            <FormGroup controlId="password">
+                                <ControlLabel>Password</ControlLabel>
+                                <FormControl
+                                    value={this.state.password}
+                                    onChange={this.handleChange}
+                                    type="password"
+                                />
+                            </FormGroup>
+                            <FormGroup controlId="email">
+                                <ControlLabel>Endereço email</ControlLabel>
+                                <FormControl
+                                    autoFocus
+                                    type="text"
+                                    value={this.state.email}
+                                    onChange={this.handleChange}
+                                />
+                            </FormGroup>
+                            <FormGroup controlId="firstName">
+                                <ControlLabel>Primeiro nome</ControlLabel>
+                                <FormControl
+                                    autoFocus
+                                    type="text"
+                                    value={this.state.firstName}
+                                    onChange={this.handleChange}
+                                />
+                            </FormGroup>
+                            <FormGroup controlId="lastName">
+                                <ControlLabel>Último nome</ControlLabel>
+                                <FormControl
+                                    autoFocus
+                                    type="text"
+                                    value={this.state.lastName}
+                                    onChange={this.handleChange}
+                                />
+                            </FormGroup>
+                            <ButtonGroup>
+                                <Button
+                                    block
+                                    bsStyle="success"
+                                    disabled={!this.validateForm()}
+                                    type="submit"
+                                >
+                                    Atualizar
+                                </Button>
+                            </ButtonGroup>
+                        </form>
+                    </div>
+                }
+            </Fragment>
         );
     }
 
     private validateForm() {
-        return this.state.username && this.state.username.length > 0 &&
-        this.state.password && this.state.password.length > 0;
+        return this.state.username && this.state.username.length > 0;
     }
 
     private handleChange = (event: any) => {
@@ -134,9 +127,9 @@ class Profile extends React.Component<IProfileProps,any> {
 
     private handleSubmit = (event: any) => {
         event.preventDefault();
-        // const proposal = this.props.proposalSelected;
         const formData = new FormData()
         const { firstName, lastName, username, email, password } = this.state;
+        formData.append('id', this.props.user.id.toString());
         formData.append('firstName', firstName);
         formData.append('lastName', lastName);
         formData.append('username', username);

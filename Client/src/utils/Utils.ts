@@ -9,21 +9,22 @@ export function timedFetch(url: string, options: any, timeout = 10000) {
 }
 
 export function fetchUrl(url: string, method: string, body: any,
-  successMessage: string, callback: (s: boolean, c: boolean) => void) {
-  fetch(url, {
-    method,
-    body,
-    headers: new Headers({
-       'Authorization': 'Basic '+btoa('admin:password'),
-     }),
-  })
-  .then(response => {
-    if (response.ok) {
-      // this.props.changeModalStatus(false);
-      callback(false, false);
-      alert(successMessage);
-    } else {
-      throw new Error(response.statusText);
-    }
-  }).catch((e: string) => alert(e));
+                         successMessage: string, callback: (s: boolean, c: boolean) => void) {
+    fetch(url, {
+        method,
+        body,
+        headers: new Headers({
+            'Authorization': 'Basic '+btoa('admin:password'),
+            'Content-type': 'application/json;charset=UTF-8'
+        }),
+    })
+        .then(response => {
+            if (response.ok) {
+                // this.props.changeModalStatus(false);
+                callback(false, false);
+                alert(successMessage);
+            } else {
+                throw new Error(response.statusText);
+            }
+        }).catch((e: string) => alert(e));
 }

@@ -35,7 +35,6 @@ export function companyFetchData(id: string) {
         const companyEmployees = halfred.parse(json2)
           .embeddedResourceArray("employees")
           .map(resource => resource.original());
-        alert(JSON.stringify(companyEmployees));
         const companyWithEmployees = Object.assign({ employees: companyEmployees }, company);
         dispatch(itemsIsLoading(false));
         dispatch(companyFetchDataSuccess(companyWithEmployees));

@@ -56,7 +56,7 @@ class CompanyDetails extends React.Component<ICompanyDetailsProps,any> {
                 <FilteredList<IUser>
                   list={company.employees}
                   show={this.show}
-                  select={() => alert('Employee selected!')}
+                  select={() => console.log('Employee selected!')}
                   predicate={this.predicate}
                 />
               }
