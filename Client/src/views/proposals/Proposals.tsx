@@ -41,15 +41,6 @@ class ProposalList extends React.Component<IProposalProps,any> {
     };
 
     public render() {
-        /*const getStateValue = (state: string) => state === "PENDING_APPROVAL" ? "Pending approval" : "Approved";*/
-
-        fetch('http://localhost:8080/users', {
-            method: 'GET',
-            headers: new Headers({
-                'Authorization': 'Basic '+btoa('dpimenta:password'),
-            }),
-        }).then(r => console.log(r));
-
         return (
             <Fragment>
                 <ListWithControllers
@@ -118,7 +109,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
     private handleModal = (openModal: boolean, toCreate: boolean) => {
         if (toCreate) {
             this.props.selectItem({
-                id: -1,
+                id: undefined,
                 title: "",
                 description: "",
                 state: "PENDING_APPROVAL",
@@ -138,27 +129,22 @@ class ProposalList extends React.Component<IProposalProps,any> {
     };
 
     private createProposal = () => {
-        const formData = new FormData();
-        const { title, description, state } = this.state;
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('state', state);
-        fetchUrl('./proposals.json', 'POST', formData, 'Created with success!', this.handleModal);
+      const proposal = { ...this.state, proposer: { id: 7 } };
+      fetchUrl('http://localhost:8080/proposals', 'POST', proposal, 'Created with success!', this.handleModal);
     };
 
     private updateProposal = () => {
-        // const proposal = this.props.proposalSelected;
-        const formData = new FormData();
-        const { title, description, state } = this.state;
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('state', state);
-        fetchUrl('./proposals.json', 'PUT', formData, 'Updated with success!', this.handleModal);
+      const { id } = this.props.itemSelected;
+      fetchUrl(`http://localhost:8080/proposals/${id}`,
+        'PUT',
+        { id, ...this.state },
+        'Updated with success!',
+        this.handleModal);
     };
 
     private deleteProposal = () => {
-        // const { id } = this.props.proposalSelected;
-        fetchUrl('./proposals.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
+      const { id } = this.props.itemSelected;
+      fetchUrl(`http://localhost:8080/proposals/${id}`, 'DELETE', this.state, 'Deleted with success!', this.handleModal);
     };
 
     private onChange = (e: any) => {

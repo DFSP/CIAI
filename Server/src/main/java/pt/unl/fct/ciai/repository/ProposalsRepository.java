@@ -72,7 +72,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     Section getSection(@Param(value = "pid") long pid, @Param(value = "sid") long sid);
 
-    @Query("SELECT CASE WHEN s IS NOT NULL THEN TRUE ELSE FALSE END " +
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN TRUE ELSE FALSE END " +
             "FROM Proposal p JOIN p.sections s " +
             "WHERE p.id = :pid AND s.id = :sid")
     boolean existsSection(@Param(value = "pid") long pid, @Param(value = "sid") long sid);
@@ -105,7 +105,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     User getStaff(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
 
 
-    @Query("SELECT CASE WHEN s IS NOT NULL THEN TRUE ELSE FALSE END " +
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN TRUE ELSE FALSE END " +
             "FROM Proposal p JOIN p.staff s " +
             "WHERE p.id = :pid AND s.id = :sid")
     boolean existsStaff(@Param(value = "pid") long pid, @Param(value = "sid") long sid);
@@ -141,7 +141,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     Employee getMember(@Param(value = "pid") long pid, @Param(value = "eid") long eid);
 
-    @Query("SELECT CASE WHEN m IS NOT NULL THEN TRUE ELSE FALSE END " +
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN TRUE ELSE FALSE END " +
             "FROM Proposal p JOIN p.members m " +
             "WHERE p.id = :pid AND m.id = :mid")
     boolean existsMember(@Param(value = "pid") long pid, @Param(value = "mid") long mid);
@@ -173,7 +173,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     Review getReview(@Param(value = "pid") long pid, @Param(value = "rid") long rid);
 
-    @Query("SELECT CASE WHEN r IS NOT NULL THEN TRUE ELSE FALSE END " +
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END " +
             "FROM Proposal p JOIN p.reviews r " +
             "WHERE p.id = :pid AND r.id = :rid")
     boolean existsReview(@Param(value = "pid") long pid, @Param(value = "rid") long rid);
@@ -204,7 +204,7 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     Comment getComment(@Param(value = "pid") long pid, @Param(value = "cid") long cid);
 
-    @Query("SELECT CASE WHEN c IS NOT NULL THEN TRUE ELSE FALSE END " +
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN TRUE ELSE FALSE END " +
             "FROM Proposal p JOIN p.comments c " +
             "WHERE p.id = :pid AND c.id = :cid")
     boolean existsComment(@Param(value = "pid") long pid, @Param(value = "cid") long cid);
@@ -274,14 +274,14 @@ public interface ProposalsRepository extends CrudRepository<Proposal, Long> {
     )
     User getProposer(@Param(value = "pid") long pid);
 
-    @Query("SELECT CASE WHEN u IS NOT NULL THEN TRUE ELSE FALSE END "
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN TRUE ELSE FALSE END "
             + "FROM Proposal p "
             + "WHERE p.id = :pid AND p.proposer.id = :uid")
     boolean existsProposer(@Param(value = "pid") long pid, @Param(value = "uid") long uid);
 
     // Reviewer queries
 
-    @Query("SELECT CASE WHEN r IS NOT NULL THEN TRUE ELSE FALSE END "
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END "
             + "FROM Proposal p JOIN p.reviewers r "
             + "WHERE p.id = :pid AND r.id = :uid")
     boolean existsReviewer(@Param(value = "pid") long pid, @Param(value = "uid") long uid);

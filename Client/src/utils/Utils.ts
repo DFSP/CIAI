@@ -8,11 +8,13 @@ export function timedFetch(url: string, options: any, timeout = 10000) {
     });
 }
 
-export function fetchUrl(url: string, method: string, body: any,
+export function fetchUrl(url: string, method: string, reqbody: any,
                          successMessage: string, callback: (s: boolean, c: boolean) => void) {
+                           console.log(url);
+                           console.log(reqbody);
     fetch(url, {
         method,
-        body,
+        body: JSON.stringify(reqbody),
         headers: new Headers({
             'Authorization': 'Basic '+btoa('admin:password'),
             'Content-type': 'application/json;charset=UTF-8'

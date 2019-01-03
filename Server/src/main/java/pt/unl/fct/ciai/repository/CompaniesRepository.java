@@ -48,7 +48,7 @@ public interface CompaniesRepository extends CrudRepository<Company, Long> {
 	)
 	Employee getEmployee(@Param(value = "cid") long cid, @Param(value = "eid") long eid);
 
-	@Query("SELECT CASE WHEN e IS NOT NULL THEN TRUE ELSE FALSE END " +
+	@Query("SELECT CASE WHEN COUNT(e) > 0 THEN TRUE ELSE FALSE END " +
 			"FROM Company c JOIN c.employees e " +
 			"WHERE c.id = :cid AND e.id = :eid")
 	boolean existsEmployee(@Param(value = "cid") long cid, @Param(value = "eid") long eid);

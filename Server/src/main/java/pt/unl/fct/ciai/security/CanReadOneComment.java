@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @PreAuthorize(CanReadOneComment.Condition)
 public @interface CanReadOneComment {
     String Condition = "@securityService.isProposalApproved(#pid) or "
-    		+ "@securityService.isMemberOrStaffOfProposal(principal, #pid) or "
+    		+ "@securityService.isPartOfProposal(principal, #pid) or "
     		+ "@securityService.isAdminOfAuthorOfProposal(principal, #pid) or "
     		+ "hasRole(T(pt.unl.fct.ciai.model.User.Role).ROLE_SYS_ADMIN.name())";
 }

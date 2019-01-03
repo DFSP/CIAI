@@ -79,7 +79,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
                   />
                   <ControlLabel>Código postal</ControlLabel>
                   <FormControl
-                      name="zipcode"
+                      name="zipCode"
                       type="text"
                       label="Zipcode"
                       value={this.state.zipCode}
@@ -133,7 +133,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
   private handleModal = (openModal: boolean, toCreate: boolean) => {
     if (toCreate) {
       this.props.selectItem({
-        id: -1,
+        id: undefined,
         name: "",
         city: "",
         zipCode: "",
@@ -155,35 +155,21 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
   };
 
   private createCompany = () => {
-    const formData = new FormData();
-    const { name, city, zipCode, address, phone, email, fax }  = this.state;
-    formData.append('name', name);
-    formData.append('city', city);
-    formData.append('zipCode', zipCode);
-    formData.append('address', address);
-    formData.append('phone', phone);
-    formData.append('email', email);
-    formData.append('fax', fax);
-    fetchUrl('./companies.json', 'POST', formData, 'Created with success!', this.handleModal);
+    fetchUrl('http://localhost:8080/companies', 'POST', this.state, 'Created with success!', this.handleModal);
   };
 
   private updateCompany = () => {
-    // const proposal = this.props.proposalSelected;
-    const formData = new FormData();
-    const { name, city, zipCode, address, phone, email, fax }  = this.state;
-    formData.append('name', name);
-    formData.append('city', city);
-    formData.append('zipCode', zipCode);
-    formData.append('address', address);
-    formData.append('phone', phone);
-    formData.append('email', email);
-    formData.append('fax', fax);
-    fetchUrl('./companies.json', 'PUT', formData, 'Updated with success!', this.handleModal);
+    const { id } = this.props.itemSelected;
+    fetchUrl(`http://localhost:8080/companies/${id}`,
+      'PUT',
+      { id, ...this.state },
+      'Updated with success!',
+      this.handleModal);
   };
 
   private deleteCompany = () => {
-    // const { id } = this.props.proposalSelected;
-    fetchUrl('./companies.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
+    const { id } = this.props.itemSelected;
+    fetchUrl(`http://localhost:8080/companies/${id}`, 'DELETE', this.state, 'Deleted with success!', this.handleModal);
   };
 
   private onChange = (e: any) => {

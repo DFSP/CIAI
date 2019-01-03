@@ -240,49 +240,21 @@ class UsersList extends React.Component<IUsersProps,any> {
   };
 
   private createUser = () => {
-    const formData = new FormData();
-    const { firstName, lastName, username, email, role, city, address, zipCode,
-      homePhone, cellPhone, gender, salary, birthday} = this.state;
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('role', role);
-    formData.append('city', city);
-    formData.append('address', address);
-    formData.append('zipCode', zipCode);
-    formData.append('homePhone', homePhone);
-    formData.append('cellPhone', cellPhone);
-    formData.append('gender', gender);
-    formData.append('salary', salary);
-    formData.append('birthday', birthday);
-    fetchUrl('./users.json', 'POST', formData, 'Created with success!', this.handleModal);
+    fetchUrl('http://localhost:8080/users', 'POST', this.state, 'Created with success!', this.handleModal);
   };
 
   private updateUser = () => {
-    // const proposal = this.props.proposalSelected;
-    const formData = new FormData();
-    const { firstName, lastName, username, email, role, city, address, zipCode,
-      homePhone, cellPhone, gender, salary, birthday} = this.state;
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('role', role);
-    formData.append('city', city);
-    formData.append('address', address);
-    formData.append('zipCode', zipCode);
-    formData.append('homePhone', homePhone);
-    formData.append('cellPhone', cellPhone);
-    formData.append('gender', gender);
-    formData.append('salary', salary);
-    formData.append('birthday', birthday);
-    fetchUrl('./users.json', 'PUT', formData, 'Updated with success!', this.handleModal);
+    const { id } = this.props.itemSelected;
+    fetchUrl(`http://localhost:8080/users/${id}`,
+      'PUT',
+      { id, ...this.state },
+      'Updated with success!',
+      this.handleModal);
   };
 
   private deleteUser = () => {
-    // const { id } = this.props.proposalSelected;
-    fetchUrl('./users.json', 'DELETE', new FormData(), 'Deleted with success!', this.handleModal);
+    const { id } = this.props.itemSelected;
+    fetchUrl(`http://localhost:8080/users/${id}`, 'DELETE', this.state, 'Deleted with success!', this.handleModal);
   };
 
   private onChange = (e: any) => {

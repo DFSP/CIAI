@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @PreAuthorize(CanAddComment.Condition)
 public @interface CanAddComment {
     String Condition = "@securityService.isProposalNotRejected(#id) and "
-    		+ "@securityService.isMemberOrStaffOfProposal(principal, #id)";
+    		+ "@securityService.isPartOfProposal(principal, #id)";
 }
