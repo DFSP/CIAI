@@ -1,6 +1,6 @@
 # CIAI
 
-Projeto prático da unidade curricular Conceção e Implementação de Aplicações para a Internet.  
+Project for the course "Design and Implementation of Internet Applications."
 
 	João Reis 43914  
 	Daniel Pimenta 45404  
